@@ -5,12 +5,14 @@
 package edu.progAvUD.parcialSegundoCorteAvanzada.cliente.control;
 
 import edu.progAvUD.parcialSegundoCorteAvanzada.cliente.vista.VentanaPrincipal;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 /**
  *
  * @author Andres Felipe
  */
-public class ControlGrafico {
+public class ControlGrafico implements ActionListener{
     
     private ControlPrincipal controlPrincipal;
     private VentanaPrincipal ventanaPrincipal;
@@ -19,8 +21,19 @@ public class ControlGrafico {
     public ControlGrafico(ControlPrincipal controlPrincipal) {
         this.controlPrincipal = controlPrincipal;
         this.ventanaPrincipal = new VentanaPrincipal();
+        
+        for (int i = 0; i <= 39; i++) {
+            ventanaPrincipal.panelJuego.anadirBoton(i);
+        }
+        
+        
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        
     }
             
-            
+        
     
 }

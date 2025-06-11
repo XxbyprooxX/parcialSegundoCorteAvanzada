@@ -4,20 +4,65 @@
  */
 package edu.progAvUD.parcialSegundoCorteAvanzada.cliente.vista;
 
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+
 /**
  *
  * @author Andres Felipe
  */
 public class VentanaPrincipal extends javax.swing.JFrame {
 
+    public PanelInicial panelInicial;
+    public PanelJuego panelJuego;
+    
     /**
      * Creates new form VentanaPrincipal
      */
     public VentanaPrincipal() {
         initComponents();
+        this.panelInicial = new PanelInicial();
+        this.panelJuego = new PanelJuego();
+        mostrarPanel(panelJuego);
+        setSize(1000,600);
         setVisible(true);
+        
+        
+    }
+    
+    /**
+     * Muestra un cuadro de diálogo con un mensaje de éxito.
+     *
+     * @param mensaje Mensaje a mostrar al usuario.
+     */
+    public void mostrarMensajeExito(String mensaje) {
+        JOptionPane.showMessageDialog(this, mensaje, "Éxito", JOptionPane.INFORMATION_MESSAGE);
     }
 
+    /**
+     * Muestra un cuadro de diálogo con un mensaje de error.
+     *
+     * @param mensaje Mensaje a mostrar al usuario.
+     */
+    public void mostrarMensajeError(String mensaje) {
+        JOptionPane.showMessageDialog(this, mensaje, "Error", JOptionPane.ERROR_MESSAGE);
+    }
+
+    /**
+     * Cambia el panel visible en la ventana principal.
+     * Ajusta el tamaño, centra la ventana en pantalla y actualiza la interfaz gráfica.
+     *
+     * @param panel Panel que se desea mostrar en la ventana principal.
+     */
+    public void mostrarPanel(JPanel panel) {
+        setContentPane(panel);
+        pack(); // Ajusta el tamaño de la ventana según el contenido
+        setLocationRelativeTo(null); // Centra la ventana en la pantalla
+        revalidate(); // Refresca el layout
+        repaint(); // Redibuja la ventana
+    }
+    
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
