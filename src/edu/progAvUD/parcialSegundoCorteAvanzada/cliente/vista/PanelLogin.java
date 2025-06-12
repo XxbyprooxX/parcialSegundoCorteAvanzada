@@ -37,7 +37,7 @@ public class PanelLogin extends javax.swing.JPanel {
         jLabel6 = new javax.swing.JLabel();
 
         jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
-        jLabel1.setText("Registrate para empezar el juego de concentrese");
+        jLabel1.setText("Inica Sesion para empezar el juego de concentrese");
 
         jLabel2.setFont(new java.awt.Font("Segoe UI", 3, 12)); // NOI18N
         jLabel2.setText("Usuario: ");
@@ -87,7 +87,7 @@ public class PanelLogin extends javax.swing.JPanel {
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                                 .addComponent(jLabel1)
                                 .addGap(30, 30, 30)))))
-                .addContainerGap(21, Short.MAX_VALUE))
+                .addContainerGap(11, Short.MAX_VALUE))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jLabel6)

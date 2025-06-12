@@ -54,7 +54,7 @@
                       </Group>
                   </Group>
               </Group>
-              <EmptySpace pref="21" max="32767" attributes="0"/>
+              <EmptySpace pref="11" max="32767" attributes="0"/>
           </Group>
           <Group type="102" alignment="1" attributes="0">
               <EmptySpace max="32767" attributes="0"/>
@@ -97,7 +97,7 @@
         <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
           <Font name="Segoe UI" size="14" style="1"/>
         </Property>
-        <Property name="text" type="java.lang.String" value="Registrate para empezar el juego de concentrese"/>
+        <Property name="text" type="java.lang.String" value="Inica Sesion para empezar el juego de concentrese"/>
       </Properties>
     </Component>
     <Component class="javax.swing.JLabel" name="jLabel2">

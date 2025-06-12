@@ -4,9 +4,11 @@
  */
 package edu.progAvUD.parcialSegundoCorteAvanzada.cliente.vista;
 
-import edu.progAvUD.parcialSegundoCorteAvanzada.servidor.vista.PanelJuego;
+import java.io.File;
+import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 /**
  *
@@ -14,18 +16,18 @@ import javax.swing.JPanel;
  */
 public class VentanaPrincipal extends javax.swing.JFrame {
 
-    public PanelLogin panelInicial;
-    public PanelJuego panelJuego;
+    public PanelLogin panelLogin;
+    public PanelInicial panelInicial;
+    public PanelJuegoChat panelJuegoChat;
     
     /**
      * Creates new form VentanaPrincipal
      */
     public VentanaPrincipal() {
         initComponents();
-        this.panelInicial = new PanelLogin();
-        this.panelJuego = new PanelJuego();
-        mostrarPanel(panelJuego);
-        setSize(1000,600);
+        this.panelLogin = new PanelLogin();
+        this.panelJuegoChat = new PanelJuegoChat();
+        this.panelInicial = new PanelInicial();
         setVisible(true);
         
         
@@ -63,6 +65,13 @@ public class VentanaPrincipal extends javax.swing.JFrame {
         repaint(); // Redibuja la ventana
     }
     
+    
+    public File pedirArchivoPropiedades(){
+        JFileChooser jFileChooser = new JFileChooser(System.getProperty("user.dir")+"src/edu/progAvUD/parcialSegundoCorteAvanzada/cliente/data");
+        jFileChooser.setFileFilter(new FileNameExtensionFilter("Archivos .properties", "properties"));
+        jFileChooser.showOpenDialog(this);
+        return jFileChooser.getSelectedFile();
+    }
     
     /**
      * This method is called from within the constructor to initialize the form.

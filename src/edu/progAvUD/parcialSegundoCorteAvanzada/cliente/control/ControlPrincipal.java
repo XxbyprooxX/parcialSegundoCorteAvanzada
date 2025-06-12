@@ -4,6 +4,8 @@
  */
 package edu.progAvUD.parcialSegundoCorteAvanzada.cliente.control;
 
+import edu.progAvUD.parcialSegundoCorteAvanzada.servidor.modelo.ConexionPropiedades;
+
 /**
  *
  * @author Andres Felipe
@@ -16,6 +18,21 @@ public class ControlPrincipal {
         this.controlGrafico = new ControlGrafico(this);
     }
     
+    public ConexionPropiedades crearConexionPropiedades(){
+        ConexionPropiedades conexionPropiedades = null;
+        boolean flag = true;
+        do{
+            try{
+                conexionPropiedades = new ConexionPropiedades(controlGrafico.pedirArchivoPropiedades());
+                if (conexionPropiedades != null) {
+                    flag = false;
+                }
+            }catch(Exception e){
+                controlGrafico.mostrarMensajeError("Ocurrio un error en el archivo de propiedades");
+            }
+        }while(flag);
+        return conexionPropiedades;
+    }
     
     
 }
