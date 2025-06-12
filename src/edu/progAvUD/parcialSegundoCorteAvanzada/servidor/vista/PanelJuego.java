@@ -2,7 +2,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JPanel.java to edit this template
  */
-package edu.progAvUD.parcialSegundoCorteAvanzada.cliente.vista;
+package edu.progAvUD.parcialSegundoCorteAvanzada.servidor.vista;
 
 import java.awt.Font;
 import javax.swing.JToggleButton;

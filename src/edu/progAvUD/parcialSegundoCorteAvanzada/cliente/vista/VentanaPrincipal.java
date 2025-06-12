@@ -4,6 +4,7 @@
  */
 package edu.progAvUD.parcialSegundoCorteAvanzada.cliente.vista;
 
+import edu.progAvUD.parcialSegundoCorteAvanzada.servidor.vista.PanelJuego;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
@@ -13,7 +14,7 @@ import javax.swing.JPanel;
  */
 public class VentanaPrincipal extends javax.swing.JFrame {
 
-    public PanelInicial panelInicial;
+    public PanelLogin panelInicial;
     public PanelJuego panelJuego;
     
     /**
@@ -21,7 +22,7 @@ public class VentanaPrincipal extends javax.swing.JFrame {
      */
     public VentanaPrincipal() {
         initComponents();
-        this.panelInicial = new PanelInicial();
+        this.panelInicial = new PanelLogin();
         this.panelJuego = new PanelJuego();
         mostrarPanel(panelJuego);
         setSize(1000,600);

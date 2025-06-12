@@ -1,5 +1,6 @@
-package edu.progAvUD.parcialSegundoCorteAvanzada.cliente.modelo;
+package edu.progAvUD.parcialSegundoCorteAvanzada.servidor.modelo;
 
+import edu.progAvUD.parcialSegundoCorteAvanzada.cliente.modelo.JugadorVO;
 import edu.progAvUD.parcialSegundoCorteAvanzada.servidor.modelo.ConexionBD;
 import java.sql.Connection;
 import java.sql.ResultSet;
