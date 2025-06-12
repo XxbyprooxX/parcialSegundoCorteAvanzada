@@ -1,8 +1,9 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
- */
 package edu.progAvUD.parcialSegundoCorteAvanzada.servidor.vista;
+
+import java.io.File;
+import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 /**
  *
@@ -16,6 +17,36 @@ public class VentanaPrincipal extends javax.swing.JFrame {
     public VentanaPrincipal() {
         initComponents();
         setVisible(true);
+    }
+
+    /**
+     * Muestra un mensaje de éxito en una ventana emergente.
+     *
+     * @param mensaje el texto que se mostrará.
+     */
+    public void mostrarMensajeExito(String mensaje) {
+        JOptionPane.showMessageDialog(this, mensaje, "Éxito", JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    /**
+     * Muestra un mensaje de error en una ventana emergente.
+     *
+     * @param mensaje el texto que se mostrará.
+     */
+    public void mostrarMensajeError(String mensaje) {
+        JOptionPane.showMessageDialog(this, mensaje, "Error", JOptionPane.ERROR_MESSAGE);
+    }
+
+    /**
+     * Abre un diálogo para que el usuario seleccione un archivo `.properties`.
+     *
+     * @return el archivo seleccionado o null si se cancela.
+     */
+    public File pedirArchivoPropiedades() {
+        JFileChooser fileChooser = new JFileChooser(System.getProperty("user.dir") + "/src/main/java/edu/progAvUD/parcialSegundoCorteAvanzada/servidor/data");
+        fileChooser.setFileFilter(new FileNameExtensionFilter("Archivos .properties", "properties"));
+        fileChooser.showOpenDialog(null);
+        return fileChooser.getSelectedFile();
     }
 
     /**

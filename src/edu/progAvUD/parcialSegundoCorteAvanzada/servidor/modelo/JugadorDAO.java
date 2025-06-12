@@ -1,6 +1,5 @@
 package edu.progAvUD.parcialSegundoCorteAvanzada.servidor.modelo;
 
-import edu.progAvUD.parcialSegundoCorteAvanzada.cliente.modelo.JugadorVO;
 import edu.progAvUD.parcialSegundoCorteAvanzada.servidor.modelo.ConexionBD;
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -28,7 +27,7 @@ public class JugadorDAO {
     }
 
     /**
-     * Consulta un jugador por ID (entero) y carga sus datos en el objeto GatoVO
+     * Consulta un jugador por ID (entero) y carga sus datos en el objeto JugadorVO
      * dado.
      *
      * @param cedula Identificador del jugador.
@@ -37,7 +36,7 @@ public class JugadorDAO {
      * @return JugadorVO con los datos del jugador si se encuentra.
      * @throws SQLException Si ocurre un error al ejecutar la consulta.
      */
-    public JugadorVO consultarGatoPorId(int cedula, JugadorVO jugador) throws SQLException {
+    public JugadorVO consultarJugadorPorId(int cedula, JugadorVO jugador) throws SQLException {
         String consulta = "SELECT * FROM jugadores where cedula='" + cedula + "'";
         connection = ConexionBD.getConnection();
         statement = connection.createStatement();
@@ -62,7 +61,7 @@ public class JugadorDAO {
      * @return JugadorVO con los datos consultados.
      * @throws SQLException Si ocurre un error al ejecutar la consulta.
      */
-    public ArrayList<JugadorVO> consultarGatos(String factorBusqueda, String datoBuscado) throws SQLException {
+    public ArrayList<JugadorVO> consultarJugadores(String factorBusqueda, String datoBuscado) throws SQLException {
         String consulta = "SELECT * FROM jugadores where " + factorBusqueda + "='" + datoBuscado + "'";
         connection = ConexionBD.getConnection();
         statement = connection.createStatement();
@@ -87,7 +86,7 @@ public class JugadorDAO {
      * @return Número de jugadores registrados.
      * @throws SQLException Si ocurre un error al ejecutar la consulta.
      */
-    public int consultarCantidadGatos() throws SQLException {
+    public int consultarCantidadJugadores() throws SQLException {
         String consulta = "SELECT COUNT(*) FROM jugadores";
         connection = ConexionBD.getConnection();
         statement = connection.createStatement();
@@ -108,7 +107,7 @@ public class JugadorDAO {
      * @return Lista de objetos JugadorVO.
      * @throws SQLException Si ocurre un error al ejecutar la consulta.
      */
-    public ArrayList<JugadorVO> darListaGatos() throws SQLException {
+    public ArrayList<JugadorVO> darListaJugadores() throws SQLException {
         String consulta = "SELECT * FROM jugadores";
         connection = ConexionBD.getConnection();
         statement = connection.createStatement();
@@ -133,7 +132,7 @@ public class JugadorDAO {
      * @param jugador Objeto JugadorVO con la información del jugador a registrar.
      * @throws SQLException Si ocurre un error al insertar.
      */
-    public void insertarGato(JugadorVO jugador) throws SQLException {
+    public void insertarJugador(JugadorVO jugador) throws SQLException {
         String insercion = "INSERT INTO `jugadores`(`nombreJugador`, `cedula`, `usuario`, `contrasena`) "
                 + "VALUES ('" + jugador.getNombreJugador() + "'," + jugador.getCedula() + "," + jugador.getUsuario() + ",'"
                 + jugador.getContrasena() + "')";
@@ -150,7 +149,7 @@ public class JugadorDAO {
      * @param cedula Identificador del jugador.
      * @throws SQLException Si ocurre un error al ejecutar la eliminación.
      */
-    public void eliminarGato(int cedula) throws SQLException {
+    public void eliminarJugador(int cedula) throws SQLException {
         String consulta = "DELETE FROM jugadores where cedula='" + cedula + "'";
         connection = ConexionBD.getConnection();
         statement = connection.createStatement();
@@ -168,7 +167,7 @@ public class JugadorDAO {
      * @param valorModificado Nuevo valor que se quiere asignar.
      * @throws SQLException Si ocurre un error al ejecutar la modificación.
      */
-    public void modificarGato(int cedula, String factorACambiar, String valorModificado) throws SQLException {
+    public void modificarJugador(int cedula, String factorACambiar, String valorModificado) throws SQLException {
         String consulta = "UPDATE jugadores SET " + factorACambiar + " = '" + valorModificado + "' WHERE cedula = '" + cedula + "'";
         connection = ConexionBD.getConnection();
         statement = connection.createStatement();
