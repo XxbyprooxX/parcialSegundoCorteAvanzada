@@ -20,7 +20,7 @@ public class ControlGrafico {
     public void mostrarMensajeError(String mensaje) {
         ventanaPrincipal.mostrarMensajeError(mensaje);
     }
-    
+
     public void mostrarMensajeExito(String mensaje) {
         ventanaPrincipal.mostrarMensajeExito(mensaje);
     }
@@ -35,4 +35,14 @@ public class ControlGrafico {
         return ventanaPrincipal.pedirArchivoPropiedades();
     }
 
+    /**
+     * Muestra un cuadro de diálogo para que el usuario escriba un dato que
+     * falta.
+     *
+     * @param datoFaltante descripción del dato que debe ingresar el usuario.
+     * @return el texto ingresado por el usuario.
+     */
+    public String mostrarJOptionEscribirDatoFaltante(String datoFaltante) {
+        return ventanaPrincipal.mostrarJOptionEscribirDatoFaltante(datoFaltante);
+    }
 }

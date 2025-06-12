@@ -1,8 +1,10 @@
 package edu.progAvUD.parcialSegundoCorteAvanzada.servidor.vista;
 
 import java.io.File;
+import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
+import javax.swing.JTextField;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 /**
@@ -47,6 +49,37 @@ public class VentanaPrincipal extends javax.swing.JFrame {
         fileChooser.setFileFilter(new FileNameExtensionFilter("Archivos .properties", "properties"));
         fileChooser.showOpenDialog(null);
         return fileChooser.getSelectedFile();
+    }
+
+    /**
+     * Muestra un JOptionPane con un campo de texto para que el usuario escriba
+     * un dato faltante.
+     *
+     * @param datoFaltante nombre del dato que falta.
+     * @return el texto ingresado por el usuario.
+     */
+    public String mostrarJOptionEscribirDatoFaltante(String datoFaltante) {
+        String mensaje = "Hace falta el dato de '" + datoFaltante + "'.\nEscriba el dato:";
+
+        JTextField textField = new JTextField();
+        Object[] contenido = {mensaje, textField};
+        Object[] botones = {"Aceptar"};
+
+        JOptionPane optionPane = new JOptionPane(
+                contenido,
+                JOptionPane.QUESTION_MESSAGE,
+                JOptionPane.DEFAULT_OPTION,
+                null,
+                botones,
+                botones[0]
+        );
+
+        JDialog dialog = optionPane.createDialog("Dato Faltante");
+        dialog.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
+        dialog.setModal(true);
+        dialog.setVisible(true);
+
+        return textField.getText();
     }
 
     /**

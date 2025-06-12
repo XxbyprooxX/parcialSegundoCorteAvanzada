@@ -12,9 +12,11 @@ import java.util.Properties;
 public class ControlPrincipal {
 
     private ControlGrafico controlGrafico;
+    private ControlJugador controlJugador;
 
     public ControlPrincipal() {
         this.controlGrafico = new ControlGrafico(this);
+        this.controlJugador = new ControlJugador(this);
     }
 
     /**
@@ -38,6 +40,7 @@ public class ControlPrincipal {
 
         return conexionPropiedades;
     }
+
     /**
      * Este metodo se encarga de cargar las propiedades de la base de datos
      */
@@ -68,8 +71,20 @@ public class ControlPrincipal {
                 Properties propiedadesJugadores = conexionPropiedades.cargarPropiedades();
                 int cantidadDeJugadoresRegistrar = Integer.parseInt(propiedadesJugadores.getProperty("cantidadJugadoresARegistrar"));
                 for (int i = 1; i <= cantidadDeJugadoresRegistrar; i++) {
-                    String nombreJugador = propiedadesJugadores.getProperty("jugador" + i + ".nombre");
+
+                    String nombreJugador = propiedadesJugadores.getProperty("jugador" + i + ".nombreJugador");
+                    String cedula = propiedadesJugadores.getProperty("jugador" + i + ".cedula");
+                    String usuario = propiedadesJugadores.getProperty("jugador" + i + ".usuario");
+                    String contrasena = propiedadesJugadores.getProperty("jugador" + i + ".contrasena");
+                            
+                    if (!cedula.isBlank()) {
+                        double cedula2 = Double.parseDouble(cedula);
+                    }
+                    if (!contrasena.isBlank()){
+                        double contrasena2 = Double.parseDouble(contrasena);
+                    }
                     
+                    controlJugador.crearJugador(nombreJugador, cedula, usuario, contrasena, i, 0, 0);
                 }
                 flag = false;
                 controlGrafico.mostrarMensajeExito("Se han creado correctamente los jugadores");
@@ -84,5 +99,23 @@ public class ControlPrincipal {
                 System.exit(0);
             }
         } while (flag);
+    }
+    
+    /**
+     * Manda a mostrar las opciones a elegir por el usuario
+     *
+     * @param datoFaltante es el dato esta en blanco
+     * @return el valor seleccionado
+     */
+    public String mostrarJOptionEscribirDatoFaltante(String datoFaltante) {
+        return controlGrafico.mostrarJOptionEscribirDatoFaltante(datoFaltante);
+    }
+    
+    public void mostrarMensajeError(String mensaje) {
+        controlGrafico.mostrarMensajeError(mensaje);
+    }
+    
+    public void mostrarMensajeExito(String mensaje) {
+        controlGrafico.mostrarMensajeExito(mensaje);
     }
 }
