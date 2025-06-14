@@ -40,7 +40,8 @@ public class ConexionBD {
      * Método para cerrar la conexión a la base de datos.
      * En realidad, solo pone la referencia a null (no cierra explícitamente).
      */
-    public static void desconectar() {
+    public static void desconectar() throws SQLException {
+        connection.close();
         connection = null;
     }
 

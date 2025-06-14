@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.util.Properties;
 
 /**
- *
+ * Controlador principal corregido con mejor validación de datos
  * @author Andres Felipe
  */
 public class ControlPrincipal {
@@ -20,9 +20,8 @@ public class ControlPrincipal {
     }
 
     /**
-     * Este metodo se encarga de crear la conexion con las propiedades
-     *
-     * @return la conexion
+     * Este método se encarga de crear la conexión con las propiedades
+     * @return la conexión
      */
     public ConexionPropiedades crearConexionPropiedades() {
         ConexionPropiedades conexionPropiedades = null;
@@ -34,7 +33,7 @@ public class ControlPrincipal {
                     flag = false;
                 }
             } catch (Exception ex) {
-                controlGrafico.mostrarMensajeError("No se pudo crear la conexion correctamente");
+                controlGrafico.mostrarMensajeError("No se pudo crear la conexión correctamente: " + ex.getMessage());
             }
         } while (flag);
 
@@ -42,7 +41,7 @@ public class ControlPrincipal {
     }
 
     /**
-     * Este metodo se encarga de cargar las propiedades de la base de datos
+     * Este método se encarga de cargar las propiedades de la base de datos
      */
     public void cargarDatosBD() {
         ConexionPropiedades conexionPropiedades = crearConexionPropiedades();
@@ -51,17 +50,25 @@ public class ControlPrincipal {
             String URLBD = propiedadesBD.getProperty("URLBD");
             String usuario = propiedadesBD.getProperty("usuario");
             String contrasena = propiedadesBD.getProperty("contrasena");
+            
+            // Validar que las propiedades no sean nulas
+            if (URLBD == null || usuario == null) {
+                controlGrafico.mostrarMensajeError("URLBD y usuario son obligatorios en el archivo de propiedades");
+            }
+            
             ConexionBD.setURLBD(URLBD);
             ConexionBD.setUsuario(usuario);
-            ConexionBD.setContrasena(contrasena);
+            ConexionBD.setContrasena(contrasena != null ? contrasena : ""); // Permitir contraseña vacía
 
         } catch (IOException ex) {
-            controlGrafico.mostrarMensajeError("No se pudo cargar el archivo propiedades de la Base de Datos");
+            controlGrafico.mostrarMensajeError("No se pudo cargar el archivo propiedades de la Base de Datos: " + ex.getMessage());
+        } catch (IllegalArgumentException ex) {
+            controlGrafico.mostrarMensajeError("Error en propiedades de BD: " + ex.getMessage());
         }
     }
 
     /**
-     * Carga los datos de los jugadores desde las propiedades
+     * Carga los datos de los jugadores desde las propiedades con validación mejorada
      */
     public void cargarDatosJugadoresPropiedades() {
         ConexionPropiedades conexionPropiedades = crearConexionPropiedades();
@@ -69,41 +76,71 @@ public class ControlPrincipal {
         do {
             try {
                 Properties propiedadesJugadores = conexionPropiedades.cargarPropiedades();
-                int cantidadDeJugadoresRegistrar = Integer.parseInt(propiedadesJugadores.getProperty("cantidadJugadoresARegistrar"));
+                String cantidadStr = propiedadesJugadores.getProperty("cantidadJugadoresARegistrar");
+                
+                if (cantidadStr == null || cantidadStr.trim().isEmpty()) {
+                    controlGrafico.mostrarMensajeError("La propiedad 'cantidadJugadoresARegistrar' no está definida");
+                }
+                
+                int cantidadDeJugadoresRegistrar = Integer.parseInt(cantidadStr.trim());
+                
+                if (cantidadDeJugadoresRegistrar <= 0) {
+                    controlGrafico.mostrarMensajeError("La cantidad de jugadores debe ser mayor a 0");
+                }
+                
                 for (int i = 1; i <= cantidadDeJugadoresRegistrar; i++) {
-
-                    String nombreJugador = propiedadesJugadores.getProperty("jugador" + i + ".nombreJugador");
-                    String cedula = propiedadesJugadores.getProperty("jugador" + i + ".cedula");
-                    String usuario = propiedadesJugadores.getProperty("jugador" + i + ".usuario");
-                    String contrasena = propiedadesJugadores.getProperty("jugador" + i + ".contrasena");
-                            
-                    if (!cedula.isBlank()) {
-                        double cedula2 = Double.parseDouble(cedula);
+                    String nombreJugador = propiedadesJugadores.getProperty("jugador" + i + ".nombreJugador", "").trim();
+                    String cedula = propiedadesJugadores.getProperty("jugador" + i + ".cedula", "").trim();
+                    String usuario = propiedadesJugadores.getProperty("jugador" + i + ".usuario", "").trim();
+                    String contrasena = propiedadesJugadores.getProperty("jugador" + i + ".contrasena", "").trim();
+                    
+                    // Validar cédula si no está en blanco
+                    if (!cedula.isEmpty()) {
+                        if (!validarCedula(cedula)) {
+                            controlGrafico.mostrarMensajeError("La cédula del jugador " + i + " debe ser un número entero válido: " + cedula);
+                        }
                     }
-                    if (!contrasena.isBlank()){
-                        double contrasena2 = Double.parseDouble(contrasena);
-                    }
+                    
+                    // Crear el jugador
                     controlJugador.crearJugador(nombreJugador, cedula, usuario, contrasena, i, 0, 0);
                 }
+                
                 flag = false;
                 controlGrafico.mostrarMensajeExito("Se han creado correctamente los jugadores");
+                
             } catch (IOException ex) {
-                controlGrafico.mostrarMensajeError("No se pudo cargar el archivo propiedades de los jugadores");
+                controlGrafico.mostrarMensajeError("No se pudo cargar el archivo propiedades de los jugadores: " + ex.getMessage());
                 System.exit(0);
             } catch (NumberFormatException ex) {
-                controlGrafico.mostrarMensajeError("El texto no es un valor valido");
+                controlGrafico.mostrarMensajeError("Error en formato numérico: " + ex.getMessage());
+                System.exit(0);
+            } catch (IllegalArgumentException ex) {
+                controlGrafico.mostrarMensajeError("Error en propiedades: " + ex.getMessage());
                 System.exit(0);
             } catch (Exception ex) {
-                controlGrafico.mostrarMensajeError("Algun dato del jugador no corresponde");
+                controlGrafico.mostrarMensajeError("Error inesperado: " + ex.getMessage());
                 System.exit(0);
             }
         } while (flag);
     }
     
     /**
+     * Valida que una cédula sea un número entero válido
+     * @param cedula la cédula a validar
+     * @return true si es válida, false en caso contrario
+     */
+    private boolean validarCedula(String cedula) {
+        try {
+            long cedulaNum = Long.parseLong(cedula);
+            return cedulaNum > 0; // La cédula debe ser un número positivo
+        } catch (NumberFormatException e) {
+            return false;
+        }
+    }
+    
+    /**
      * Manda a mostrar las opciones a elegir por el usuario
-     *
-     * @param datoFaltante es el dato esta en blanco
+     * @param datoFaltante es el dato que está en blanco
      * @return el valor seleccionado
      */
     public String mostrarJOptionEscribirDatoFaltante(String datoFaltante) {
@@ -120,7 +157,6 @@ public class ControlPrincipal {
     
     /**
      * Envía un mensaje a la consola del servidor (interfaz gráfica).
-     *
      * @param mensaje Mensaje que se quiere mostrar.
      */
     public void mostrarMensajeConsolaServidor(String mensaje) {
