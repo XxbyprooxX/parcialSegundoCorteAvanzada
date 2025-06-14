@@ -7,20 +7,24 @@ import java.util.Properties;
 
 /**
  * Controlador principal corregido con mejor validación de datos
+ *
  * @author Andres Felipe
  */
 public class ControlPrincipal {
 
     private ControlGrafico controlGrafico;
     private ControlJugador controlJugador;
+    private ControlServidor controlServidor;
 
     public ControlPrincipal() {
         this.controlGrafico = new ControlGrafico(this);
         this.controlJugador = new ControlJugador(this);
+        this.controlServidor = new ControlServidor(this);
     }
 
     /**
      * Este método se encarga de crear la conexión con las propiedades
+     *
      * @return la conexión
      */
     public ConexionPropiedades crearConexionPropiedades() {
@@ -50,12 +54,12 @@ public class ControlPrincipal {
             String URLBD = propiedadesBD.getProperty("URLBD");
             String usuario = propiedadesBD.getProperty("usuario");
             String contrasena = propiedadesBD.getProperty("contrasena");
-            
+
             // Validar que las propiedades no sean nulas
-            if (URLBD == null || usuario == null) {
+            if (URLBD.isBlank() || usuario.isBlank()) {
                 controlGrafico.mostrarMensajeError("URLBD y usuario son obligatorios en el archivo de propiedades");
             }
-            
+
             ConexionBD.setURLBD(URLBD);
             ConexionBD.setUsuario(usuario);
             ConexionBD.setContrasena(contrasena != null ? contrasena : ""); // Permitir contraseña vacía
@@ -68,7 +72,31 @@ public class ControlPrincipal {
     }
 
     /**
-     * Carga los datos de los jugadores desde las propiedades con validación mejorada
+     * Este método se encarga de cargar las propiedades de los puertos de los
+     * sockets
+     */
+    public void cargarPropiedadesSockets() {
+        ConexionPropiedades conexionPropiedades = crearConexionPropiedades();
+        try {
+            Properties propiedadesPuertos = conexionPropiedades.cargarPropiedades();
+            String Puerto1 = propiedadesPuertos.getProperty("PUERTO_1");
+            String Puerto2 = propiedadesPuertos.getProperty("PUERTO_2");
+
+            // Validar que las propiedades no sean nulas
+            if (Puerto1.isBlank() || Puerto2.isBlank()) {
+                controlGrafico.mostrarMensajeError("Los puertos son obligatorios para la ejecucion");
+            }
+            controlServidor.asignarIps(Puerto1, Puerto2);
+        } catch (IOException ex) {
+            controlGrafico.mostrarMensajeError("No se pudo cargar el archivo propiedades de los puertos: " + ex.getMessage());
+        } catch (IllegalArgumentException ex) {
+            controlGrafico.mostrarMensajeError("Error en propiedades de los puertos: " + ex.getMessage());
+        }
+    }
+
+    /**
+     * Carga los datos de los jugadores desde las propiedades con validación
+     * mejorada
      */
     public void cargarDatosJugadoresPropiedades() {
         ConexionPropiedades conexionPropiedades = crearConexionPropiedades();
@@ -77,37 +105,37 @@ public class ControlPrincipal {
             try {
                 Properties propiedadesJugadores = conexionPropiedades.cargarPropiedades();
                 String cantidadStr = propiedadesJugadores.getProperty("cantidadJugadoresARegistrar");
-                
-                if (cantidadStr == null || cantidadStr.trim().isEmpty()) {
+
+                if (cantidadStr.isBlank() || cantidadStr.trim().isEmpty()) {
                     controlGrafico.mostrarMensajeError("La propiedad 'cantidadJugadoresARegistrar' no está definida");
                 }
-                
+
                 int cantidadDeJugadoresRegistrar = Integer.parseInt(cantidadStr.trim());
-                
+
                 if (cantidadDeJugadoresRegistrar <= 0) {
                     controlGrafico.mostrarMensajeError("La cantidad de jugadores debe ser mayor a 0");
                 }
-                
+
                 for (int i = 1; i <= cantidadDeJugadoresRegistrar; i++) {
                     String nombreJugador = propiedadesJugadores.getProperty("jugador" + i + ".nombreJugador", "").trim();
                     String cedula = propiedadesJugadores.getProperty("jugador" + i + ".cedula", "").trim();
                     String usuario = propiedadesJugadores.getProperty("jugador" + i + ".usuario", "").trim();
                     String contrasena = propiedadesJugadores.getProperty("jugador" + i + ".contrasena", "").trim();
-                    
+
                     // Validar cédula si no está en blanco
                     if (!cedula.isEmpty()) {
                         if (!validarCedula(cedula)) {
                             controlGrafico.mostrarMensajeError("La cédula del jugador " + i + " debe ser un número entero válido: " + cedula);
                         }
                     }
-                    
+
                     // Crear el jugador
                     controlJugador.crearJugador(nombreJugador, cedula, usuario, contrasena, i, 0, 0);
                 }
-                
+
                 flag = false;
                 controlGrafico.mostrarMensajeExito("Se han creado correctamente los jugadores");
-                
+
             } catch (IOException ex) {
                 controlGrafico.mostrarMensajeError("No se pudo cargar el archivo propiedades de los jugadores: " + ex.getMessage());
                 System.exit(0);
@@ -123,9 +151,10 @@ public class ControlPrincipal {
             }
         } while (flag);
     }
-    
+
     /**
      * Valida que una cédula sea un número entero válido
+     *
      * @param cedula la cédula a validar
      * @return true si es válida, false en caso contrario
      */
@@ -137,29 +166,36 @@ public class ControlPrincipal {
             return false;
         }
     }
-    
+
     /**
      * Manda a mostrar las opciones a elegir por el usuario
+     *
      * @param datoFaltante es el dato que está en blanco
      * @return el valor seleccionado
      */
     public String mostrarJOptionEscribirDatoFaltante(String datoFaltante) {
         return controlGrafico.mostrarJOptionEscribirDatoFaltante(datoFaltante);
     }
-    
+
     public void mostrarMensajeError(String mensaje) {
         controlGrafico.mostrarMensajeError(mensaje);
     }
-    
+
     public void mostrarMensajeExito(String mensaje) {
         controlGrafico.mostrarMensajeExito(mensaje);
     }
-    
+
     /**
      * Envía un mensaje a la consola del servidor (interfaz gráfica).
+     *
      * @param mensaje Mensaje que se quiere mostrar.
      */
     public void mostrarMensajeConsolaServidor(String mensaje) {
         controlGrafico.mostrarMensajeConsolaServidor(mensaje);
     }
+
+    public void empezarServer() {
+        new Thread(() -> controlServidor.runServer()).start();
+    }
+
 }

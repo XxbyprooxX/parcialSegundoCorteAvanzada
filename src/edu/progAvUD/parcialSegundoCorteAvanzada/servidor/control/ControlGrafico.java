@@ -19,7 +19,9 @@ public class ControlGrafico implements ActionListener {
         this.ventanaPrincipal = new VentanaPrincipal(this);
         ventanaPrincipal.panelInicial.jButtonPropiedadesBD.addActionListener(this);
         ventanaPrincipal.panelInicial.jButtonPropiedadesJugadores.addActionListener(this);
+        ventanaPrincipal.panelInicial.jButtonPropiedadesSockets.addActionListener(this);
         ventanaPrincipal.panelInicial.jButtonPropiedadesJugadores.setEnabled(false);
+        ventanaPrincipal.panelInicial.jButtonPropiedadesSockets.setEnabled(false);
         ventanaPrincipal.mostrarPanel(ventanaPrincipal.panelInicial);
     }
 
@@ -55,22 +57,31 @@ public class ControlGrafico implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == ventanaPrincipal.panelInicial.jButtonPropiedadesBD) {
-            ventanaPrincipal.panelInicial.jButtonPropiedadesJugadores.setEnabled(true);
             controlPrincipal.cargarDatosBD();
+            ventanaPrincipal.panelInicial.jButtonPropiedadesSockets.setEnabled(true);
             ventanaPrincipal.panelInicial.jButtonPropiedadesBD.setEnabled(false);
         }
         if (e.getSource() == ventanaPrincipal.panelInicial.jButtonPropiedadesJugadores) {
             ventanaPrincipal.panelInicial.jButtonPropiedadesJugadores.setEnabled(false);
             controlPrincipal.cargarDatosJugadoresPropiedades();
+            ventanaPrincipal.mostrarPanel(ventanaPrincipal.panelConsolaServidor);
+            controlPrincipal.empezarServer();
         }
+        if (e.getSource() == ventanaPrincipal.panelInicial.jButtonPropiedadesSockets) {
+            controlPrincipal.cargarPropiedadesSockets();
+            ventanaPrincipal.panelInicial.jButtonPropiedadesJugadores.setEnabled(true);
+            ventanaPrincipal.panelInicial.jButtonPropiedadesSockets.setEnabled(false);
+        }
+            
     }
-    
+
     /**
      * Muestra un mensaje en la consola gráfica del servidor.
-     * 
+     *
      * @param mensaje Texto a mostrar en el área de consola.
      */
     public void mostrarMensajeConsolaServidor(String mensaje) {
         ventanaPrincipal.mostrarMensajeConsolaServidor(mensaje);
     }
+    
 }

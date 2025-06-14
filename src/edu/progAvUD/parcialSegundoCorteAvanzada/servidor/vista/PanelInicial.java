@@ -25,6 +25,7 @@ public class PanelInicial extends javax.swing.JPanel {
         jLabel1 = new javax.swing.JLabel();
         jButtonPropiedadesBD = new javax.swing.JButton();
         jButtonPropiedadesJugadores = new javax.swing.JButton();
+        jButtonPropiedadesSockets = new javax.swing.JButton();
 
         jLabel1.setText("Antes de empezar, selecciona el archivo de propiedades del Socket");
 
@@ -32,33 +33,41 @@ public class PanelInicial extends javax.swing.JPanel {
 
         jButtonPropiedadesJugadores.setText("Seleccionar Propiedades Jugadores");
 
+        jButtonPropiedadesSockets.setText("Seleccionar Propiedades Sockets");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(29, 29, 29)
-                .addComponent(jLabel1)
-                .addContainerGap(35, Short.MAX_VALUE))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(jButtonPropiedadesBD)
+                .addGap(122, 122, 122))
+            .addGroup(layout.createSequentialGroup()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jButtonPropiedadesJugadores)
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(22, 22, 22)
-                        .addComponent(jButtonPropiedadesBD)))
-                .addGap(107, 107, 107))
+                        .addGap(29, 29, 29)
+                        .addComponent(jLabel1))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(105, 105, 105)
+                        .addComponent(jButtonPropiedadesSockets))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(92, 92, 92)
+                        .addComponent(jButtonPropiedadesJugadores, javax.swing.GroupLayout.PREFERRED_SIZE, 224, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(35, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addGap(20, 20, 20)
                 .addComponent(jLabel1)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jButtonPropiedadesBD)
                 .addGap(18, 18, 18)
+                .addComponent(jButtonPropiedadesBD)
+                .addGap(12, 12, 12)
+                .addComponent(jButtonPropiedadesSockets)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jButtonPropiedadesJugadores)
-                .addContainerGap(25, Short.MAX_VALUE))
+                .addContainerGap(20, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -66,6 +75,7 @@ public class PanelInicial extends javax.swing.JPanel {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     public javax.swing.JButton jButtonPropiedadesBD;
     public javax.swing.JButton jButtonPropiedadesJugadores;
+    public javax.swing.JButton jButtonPropiedadesSockets;
     private javax.swing.JLabel jLabel1;
     // End of variables declaration//GEN-END:variables
 }

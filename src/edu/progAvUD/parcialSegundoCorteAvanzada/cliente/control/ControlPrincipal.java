@@ -73,4 +73,7 @@ public class ControlPrincipal {
         controlCliente.conectarAServer();
     }
     
+    public void crearCliente(){
+        controlCliente.crearCliente();
+    }
 }

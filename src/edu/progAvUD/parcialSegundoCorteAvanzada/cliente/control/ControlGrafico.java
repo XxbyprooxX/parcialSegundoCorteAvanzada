@@ -32,6 +32,7 @@ public class ControlGrafico implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         if(e.getSource() == ventanaPrincipal.panelInicial.jButtonPropiedadesSocket){
             controlPrincipal.cargarDatosSocket();
+            controlPrincipal.crearCliente();
             controlPrincipal.conectarAServer();
             
         }

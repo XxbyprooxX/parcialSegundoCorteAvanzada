@@ -17,7 +17,7 @@ public class VentanaPrincipal extends javax.swing.JFrame {
 
     public PanelInicial panelInicial;
     public PanelJuego panelJuego;
-    public PanelConsolaServidor panelConsoloConsolaServidor;
+    public PanelConsolaServidor panelConsolaServidor;
     /**
      * Creates new form VentanaPrincipal
      */
@@ -25,7 +25,7 @@ public class VentanaPrincipal extends javax.swing.JFrame {
         initComponents();
         this.panelInicial = new PanelInicial();
         this.panelJuego = new PanelJuego();
-        this.panelConsoloConsolaServidor = new PanelConsolaServidor();
+        this.panelConsolaServidor = new PanelConsolaServidor();
         setVisible(true);
     }
 
@@ -53,7 +53,7 @@ public class VentanaPrincipal extends javax.swing.JFrame {
      * @return el archivo seleccionado o null si se cancela.
      */
     public File pedirArchivoPropiedades() {
-        JFileChooser fileChooser = new JFileChooser(System.getProperty("user.dir") + "/src/edu/progAvUD/parcialSegundoCorteAvanzada/servidor/Data");
+        JFileChooser fileChooser = new JFileChooser(System.getProperty("user.dir") + "/src/edu/progAvUD/parcialSegundoCorteAvanzada/servidor/data");
         fileChooser.setFileFilter(new FileNameExtensionFilter("Archivos .properties", "properties"));
         fileChooser.showOpenDialog(null);
         return fileChooser.getSelectedFile();
@@ -110,7 +110,7 @@ public class VentanaPrincipal extends javax.swing.JFrame {
      * @param mensaje Texto que se desea añadir al log de la consola.
      */
     public void mostrarMensajeConsolaServidor(String mensaje) {
-        panelConsoloConsolaServidor.jTextAreaConsola.append(mensaje + "\n");
+        panelConsolaServidor.jTextAreaConsola.append(mensaje + "\n");
     }
 
     /**

@@ -15,6 +15,10 @@ import java.net.Socket;
  * @author Andres Felipe
  */
 public class Servidor {
+    
+     private static int PUERTO_1;
+    
+    private static int PUERTO_2;
 
     /** Socket para el primer cliente conectado al servidor */
     private Socket servidorCliente1;
@@ -143,4 +147,21 @@ public class Servidor {
     public void setNombreUsuario(String nombreUsuario) {
         this.nombreUsuario = nombreUsuario;
     }
+
+    public static int getPUERTO_1() {
+        return PUERTO_1;
+    }
+
+    public static void setPUERTO_1(int PUERTO_1) {
+        Servidor.PUERTO_1 = PUERTO_1;
+    }
+
+    public static int getPUERTO_2() {
+        return PUERTO_2;
+    }
+
+    public static void setPUERTO_2(int PUERTO_2) {
+        Servidor.PUERTO_2 = PUERTO_2;
+    }
+    
 }
