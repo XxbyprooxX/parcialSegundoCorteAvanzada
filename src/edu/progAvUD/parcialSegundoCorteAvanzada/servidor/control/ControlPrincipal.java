@@ -83,7 +83,6 @@ public class ControlPrincipal {
                     if (!contrasena.isBlank()){
                         double contrasena2 = Double.parseDouble(contrasena);
                     }
-                    
                     controlJugador.crearJugador(nombreJugador, cedula, usuario, contrasena, i, 0, 0);
                 }
                 flag = false;
@@ -117,5 +116,14 @@ public class ControlPrincipal {
     
     public void mostrarMensajeExito(String mensaje) {
         controlGrafico.mostrarMensajeExito(mensaje);
+    }
+    
+    /**
+     * Envía un mensaje a la consola del servidor (interfaz gráfica).
+     *
+     * @param mensaje Mensaje que se quiere mostrar.
+     */
+    public void mostrarMensajeConsolaServidor(String mensaje) {
+        controlGrafico.mostrarMensajeConsolaServidor(mensaje);
     }
 }

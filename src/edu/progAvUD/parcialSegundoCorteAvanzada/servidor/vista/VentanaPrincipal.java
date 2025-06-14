@@ -1,9 +1,11 @@
 package edu.progAvUD.parcialSegundoCorteAvanzada.servidor.vista;
 
+import edu.progAvUD.parcialSegundoCorteAvanzada.servidor.control.ControlGrafico;
 import java.io.File;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
@@ -13,11 +15,17 @@ import javax.swing.filechooser.FileNameExtensionFilter;
  */
 public class VentanaPrincipal extends javax.swing.JFrame {
 
+    public PanelInicial panelInicial;
+    public PanelJuego panelJuego;
+    public PanelConsolaServidor panelConsoloConsolaServidor;
     /**
      * Creates new form VentanaPrincipal
      */
-    public VentanaPrincipal() {
+    public VentanaPrincipal(ControlGrafico controlGrafico) {
         initComponents();
+        this.panelInicial = new PanelInicial();
+        this.panelJuego = new PanelJuego();
+        this.panelConsoloConsolaServidor = new PanelConsolaServidor();
         setVisible(true);
     }
 
@@ -45,7 +53,7 @@ public class VentanaPrincipal extends javax.swing.JFrame {
      * @return el archivo seleccionado o null si se cancela.
      */
     public File pedirArchivoPropiedades() {
-        JFileChooser fileChooser = new JFileChooser(System.getProperty("user.dir") + "/src/main/java/edu/progAvUD/parcialSegundoCorteAvanzada/servidor/data");
+        JFileChooser fileChooser = new JFileChooser(System.getProperty("user.dir") + "/src/edu/progAvUD/parcialSegundoCorteAvanzada/servidor/Data");
         fileChooser.setFileFilter(new FileNameExtensionFilter("Archivos .properties", "properties"));
         fileChooser.showOpenDialog(null);
         return fileChooser.getSelectedFile();
@@ -80,6 +88,29 @@ public class VentanaPrincipal extends javax.swing.JFrame {
         dialog.setVisible(true);
 
         return textField.getText();
+    }
+    
+    /**
+     * Cambia el panel visible en la ventana principal.
+     * Ajusta el tamaño, centra la ventana en pantalla y actualiza la interfaz gráfica.
+     *
+     * @param panel Panel que se desea mostrar en la ventana principal.
+     */
+    public void mostrarPanel(JPanel panel) {
+        setContentPane(panel);
+        pack(); // Ajusta el tamaño de la ventana según el contenido
+        setLocationRelativeTo(null); // Centra la ventana en la pantalla
+        revalidate(); // Refresca el layout
+        repaint(); // Redibuja la ventana
+    }
+    
+    /**
+     * Muestra un mensaje en el área de texto de la consola del servidor.
+     * 
+     * @param mensaje Texto que se desea añadir al log de la consola.
+     */
+    public void mostrarMensajeConsolaServidor(String mensaje) {
+        panelConsoloConsolaServidor.jTextAreaConsola.append(mensaje + "\n");
     }
 
     /**

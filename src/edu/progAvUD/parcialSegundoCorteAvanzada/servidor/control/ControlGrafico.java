@@ -1,20 +1,26 @@
 package edu.progAvUD.parcialSegundoCorteAvanzada.servidor.control;
 
 import edu.progAvUD.parcialSegundoCorteAvanzada.servidor.vista.VentanaPrincipal;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.File;
 
 /**
  *
  * @author Andres Felipe
  */
-public class ControlGrafico {
+public class ControlGrafico implements ActionListener {
 
     private ControlPrincipal controlPrincipal;
     private VentanaPrincipal ventanaPrincipal;
 
     public ControlGrafico(ControlPrincipal controlPrincipal) {
         this.controlPrincipal = controlPrincipal;
-        this.ventanaPrincipal = new VentanaPrincipal();
+        this.ventanaPrincipal = new VentanaPrincipal(this);
+        ventanaPrincipal.panelInicial.jButtonPropiedadesBD.addActionListener(this);
+        ventanaPrincipal.panelInicial.jButtonPropiedadesJugadores.addActionListener(this);
+        ventanaPrincipal.panelInicial.jButtonPropiedadesJugadores.setEnabled(false);
+        ventanaPrincipal.mostrarPanel(ventanaPrincipal.panelInicial);
     }
 
     public void mostrarMensajeError(String mensaje) {
@@ -44,5 +50,27 @@ public class ControlGrafico {
      */
     public String mostrarJOptionEscribirDatoFaltante(String datoFaltante) {
         return ventanaPrincipal.mostrarJOptionEscribirDatoFaltante(datoFaltante);
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        if (e.getSource() == ventanaPrincipal.panelInicial.jButtonPropiedadesBD) {
+            ventanaPrincipal.panelInicial.jButtonPropiedadesJugadores.setEnabled(true);
+            controlPrincipal.cargarDatosBD();
+            ventanaPrincipal.panelInicial.jButtonPropiedadesBD.setEnabled(false);
+        }
+        if (e.getSource() == ventanaPrincipal.panelInicial.jButtonPropiedadesJugadores) {
+            ventanaPrincipal.panelInicial.jButtonPropiedadesJugadores.setEnabled(false);
+            controlPrincipal.cargarDatosJugadoresPropiedades();
+        }
+    }
+    
+    /**
+     * Muestra un mensaje en la consola gráfica del servidor.
+     * 
+     * @param mensaje Texto a mostrar en el área de consola.
+     */
+    public void mostrarMensajeConsolaServidor(String mensaje) {
+        ventanaPrincipal.mostrarMensajeConsolaServidor(mensaje);
     }
 }

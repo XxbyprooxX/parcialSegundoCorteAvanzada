@@ -23,7 +23,13 @@
           </Group>
           <Group type="102" alignment="1" attributes="0">
               <EmptySpace max="32767" attributes="0"/>
-              <Component id="jButtonPropiedadesSocket" min="-2" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="0" attributes="0">
+                  <Component id="jButtonPropiedadesJugadores" min="-2" max="-2" attributes="0"/>
+                  <Group type="102" alignment="0" attributes="0">
+                      <EmptySpace min="-2" pref="22" max="-2" attributes="0"/>
+                      <Component id="jButtonPropiedadesBD" min="-2" max="-2" attributes="0"/>
+                  </Group>
+              </Group>
               <EmptySpace min="-2" pref="107" max="-2" attributes="0"/>
           </Group>
       </Group>
@@ -34,8 +40,10 @@
               <EmptySpace min="-2" pref="20" max="-2" attributes="0"/>
               <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
               <EmptySpace type="unrelated" max="-2" attributes="0"/>
-              <Component id="jButtonPropiedadesSocket" min="-2" max="-2" attributes="0"/>
-              <EmptySpace pref="20" max="32767" attributes="0"/>
+              <Component id="jButtonPropiedadesBD" min="-2" max="-2" attributes="0"/>
+              <EmptySpace type="separate" max="-2" attributes="0"/>
+              <Component id="jButtonPropiedadesJugadores" min="-2" max="-2" attributes="0"/>
+              <EmptySpace pref="25" max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -46,9 +54,17 @@
         <Property name="text" type="java.lang.String" value="Antes de empezar, selecciona el archivo de propiedades del Socket"/>
       </Properties>
     </Component>
-    <Component class="javax.swing.JButton" name="jButtonPropiedadesSocket">
+    <Component class="javax.swing.JButton" name="jButtonPropiedadesBD">
       <Properties>
-        <Property name="text" type="java.lang.String" value="Seleccionar Propiedades Socket"/>
+        <Property name="text" type="java.lang.String" value="Seleccionar Propiedades BD"/>
+      </Properties>
+      <AuxValues>
+        <AuxValue name="JavaCodeGenerator_VariableModifier" type="java.lang.Integer" value="1"/>
+      </AuxValues>
+    </Component>
+    <Component class="javax.swing.JButton" name="jButtonPropiedadesJugadores">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Seleccionar Propiedades Jugadores"/>
       </Properties>
       <AuxValues>
         <AuxValue name="JavaCodeGenerator_VariableModifier" type="java.lang.Integer" value="1"/>
