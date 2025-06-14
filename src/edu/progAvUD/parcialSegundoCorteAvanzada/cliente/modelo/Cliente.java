@@ -10,6 +10,12 @@ import java.net.Socket;
  */
 public class Cliente {
 
+    private static String IP_SERVER;
+    
+    private static int PUERTO_1;
+    
+    private static int PUERTO_2;
+    
     // Flujo de entrada desde el servidor (lectura de datos)
     private DataInputStream entrada;
 
@@ -67,5 +73,33 @@ public class Cliente {
     public void setComunication2(Socket comunication2) {
         this.comunication2 = comunication2;
     }
+
+    public static String getIP_SERVER() {
+        return IP_SERVER;
+    }
+
+    public static void setIP_SERVER(String IP_SERVER) {
+        Cliente.IP_SERVER = IP_SERVER;
+    }
+
+    public static int getPUERTO_1() {
+        return PUERTO_1;
+    }
+
+    public static void setPUERTO_1(int PUERTO_1) {
+        Cliente.PUERTO_1 = PUERTO_1;
+    }
+
+    public static int getPUERTO_2() {
+        return PUERTO_2;
+    }
+
+    public static void setPUERTO_2(int PUERTO_2) {
+        Cliente.PUERTO_2 = PUERTO_2;
+    }
+
+    
+    
+    
     
 }

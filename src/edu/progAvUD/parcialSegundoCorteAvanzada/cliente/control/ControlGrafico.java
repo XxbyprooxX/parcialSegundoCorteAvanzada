@@ -22,17 +22,24 @@ public class ControlGrafico implements ActionListener {
         this.controlPrincipal = controlPrincipal;
         this.ventanaPrincipal = new VentanaPrincipal();
 
+        ventanaPrincipal.mostrarPanel(ventanaPrincipal.panelInicial);
+        
         ventanaPrincipal.panelInicial.jButtonPropiedadesSocket.addActionListener(this);
 
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-
+        if(e.getSource() == ventanaPrincipal.panelInicial.jButtonPropiedadesSocket){
+            controlPrincipal.cargarDatosSocket();
+            controlPrincipal.conectarAServer();
+            
+        }
     }
 
     public File pedirArchivoPropiedades() {
         return ventanaPrincipal.pedirArchivoPropiedades();
+        
     }
 
     /**

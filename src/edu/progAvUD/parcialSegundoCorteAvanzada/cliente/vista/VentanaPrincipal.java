@@ -63,7 +63,7 @@ public class VentanaPrincipal extends javax.swing.JFrame {
     
     
     public File pedirArchivoPropiedades(){
-        JFileChooser jFileChooser = new JFileChooser(System.getProperty("user.dir")+"src/edu/progAvUD/parcialSegundoCorteAvanzada/cliente/data");
+        JFileChooser jFileChooser = new JFileChooser(System.getProperty("user.dir")/*+"src/edu/progAvUD/parcialSegundoCorteAvanzada/cliente/data"*/);
         jFileChooser.setFileFilter(new FileNameExtensionFilter("Archivos .properties", "properties"));
         jFileChooser.showOpenDialog(this);
         return jFileChooser.getSelectedFile();
