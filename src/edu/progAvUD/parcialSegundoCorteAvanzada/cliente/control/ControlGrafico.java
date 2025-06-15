@@ -22,6 +22,8 @@ public class ControlGrafico implements ActionListener {
 
         ventanaPrincipal.panelInicial.jButtonPropiedadesSocket.addActionListener(this);
         ventanaPrincipal.panelLogin.jButtonInciarSesion.addActionListener(this);
+        
+        ventanaPrincipal.panelJuegoChat.jButtonEnviar.addActionListener(this);
 
     }
 
@@ -44,13 +46,17 @@ public class ControlGrafico implements ActionListener {
             if (respuesta.equalsIgnoreCase("logeado")) {
                 ventanaPrincipal.mostrarMensajeExito("Has iniciado sesion con exito");
                 ventanaPrincipal.mostrarPanel(ventanaPrincipal.panelJuegoChat);
+                controlPrincipal.crearThreadCliente();
             } else if (respuesta.equalsIgnoreCase("noLogeado")) {
                 ventanaPrincipal.mostrarMensajeError("Credenciales incorrectas intente de nuevo");
             } else if (respuesta.equals("")) {
                 ventanaPrincipal.mostrarMensajeError("No aplica");
-            } else if (respuesta.equalsIgnoreCase("conectado")){
+            } else if (respuesta.equalsIgnoreCase("conectado")) {
                 ventanaPrincipal.mostrarMensajeError("Ya se encuentra logeado dentro del sistema");
             }
+        }
+        if(e.getSource() == ventanaPrincipal.panelJuegoChat.jButtonEnviar){
+            pedirCoordenadasCartas();
         }
     }
 
@@ -77,6 +83,64 @@ public class ControlGrafico implements ActionListener {
      */
     public void mostrarMensajeExito(String mensaje) {
         ventanaPrincipal.mostrarMensajeExito(mensaje);
+    }
+
+    public void mostrarMensajeChatJuego(String msg) {
+        ventanaPrincipal.panelJuegoChat.mostrarMensajeChatJuego(msg);
+    }
+    
+    public void bloquearEntradaTextoChatJuego(){
+        ventanaPrincipal.panelJuegoChat.jButtonEnviar.setEnabled(false);
+        ventanaPrincipal.panelJuegoChat.jTextFieldMensaje.setEnabled(false); 
+    }
+    
+    public void permitirEntradaTextoChatJuego(){
+        ventanaPrincipal.panelJuegoChat.jButtonEnviar.setEnabled(true);
+        ventanaPrincipal.panelJuegoChat.jTextFieldMensaje.setEnabled(true);
+    }
+    
+
+    public void pedirCoordenadasCartas() {
+        String texto = ventanaPrincipal.panelJuegoChat.jTextFieldMensaje.getText().trim();
+        if (texto.isBlank()) {
+            return;
+        }
+        ventanaPrincipal.panelJuegoChat.mostrarMensajeChatJuego("Tú: " + texto);
+        ventanaPrincipal.panelJuegoChat.jTextFieldMensaje.setText("");
+        try {
+            int valor = Integer.parseInt(texto);
+            if (controlPrincipal.getPasoActivoCoordenadas() == 0) { //cordenada en x primera carta
+                String coordenadas = controlPrincipal.getCoordenadasCartas();
+                coordenadas += valor+ ",";
+                controlPrincipal.setCoordenadasCartas(coordenadas);
+                
+                controlPrincipal.setPasoActivoCoordenadas(1);
+                ventanaPrincipal.panelJuegoChat.mostrarMensajeChatJuego("Ok. Ahora ingresa la cordenada en y de la primera carta");
+            } else if(controlPrincipal.getPasoActivoCoordenadas()==1){// cordenada en y primera carta
+                String coordenadas = controlPrincipal.getCoordenadasCartas();
+                coordenadas += valor+ ",";
+                controlPrincipal.setCoordenadasCartas(coordenadas);
+                
+                controlPrincipal.setPasoActivoCoordenadas(2);
+                ventanaPrincipal.panelJuegoChat.mostrarMensajeChatJuego("Ok. Ahora ingresa la cordenada en x de la segunda carta");
+            } else if(controlPrincipal.getPasoActivoCoordenadas()==2){ // coordenada en x segunda carta
+                
+                String coordenadas = controlPrincipal.getCoordenadasCartas();
+                coordenadas += valor+ ",";
+                controlPrincipal.setCoordenadasCartas(coordenadas);
+                
+                controlPrincipal.setPasoActivoCoordenadas(3);
+                ventanaPrincipal.panelJuegoChat.mostrarMensajeChatJuego("Ok. Ahora ingresa la cordenada en y de la segunda carta");
+            } else if(controlPrincipal.getPasoActivoCoordenadas()== 3){ // coordenada en y segunda carta
+                String coordenadas = controlPrincipal.getCoordenadasCartas();
+                coordenadas += valor;
+                controlPrincipal.setCoordenadasCartas(coordenadas);
+                controlPrincipal.setPasoActivoCoordenadas(4);
+            }
+        } catch (NumberFormatException e) {
+            ventanaPrincipal.panelJuegoChat.mostrarMensajeChatJuego("Por favor, ingresa un numero valido");
+        }
+
     }
 
 }

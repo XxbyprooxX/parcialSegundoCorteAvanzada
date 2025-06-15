@@ -16,6 +16,11 @@ public class PanelJuegoChat extends javax.swing.JPanel {
     public PanelJuegoChat() {
         initComponents();
     }
+    
+    public void mostrarMensajeChatJuego(String msg) {
+        jTextAreaMensajes.append(msg + "\n");
+    }
+
 
     /**
      * This method is called from within the constructor to initialize the form.

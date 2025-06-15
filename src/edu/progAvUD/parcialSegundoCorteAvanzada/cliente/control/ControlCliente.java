@@ -8,7 +8,6 @@ import edu.progAvUD.parcialSegundoCorteAvanzada.cliente.modelo.Cliente;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.net.Socket;
 
 /**
@@ -18,7 +17,7 @@ import java.net.Socket;
 public class ControlCliente {
 
     private Cliente cliente;
-    private ThreadCliente clienteHilo;
+    private ThreadCliente threadCliente;
     private ControlPrincipal controlPrincipal;
 
     public ControlCliente(ControlPrincipal controlPrincipal) {
@@ -57,30 +56,71 @@ public class ControlCliente {
         }
 
     }
-    
-    public String enviarCredencialesCliente(String usuario, String contrasena){
+
+    public String enviarCredencialesCliente(String usuario, String contrasena) {
         String respuesta = "";
         try {
-            cliente.getSalida().writeUTF("login,"+usuario+","+contrasena);
+            cliente.getSalida().writeUTF("login," + usuario + "," + contrasena);
             String estado = cliente.getEntrada().readUTF();
-            
-            if(estado.equalsIgnoreCase("valido")){
-                respuesta="logeado";
-            }else if (estado.equalsIgnoreCase("invalido")){
+
+            if (estado.equalsIgnoreCase("valido")) {
+                respuesta = "logeado";
+            } else if (estado.equalsIgnoreCase("invalido")) {
                 respuesta = "noLogeado";
-            }else if (estado.equalsIgnoreCase("yaConectado")){
+            } else if (estado.equalsIgnoreCase("yaConectado")) {
                 respuesta = "conectado";
             }
-            
+
         } catch (IOException ex) {
             controlPrincipal.mostrarMensajeError("Ocurrio algun error al mandar credenciales");
         }
         return respuesta;
     }
 
-
     public void crearCliente() {
         this.cliente = new Cliente();
+    }
+
+    public void crearThreadCliente() {
+        this.threadCliente = new ThreadCliente(cliente.getEntrada(), cliente.getSalida(), this);
+        threadCliente.start();
+    }
+
+    /**
+     * Muestra un mensaje de error en la interfaz
+     *
+     * @param mensaje contenido del error
+     */
+    public void mostrarMensajeError(String mensaje) {
+        controlPrincipal.mostrarMensajeError(mensaje);
+    }
+
+    public void mostrarMensajeChatJuego(String msg) {
+        controlPrincipal.mostrarMensajeChatJuego(msg);
+    }
+
+    public String getCoordenadasCartas() {
+        return controlPrincipal.getCoordenadasCartas();
+    }
+
+    public void setCoordenadasCartas(String coordenadasCartas) {
+        controlPrincipal.setCoordenadasCartas(coordenadasCartas);
+    }
+
+    public int getPasoActivoCoordenadas() {
+        return controlPrincipal.getPasoActivoCoordenadas();
+    }
+
+    public void setPasoActivoCoordenadas(int pasoActivoCoordenadas) {
+        controlPrincipal.setPasoActivoCoordenadas(pasoActivoCoordenadas);
+    }
+    
+    public void bloquearEntradaTextoChatJuego(){
+        controlPrincipal.bloquearEntradaTextoChatJuego();
+    }
+    
+    public void permitirEntradaTextoChatJuego(){
+        controlPrincipal.permitirEntradaTextoChatJuego();
     }
 
 }
