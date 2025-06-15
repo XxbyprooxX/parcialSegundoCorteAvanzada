@@ -24,10 +24,10 @@ public class ControlGrafico implements ActionListener {
         ventanaPrincipal.panelInicial.jButtonPropiedadesJugadores.setEnabled(false);
         ventanaPrincipal.panelInicial.jButtonPropiedadesSockets.setEnabled(false);
         ventanaPrincipal.mostrarPanel(ventanaPrincipal.panelInicial);
-        
+
         ventanaPrincipal.panelConsolaServidor.jButtonEmpezarJuego.setVisible(false);
         ventanaPrincipal.panelConsolaServidor.jButtonEmpezarJuego.addActionListener(this);
-        
+
     }
 
     public void mostrarMensajeError(String mensaje) {
@@ -77,11 +77,13 @@ public class ControlGrafico implements ActionListener {
             ventanaPrincipal.panelInicial.jButtonPropiedadesJugadores.setEnabled(true);
             ventanaPrincipal.panelInicial.jButtonPropiedadesSockets.setEnabled(false);
         }
-        if(e.getSource() == ventanaPrincipal.panelConsolaServidor.jButtonEmpezarJuego){
+        if (e.getSource() == ventanaPrincipal.panelConsolaServidor.jButtonEmpezarJuego) {
+            controlPrincipal.asignarOrdenMatrizCartas();
             anadirCartasJuego();
+            ponerImagenCartas();
             ventanaPrincipal.mostrarPanel(ventanaPrincipal.panelJuego);
         }
-            
+
     }
 
     /**
@@ -92,16 +94,29 @@ public class ControlGrafico implements ActionListener {
     public void mostrarMensajeConsolaServidor(String mensaje) {
         ventanaPrincipal.mostrarMensajeConsolaServidor(mensaje);
     }
-    
-    
-    public void ocultarBotonIniciarJuego(boolean estado){
+
+    public void ocultarBotonIniciarJuego(boolean estado) {
         ventanaPrincipal.panelConsolaServidor.jButtonEmpezarJuego.setVisible(estado);
     }
-    
-    public void anadirCartasJuego(){
-        for(int i=0;i<40;i++){
+
+    public void anadirCartasJuego() {
+        for (int i = 0; i < 40; i++) {
             ventanaPrincipal.panelJuego.anadirBoton(i);
         }
     }
-    
+
+    public void ponerImagenCartas() {
+        int idCarta;
+        int idImagen;
+        int[][] matrizCartas = controlPrincipal.getMatrizCartas();
+        for (int fila = 0; fila < 5; fila++) {
+            for (int columna = 0; columna < 8; columna++) {
+                idCarta = fila * 8 + columna;
+                idImagen = matrizCartas[fila][columna];
+                ventanaPrincipal.panelJuego.ponerImagenCarta(idCarta, idImagen);
+            }
+
+        }
+    }
+
 }

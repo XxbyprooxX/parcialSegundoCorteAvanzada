@@ -28,6 +28,13 @@ public class PanelJuego extends javax.swing.JPanel {
         jPanelBotones.add(carta);
         revalidate();
     }
+    
+    public void ponerImagenCarta(int idCarta, int idImagen){
+        JToggleButton carta = cartas[idCarta];
+        ImageIcon iconSeleccionado = new ImageIcon(System.getProperty("user.dir") + "/src/edu/progAvUD/parcialSegundoCorteAvanzada/servidor/imagenes/"+idImagen+".jpg");
+        carta.setSelectedIcon(iconSeleccionado);
+        revalidate();
+    }
 
     /**
      * This method is called from within the constructor to initialize the form.

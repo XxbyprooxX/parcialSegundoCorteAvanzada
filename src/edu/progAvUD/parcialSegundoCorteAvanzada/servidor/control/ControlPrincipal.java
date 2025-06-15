@@ -3,6 +3,8 @@ package edu.progAvUD.parcialSegundoCorteAvanzada.servidor.control;
 import edu.progAvUD.parcialSegundoCorteAvanzada.servidor.modelo.ConexionBD;
 import edu.progAvUD.parcialSegundoCorteAvanzada.servidor.modelo.ConexionPropiedades;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Properties;
 
 /**
@@ -15,11 +17,13 @@ public class ControlPrincipal {
     private ControlGrafico controlGrafico;
     private ControlJugador controlJugador;
     private ControlServidor controlServidor;
+    private int[][] matrizCartas;
 
     public ControlPrincipal() {
         this.controlGrafico = new ControlGrafico(this);
         this.controlJugador = new ControlJugador(this);
         this.controlServidor = new ControlServidor(this);
+        matrizCartas = new int[5][8];
     }
 
     /**
@@ -166,6 +170,34 @@ public class ControlPrincipal {
             return false;
         }
     }
+    
+    
+    public void asignarOrdenMatrizCartas(){
+        ArrayList<Integer> numeros = new ArrayList<>();
+        for (int i = 1; i <= 20; i++) {
+            numeros.add(i);
+            numeros.add(i);
+        }
+        
+        Collections.shuffle(numeros);
+        
+        // Rellenar la matriz con los números mezclados
+        int index = 0;
+        for (int i = 0; i < 5; i++) {
+            for (int j = 0; j < 8; j++) {
+                this.matrizCartas[i][j] = numeros.get(index++);
+            }
+        }
+        
+        // Imprimir la matriz
+        for (int i = 0; i < 5; i++) {
+            for (int j = 0; j < 8; j++) {
+                System.out.print(matrizCartas[i][j] + "\t");
+            }
+            System.out.println();
+        }
+    }
+    
 
     /**
      * Manda a mostrar las opciones a elegir por el usuario
@@ -209,4 +241,9 @@ public class ControlPrincipal {
     public void ocultarBotonIniciarJuego(boolean estado){
         controlGrafico.ocultarBotonIniciarJuego(estado);
     }
+
+    public int[][] getMatrizCartas() {
+        return matrizCartas;
+    }  
+    
 }
