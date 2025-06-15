@@ -7,6 +7,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 /**
+ * DAO de Jugador con validación mejorada para usuarios únicos
  *
  * @author Cristianlol789
  */
@@ -26,6 +27,72 @@ public class JugadorDAO {
     }
 
     /**
+     * Verifica si ya existe un jugador con el usuario especificado
+     *
+     * @param usuario el usuario a verificar
+     * @return true si el usuario ya existe, false en caso contrario
+     * @throws SQLException Si ocurre un error al ejecutar la consulta
+     */
+    public boolean existeUsuario(String usuario) throws SQLException {
+        String consulta = "SELECT COUNT(*) FROM jugadores WHERE LOWER(TRIM(usuario)) = LOWER(TRIM(?))";
+        connection = ConexionBD.getConnection();
+        preparedStatement = connection.prepareStatement(consulta);
+        preparedStatement.setString(1, usuario);
+        resultSet = preparedStatement.executeQuery();
+
+        boolean existe = false;
+        if (resultSet.next()) {
+            existe = resultSet.getInt(1) > 0;
+        }
+
+        // Cerrar recursos
+        if (resultSet != null) {
+            resultSet.close();
+        }
+        if (preparedStatement != null) {
+            preparedStatement.close();
+        }
+        ConexionBD.desconectar();
+
+        return existe;
+    }
+
+    /**
+     * Verifica si ya existe un jugador con la cédula especificada
+     *
+     * @param cedula la cédula a verificar
+     * @return true si la cédula ya existe, false en caso contrario
+     * @throws SQLException Si ocurre un error al ejecutar la consulta
+     */
+    public boolean existeCedula(String cedula) throws SQLException {
+        if (cedula == null || cedula.trim().isEmpty()) {
+            return false; // Si no hay cédula, no puede estar duplicada
+        }
+        
+        String consulta = "SELECT COUNT(*) FROM jugadores WHERE TRIM(cedula) = TRIM(?)";
+        connection = ConexionBD.getConnection();
+        preparedStatement = connection.prepareStatement(consulta);
+        preparedStatement.setString(1, cedula);
+        resultSet = preparedStatement.executeQuery();
+
+        boolean existe = false;
+        if (resultSet.next()) {
+            existe = resultSet.getInt(1) > 0;
+        }
+
+        // Cerrar recursos
+        if (resultSet != null) {
+            resultSet.close();
+        }
+        if (preparedStatement != null) {
+            preparedStatement.close();
+        }
+        ConexionBD.desconectar();
+
+        return existe;
+    }
+
+    /**
      * Consulta un jugador por usuario usando PreparedStatement para evitar
      * inyección SQL
      *
@@ -36,7 +103,7 @@ public class JugadorDAO {
      * @throws SQLException Si ocurre un error al ejecutar la consulta
      */
     public JugadorVO consultarUsuarioJugador(String usuario, JugadorVO jugador) throws SQLException {
-        String consulta = "SELECT * FROM jugadores WHERE usuario = ?";
+        String consulta = "SELECT * FROM jugadores WHERE LOWER(TRIM(usuario)) = LOWER(TRIM(?))";
         connection = ConexionBD.getConnection();
         preparedStatement = connection.prepareStatement(consulta);
         preparedStatement.setString(1, usuario);
@@ -179,12 +246,25 @@ public class JugadorDAO {
 
     /**
      * Inserta un nuevo jugador en la base de datos usando PreparedStatement
+     * con validación previa de usuario único
      *
      * @param jugador Objeto JugadorVO con la información del jugador a
      * registrar
-     * @throws SQLException Si ocurre un error al insertar
+     * @throws SQLException Si ocurre un error al insertar o si el usuario ya existe
      */
     public void insertarJugador(JugadorVO jugador) throws SQLException {
+        // Validar que el usuario no exista antes de insertar
+        if (existeUsuario(jugador.getUsuario())) {
+            throw new SQLException("El usuario '" + jugador.getUsuario() + "' ya existe en la base de datos");
+        }
+        
+        // Validar que la cédula no exista (si no está vacía)
+        if (jugador.getCedula() != null && !jugador.getCedula().trim().isEmpty()) {
+            if (existeCedula(jugador.getCedula())) {
+                throw new SQLException("La cédula '" + jugador.getCedula() + "' ya existe en la base de datos");
+            }
+        }
+
         String insercion = "INSERT INTO jugadores (nombreJugador, cedula, usuario, contrasena) VALUES (?, ?, ?, ?)";
         connection = ConexionBD.getConnection();
         preparedStatement = connection.prepareStatement(insercion);

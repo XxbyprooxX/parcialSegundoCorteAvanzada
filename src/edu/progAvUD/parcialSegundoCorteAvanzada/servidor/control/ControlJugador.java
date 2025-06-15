@@ -4,11 +4,9 @@ import edu.progAvUD.parcialSegundoCorteAvanzada.servidor.modelo.JugadorDAO;
 import edu.progAvUD.parcialSegundoCorteAvanzada.servidor.modelo.JugadorVO;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
- * Controlador de jugador corregido con mejor manejo de errores
+ * Controlador de jugador con validación mejorada para usuarios únicos
  *
  * @author Cristianlol789
  */
@@ -41,23 +39,54 @@ public class ControlJugador {
             // Crear el objeto con los valores ya validados
             JugadorVO jugador = new JugadorVO(nombreJugador.trim(), cedula.trim(), usuario.trim(), contrasena.trim(), id, cantidadIntentos, cantidadParejasResueltas);
 
-            // Verificar unicidad e insertar
-            int cantidadJugadores = consultarCantidadJugadores();
-            if (cantidadJugadores == 0) {
+            // Verificar unicidad del usuario y la cédula antes de insertar
+            if (verificarUsuarioUnico(jugador.getUsuario())) {
+                if (jugador.getCedula() != null && !jugador.getCedula().trim().isEmpty()) {
+                    if (!verificarCedulaUnica(jugador.getCedula())) {
+                        controlPrincipal.mostrarMensajeError("No se ha creado el jugador " + id + " porque la cédula '" + jugador.getCedula() + "' ya existe en la base de datos");
+                        return;
+                    }
+                }
+
+                // Insertar el jugador
                 insertarJugador(jugador);
                 controlPrincipal.mostrarMensajeExito("Jugador " + id + " creado exitosamente");
-            } else if (cantidadJugadores > 0) {
-                if (verificarjugadorRepetido(jugador)) {
-                    insertarJugador(jugador);
-                    controlPrincipal.mostrarMensajeExito("Jugador " + id + " creado exitosamente");
-                } else {
-                    controlPrincipal.mostrarMensajeError("No se ha creado el jugador " + id + " porque ya se encuentra en la Base de Datos (cédula o usuario duplicado)");
-                }
             } else {
-                controlPrincipal.mostrarMensajeError("Error al consultar la base de datos para el jugador " + id);
+                controlPrincipal.mostrarMensajeError("No se ha creado el jugador " + id + " porque el usuario '" + jugador.getUsuario() + "' ya existe en la base de datos");
             }
+
         } catch (Exception ex) {
             controlPrincipal.mostrarMensajeError("Error al crear jugador " + id + ": " + ex.getMessage());
+        }
+    }
+
+    /**
+     * Verifica que el usuario sea único en la base de datos
+     *
+     * @param usuario el usuario a verificar
+     * @return true si el usuario es único, false si ya existe
+     */
+    private boolean verificarUsuarioUnico(String usuario) {
+        try {
+            return !jugadorDao.existeUsuario(usuario);
+        } catch (SQLException ex) {
+            controlPrincipal.mostrarMensajeError("Error al verificar usuario único: " + ex.getMessage());
+            return false; // En caso de error, asumir que no es único para evitar duplicados
+        }
+    }
+
+    /**
+     * Verifica que la cédula sea única en la base de datos
+     *
+     * @param cedula la cédula a verificar
+     * @return true si la cédula es única, false si ya existe
+     */
+    private boolean verificarCedulaUnica(String cedula) {
+        try {
+            return !jugadorDao.existeCedula(cedula);
+        } catch (SQLException ex) {
+            controlPrincipal.mostrarMensajeError("Error al verificar cédula única: " + ex.getMessage());
+            return false; // En caso de error, asumir que no es única para evitar duplicados
         }
     }
 
@@ -72,40 +101,6 @@ public class ControlJugador {
         } catch (SQLException ex) {
             controlPrincipal.mostrarMensajeError("Error SQL al obtener lista de jugadores: " + ex.getMessage());
             return new ArrayList<>(); // Retornar lista vacía en lugar de null
-        }
-    }
-
-    /**
-     * Se encarga de verificar que en la base de datos no estén repetidos los
-     * mismos Jugadores
-     *
-     * @param jugador le llega el jugador para comprobar si está o no repetido
-     * @return un true o false para saber si está o no repetido
-     */
-    public boolean verificarjugadorRepetido(JugadorVO jugador) {
-        try {
-            ArrayList<JugadorVO> jugadores = darListaJugadores();
-            if (jugadores == null || jugadores.isEmpty()) {
-                return true; // Si no hay jugadores, no está repetido
-            }
-
-            for (JugadorVO jugadorExistente : jugadores) {
-                String cedula1 = jugador.getCedula() != null ? jugador.getCedula().trim() : "";
-                String cedula2 = jugadorExistente.getCedula() != null ? jugadorExistente.getCedula().trim() : "";
-
-                String usuario1 = jugador.getUsuario() != null ? jugador.getUsuario().trim().toLowerCase() : "";
-                String usuario2 = jugadorExistente.getUsuario() != null ? jugadorExistente.getUsuario().trim().toLowerCase() : "";
-
-                // Verificar duplicados por cédula o usuario
-                if ((!cedula1.isEmpty() && cedula1.equals(cedula2))
-                        || (!usuario1.isEmpty() && usuario1.equals(usuario2))) {
-                    return false; // Está repetido
-                }
-            }
-            return true; // No está repetido
-        } catch (Exception ex) {
-            controlPrincipal.mostrarMensajeError("Error al verificar jugador repetido: " + ex.getMessage());
-            return false; // En caso de error, asumir que está repetido para evitar duplicados
         }
     }
 
@@ -133,13 +128,18 @@ public class ControlJugador {
         try {
             jugadorDao.insertarJugador(jugador);
         } catch (SQLException ex) {
-            controlPrincipal.mostrarMensajeError("Error SQL al insertar jugador: " + ex.getMessage());
+            // Si es un error de usuario duplicado, mostrar mensaje específico
+            if (ex.getMessage().contains("ya existe")) {
+                controlPrincipal.mostrarMensajeError(ex.getMessage());
+            } else {
+                controlPrincipal.mostrarMensajeError("Error SQL al insertar jugador: " + ex.getMessage());
+            }
         }
     }
 
     /**
      * Solicita al usuario un dato faltante y valida si es numérico según el
-     * tipo. Reintenta en caso de error.
+     * tipo. Reintenta en caso de error y valida unicidad para usuario.
      *
      * @param mensaje texto para solicitar el dato.
      * @param tipo indica si debe parsear a long ("cedula") o validar otros
@@ -149,7 +149,7 @@ public class ControlJugador {
     private String obtenerDatoFaltante(String mensaje, String tipo) {
         String dato = controlPrincipal.mostrarJOptionEscribirDatoFaltante(mensaje);
 
-        if (dato == null || dato.trim().isEmpty()) {
+        if (dato == null || dato.trim().isBlank()) {
             controlPrincipal.mostrarMensajeError("No se ha escrito nada en el campo de " + tipo);
             return obtenerDatoFaltante(mensaje, tipo);
         }
@@ -159,6 +159,13 @@ public class ControlJugador {
                 long cedulaNum = Long.parseLong(dato.trim());
                 if (cedulaNum <= 0) {
                     controlPrincipal.mostrarMensajeError("La cédula debe ser un número positivo");
+                    return obtenerDatoFaltante(mensaje, tipo);
+                }
+
+                // Verificar que la cédula sea única
+                if (!verificarCedulaUnica(dato.trim())) {
+                    controlPrincipal.mostrarMensajeError("La cédula '" + dato.trim() + "' ya existe. Ingrese una cédula diferente.");
+                    return obtenerDatoFaltante(mensaje, tipo);
                 }
             } catch (NumberFormatException e) {
                 controlPrincipal.mostrarMensajeError("Se ha escrito algo incorrecto en el campo de " + tipo + ". Debe ser un número entero positivo.");
@@ -168,6 +175,12 @@ public class ControlJugador {
             // Validar longitud del usuario
             if (dato.trim().length() > 20) {
                 controlPrincipal.mostrarMensajeError("El usuario no puede tener más de 20 caracteres.");
+                return obtenerDatoFaltante(mensaje, tipo);
+            }
+
+            // Verificar que el usuario sea único
+            if (!verificarUsuarioUnico(dato.trim())) {
+                controlPrincipal.mostrarMensajeError("El usuario '" + dato.trim() + "' ya existe. Ingrese un usuario diferente.");
                 return obtenerDatoFaltante(mensaje, tipo);
             }
         } else if (tipo.equalsIgnoreCase("contrasena")) {
@@ -191,7 +204,7 @@ public class ControlJugador {
         JugadorVO jugador = new JugadorVO();
         try {
             jugador = jugadorDao.consultarUsuarioJugador(usuario, jugador);
-            if (jugador.getContrasena().equals(contrasena)) {
+            if (jugador.getContrasena() != null && jugador.getContrasena().equals(contrasena)) {
                 return true;
             } else {
                 controlPrincipal.mostrarMensajeError("La contrasena no coincide");
@@ -213,7 +226,9 @@ public class ControlJugador {
         JugadorVO jugador = new JugadorVO();
         try {
             jugador = jugadorDao.consultarUsuarioJugador(usuario, jugador);
-            return jugador.getNombreJugador() + "," + jugador.getCedula() + "," + jugador.getUsuario() + "," + jugador.getContrasena();
+            if (jugador.getNombreJugador() != null) {
+                return jugador.getNombreJugador() + "," + jugador.getCedula() + "," + jugador.getUsuario() + "," + jugador.getContrasena();
+            }
         } catch (SQLException ex) {
             controlPrincipal.mostrarMensajeError("No existe el usuario");
         }

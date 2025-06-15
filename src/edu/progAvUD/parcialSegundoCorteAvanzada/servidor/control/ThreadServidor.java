@@ -292,20 +292,47 @@ public class ThreadServidor extends Thread {
                     case "login":
                         String usuario = partes[1];
                         String contrasena = partes[2];
+
+                        // Primero verificar si el usuario ya está conectado
+                        if (controlServidor.usuarioYaConectado(usuario)) {
+                            controlServidor.mostrarMensajeConsolaServidor(
+                                    "Intento de login fallido: Usuario '" + usuario + "' ya está conectado"
+                            );
+                            salida1.writeUTF("yaConectado");
+                            salida1.flush();
+                            break;
+                        }
+
+                        // Verificar credenciales
                         boolean jugadorExiste = controlServidor.buscarUsuarioYContrasenaExistente(usuario, contrasena);
 
                         if (jugadorExiste && asignarJugador(usuario)) {
-                            servidor.setNombreUsuario(usuario);
-                            this.numeroTurno = asignarTurno();
+                            // Intentar registrar el usuario como conectado
+                            if (controlServidor.registrarUsuarioConectado(usuario)) {
+                                servidor.setNombreUsuario(usuario);
+                                this.numeroTurno = asignarTurno();
 
-                            salida1.writeUTF("valido");
-                            salida1.flush();
+                                salida1.writeUTF("valido");
+                                salida1.flush();
 
-                            gestionarTurnosConcentrese();
-                            ControlServidor.setCantidadClientesLogeados(ControlServidor.getCantidadClientesLogeados() + 1);
-                            controlServidor.verificarJugadoresMostrarBotonJugar();
+                                controlServidor.mostrarMensajeConsolaServidor(
+                                        "Login exitoso para usuario: " + usuario + " (Turno: " + this.numeroTurno + ")"
+                                );
 
+                                gestionarTurnosConcentrese();
+                                ControlServidor.setCantidadClientesLogeados(ControlServidor.getCantidadClientesLogeados() + 1);
+                                controlServidor.verificarJugadoresMostrarBotonJugar();
+                            } else {
+                                controlServidor.mostrarMensajeConsolaServidor(
+                                        "Error: Usuario '" + usuario + "' ya estaba registrado como conectado"
+                                );
+                                salida1.writeUTF("yaConectado");
+                                salida1.flush();
+                            }
                         } else {
+                            controlServidor.mostrarMensajeConsolaServidor(
+                                    "Login fallido: Credenciales incorrectas para usuario: " + usuario
+                            );
                             salida1.writeUTF("invalido");
                             salida1.flush();
                         }

@@ -64,10 +64,12 @@ public class ControlCliente {
             cliente.getSalida().writeUTF("login,"+usuario+","+contrasena);
             String estado = cliente.getEntrada().readUTF();
             
-            if("valido".equals(estado)){
-                respuesta="t";
-            }else if ("invalido".equals(estado)){
-                respuesta = "f";
+            if(estado.equalsIgnoreCase("valido")){
+                respuesta="logeado";
+            }else if (estado.equalsIgnoreCase("invalido")){
+                respuesta = "noLogeado";
+            }else if (estado.equalsIgnoreCase("yaConectado")){
+                respuesta = "conectado";
             }
             
         } catch (IOException ex) {

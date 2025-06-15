@@ -106,7 +106,7 @@ public class ControlPrincipal {
                 Properties propiedadesJugadores = conexionPropiedades.cargarPropiedades();
                 String cantidadStr = propiedadesJugadores.getProperty("cantidadJugadoresARegistrar");
 
-                if (cantidadStr.isBlank() || cantidadStr.trim().isEmpty()) {
+                if (cantidadStr.isBlank() || cantidadStr.trim().isBlank()) {
                     controlGrafico.mostrarMensajeError("La propiedad 'cantidadJugadoresARegistrar' no está definida");
                 }
 
@@ -123,7 +123,7 @@ public class ControlPrincipal {
                     String contrasena = propiedadesJugadores.getProperty("jugador" + i + ".contrasena", "").trim();
 
                     // Validar cédula si no está en blanco
-                    if (!cedula.isEmpty()) {
+                    if (!cedula.isBlank()) {
                         if (!validarCedula(cedula)) {
                             controlGrafico.mostrarMensajeError("La cédula del jugador " + i + " debe ser un número entero válido: " + cedula);
                         }
@@ -209,5 +209,4 @@ public class ControlPrincipal {
     public void ocultarBotonIniciarJuego(boolean estado){
         controlGrafico.ocultarBotonIniciarJuego(estado);
     }
-
 }

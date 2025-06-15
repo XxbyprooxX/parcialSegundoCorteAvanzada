@@ -41,13 +41,15 @@ public class ControlGrafico implements ActionListener {
 
             String respuesta = controlPrincipal.enviarCredencialesCliente(usuario, contrasena);
 
-            if (respuesta == "t") {
+            if (respuesta.equalsIgnoreCase("logeado")) {
                 ventanaPrincipal.mostrarMensajeExito("Has iniciado sesion con exito");
                 ventanaPrincipal.mostrarPanel(ventanaPrincipal.panelJuegoChat);
-            } else if (respuesta == "f") {
+            } else if (respuesta.equalsIgnoreCase("noLogeado")) {
                 ventanaPrincipal.mostrarMensajeError("Credenciales incorrectas intente de nuevo");
-            } else if (respuesta == "") {
+            } else if (respuesta.equals("")) {
                 ventanaPrincipal.mostrarMensajeError("No aplica");
+            } else if (respuesta.equalsIgnoreCase("conectado")){
+                ventanaPrincipal.mostrarMensajeError("Ya se encuentra logeado dentro del sistema");
             }
         }
     }
