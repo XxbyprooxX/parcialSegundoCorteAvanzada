@@ -7,13 +7,15 @@ import java.net.Socket;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.Vector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
  * @author Cristianlol789
  */
 public class ControlServidor {
-
+    
     private ControlPrincipal controlPrincipal;
 
     /**
@@ -26,7 +28,7 @@ public class ControlServidor {
      * representa mediante un hilo de tipo {@link ThreadServidor}.
      */
     private static Vector<ThreadServidor> clientesActivos;
-
+    
     private static int cantidadClientesLogeados;
 
     /**
@@ -72,7 +74,7 @@ public class ControlServidor {
             server2 = new ServerSocket(Servidor.getPUERTO_2());
             controlPrincipal.mostrarMensajeConsolaServidor(".::Servidor activo :");
             controlPrincipal.mostrarMensajeConsolaServidor("Sistema de turnos iniciado");
-
+            
             while (listening) {
                 Socket socket1 = null;
                 Socket socket2 = null;
@@ -84,7 +86,7 @@ public class ControlServidor {
                     controlPrincipal.mostrarMensajeConsolaServidor("Accept failed: " + server1 + ", " + e.getMessage());
                     continue;
                 }
-
+                
                 ThreadServidor usuario = new ThreadServidor(socket1, socket2, this);
                 agregarCliente(usuario); // Usar el método con control de turnos
                 usuario.start(); // inicia el hilo que manejará la comunicación con este cliente
@@ -119,7 +121,7 @@ public class ControlServidor {
         // Desregistrar el usuario del control de sesiones
         String nombreUsuario = threadCliente.getServidor().getNombreUsuario();
         desregistrarUsuarioConectado(nombreUsuario);
-
+        
         controlPrincipal.mostrarMensajeConsolaServidor("Cliente removido: " + threadCliente.getInformacionCliente());
         controlPrincipal.mostrarMensajeConsolaServidor("Total de clientes restantes: " + clientesActivos.size());
 
@@ -213,7 +215,7 @@ public class ControlServidor {
     public synchronized void avanzarSiguienteTurnoConcentrese() {
         // Encontrar el siguiente jugador conectado
         int siguienteTurno = encontrarSiguienteJugadorActivo();
-
+        
         if (siguienteTurno != -1) {
             this.turnoActivo = siguienteTurno;
             controlPrincipal.mostrarMensajeConsolaServidor("Turno de Concentrese pasa a: " + this.turnoActivo);
@@ -274,7 +276,7 @@ public class ControlServidor {
     public void mostrarClientesConectados() {
         controlPrincipal.mostrarMensajeConsolaServidor("=== CLIENTES CONECTADOS ===");
         controlPrincipal.mostrarMensajeConsolaServidor("Turno activo: " + turnoActivo);
-
+        
         if (clientesActivos.isEmpty()) {
             controlPrincipal.mostrarMensajeConsolaServidor("No hay clientes conectados");
         } else {
@@ -320,45 +322,34 @@ public class ControlServidor {
     }
 
     /**
-     * Verifica si dos cartas forman una pareja en Concentrese basándose en las
-     * coordenadas y el contenido de las cartas enviadas por el cliente
-     *
-     * @param x1 Coordenada X de la primera carta
-     * @param y1 Coordenada Y de la primera carta
-     * @param carta1 Contenido de la primera carta como String
-     * @param x2 Coordenada X de la segunda carta
-     * @param y2 Coordenada Y de la segunda carta
-     * @param carta2 Contenido de la segunda carta como String
-     * @return true si es una pareja válida
+     * Método mejorado para verificar parejas con mejor logging
      */
-    public boolean verificarPareja(int x1, int y1, String carta1, int x2, int y2, String carta2) {
-        controlPrincipal.mostrarMensajeConsolaServidor(
-                "Verificando pareja: Pos1(" + x1 + "," + y1 + ")='" + carta1
-                + "' y Pos2(" + x2 + "," + y2 + ")='" + carta2 + "'"
-        );
-
-        // Verificar que las coordenadas sean diferentes (no puede seleccionar la misma carta)
+    public boolean verificarPareja(int x1, int y1, String carta1, int x2, int y2, String carta2, ThreadServidor cliente) {
+        
         if (x1 == x2 && y1 == y2) {
-            controlPrincipal.mostrarMensajeConsolaServidor("Error: No se puede seleccionar la misma carta dos veces");
             return false;
         }
-
-        // Verificar si las cartas son iguales (aquí tienes la lógica personalizable)
-        boolean esPareja = carta1.equals(carta2);
-
+        
+        boolean esPareja = carta1 != null && carta1.equals(carta2);
+        
         if (esPareja) {
             paresEncontrados++;
-            controlPrincipal.mostrarMensajeConsolaServidor(
-                    "¡Pareja encontrada! (" + carta1 + ") en posiciones (" + x1 + "," + y1 + ") y (" + x2 + "," + y2
-                    + ") - Pares encontrados: " + paresEncontrados + "/" + totalPares
-            );
+            try {
+                cliente.getServidor().getServidorInformacionSalida1().writeUTF("parejaEncontrada");
+                cliente.getServidor().getServidorInformacionSalida1().flush();
+                controlPrincipal.mostrarMensajeConsolaServidor(
+                        "Progreso: " + paresEncontrados + "/" + totalPares + " pares encontrados"
+                );
+            } catch (IOException ex) {
+                controlPrincipal.mostrarMensajeError("No se puede enviar el mensaje");
+            }
         } else {
             controlPrincipal.mostrarMensajeConsolaServidor(
-                    "No es pareja: '" + carta1 + "' ≠ '" + carta2 + "' en posiciones ("
-                    + x1 + "," + y1 + ") y (" + x2 + "," + y2 + ")"
+                    "No es pareja: '" + carta1 + "' ≠ '" + carta2 + "'"
             );
         }
-
+        
+        controlPrincipal.mostrarMensajeConsolaServidor("=========================");
         return esPareja;
     }
 
@@ -433,7 +424,7 @@ public class ControlServidor {
                 controlPrincipal.mostrarMensajeConsolaServidor("Error al notificar reinicio: " + e.getMessage());
             }
         }
-
+        
         notificarCambioTurno();
     }
 
@@ -509,7 +500,7 @@ public class ControlServidor {
     public static void setClientesActivos(Vector<ThreadServidor> clientesActivos) {
         ControlServidor.clientesActivos = clientesActivos;
     }
-
+    
     public void asignarIps(String puerto1, String puerto2) {
         try {
             int puerto1Int = Integer.parseInt(puerto1);
@@ -517,12 +508,34 @@ public class ControlServidor {
             Servidor.setPUERTO_1(puerto1Int);
             Servidor.setPUERTO_2(puerto2Int);
         } catch (NumberFormatException e) {
-
+            
         }
     }
-
+    
     public boolean buscarUsuarioYContrasenaExistente(String usuario, String contrasena) {
         return controlPrincipal.buscarUsuarioYContrasenaExistente(usuario, contrasena);
+    }
+
+    /**
+     * Obtiene el tipo de carta en una posición específica de la matriz
+     *
+     * @param x coordenada X (columna)
+     * @param y coordenada Y (fila)
+     * @return el tipo de carta como String, o null si las coordenadas son
+     * inválidas
+     */
+    public String obtenerTipoCartaEnPosicion(int x, int y) {
+        try {
+            int[][] matrizCartas = controlPrincipal.getMatrizCartas();
+            if (y < 0 || y >= matrizCartas.length || x < 0 || x >= matrizCartas[0].length) {
+                return "";
+            }
+            int valorCarta = matrizCartas[y][x];
+            return String.valueOf(valorCarta);
+            
+        } catch (Exception e) {
+            return "";
+        }
     }
 
     /**
@@ -534,11 +547,11 @@ public class ControlServidor {
     public synchronized boolean usuarioYaConectado(String usuario) {
         return usuariosConectados.contains(usuario);
     }
-
+    
     public String obtenerJugadorPorCredenciales(String usuario) {
         return controlPrincipal.obtenerJugadorPorCredenciales(usuario);
     }
-
+    
     public void verificarJugadoresMostrarBotonJugar() {
         if (cantidadClientesLogeados >= 2) {
             controlPrincipal.ocultarBotonIniciarJuego(true);
@@ -546,13 +559,13 @@ public class ControlServidor {
             controlPrincipal.ocultarBotonIniciarJuego(false);
         }
     }
-
+    
     public static int getCantidadClientesLogeados() {
         return cantidadClientesLogeados;
     }
-
+    
     public static void setCantidadClientesLogeados(int cantidadClientesLogeados) {
         ControlServidor.cantidadClientesLogeados = cantidadClientesLogeados;
     }
-
+    
 }

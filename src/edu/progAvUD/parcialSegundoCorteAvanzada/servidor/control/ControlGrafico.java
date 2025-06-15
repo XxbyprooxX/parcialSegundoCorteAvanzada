@@ -4,7 +4,6 @@ import edu.progAvUD.parcialSegundoCorteAvanzada.servidor.vista.VentanaPrincipal;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
-import javax.swing.JToggleButton;
 
 /**
  *
@@ -118,5 +117,4 @@ public class ControlGrafico implements ActionListener {
 
         }
     }
-
 }

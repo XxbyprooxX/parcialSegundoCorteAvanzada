@@ -210,11 +210,17 @@ public class ThreadServidor extends Thread {
      * @param y2 Coordenada Y de la segunda carta
      */
     public void procesarJugadaConcentrese(int x1, int y1, int x2, int y2) {
+        
+        String tipoCarta1 = controlServidor.obtenerTipoCartaEnPosicion(x1, y1);
+        String tipoCarta2 = controlServidor.obtenerTipoCartaEnPosicion(x2, y2);
 
-        String tipoCarta1 = null;
-        String tipoCarta2 = null;
+        // Verificar si se pudieron obtener las cartas
+        if (tipoCarta1.equals("") || tipoCarta2.equals("")) {
+            manejarFallo();
+            return;
+        }
 
-        boolean esPareja = controlServidor.verificarPareja(x1, y1, tipoCarta1, x2, y2, tipoCarta2);
+        boolean esPareja = controlServidor.verificarPareja(x1, y1, tipoCarta1, x2, y2, tipoCarta2, this);
 
         if (esPareja) {
             manejarAcierto();
