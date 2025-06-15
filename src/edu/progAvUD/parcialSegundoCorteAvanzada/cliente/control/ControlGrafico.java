@@ -42,17 +42,17 @@ public class ControlGrafico implements ActionListener {
             String usuario = ventanaPrincipal.panelLogin.jTextFieldUsuario.getText();
             char[] contrasenaChars = ventanaPrincipal.panelLogin.jPasswordField.getPassword();
             String contrasena = new String(contrasenaChars);
-            
-            if(controlPrincipal.enviarCredencialesCliente(usuario, contrasena)){
+
+            String respuesta = controlPrincipal.enviarCredencialesCliente(usuario, contrasena);
+
+            if (respuesta == "t") {
                 ventanaPrincipal.mostrarMensajeExito("Has iniciado sesion con exito");
                 ventanaPrincipal.mostrarPanel(ventanaPrincipal.panelJuegoChat);
-            } else{
+            } else if (respuesta == "f") {
                 ventanaPrincipal.mostrarMensajeError("Credenciales incorrectas intente de nuevo");
+            } else if (respuesta == "") {
+                ventanaPrincipal.mostrarMensajeError("No aplica");
             }
-            
-            
-            
-            
         }
     }
 

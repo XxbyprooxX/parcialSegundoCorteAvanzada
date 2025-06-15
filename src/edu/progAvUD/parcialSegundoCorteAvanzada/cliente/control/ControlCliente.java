@@ -58,16 +58,16 @@ public class ControlCliente {
 
     }
     
-    public boolean enviarCredencialesCliente(String usuario, String contrasena){
-        boolean respuesta = false;
+    public String enviarCredencialesCliente(String usuario, String contrasena){
+        String respuesta = "";
         try {
             cliente.getSalida().writeUTF("login,"+usuario+","+contrasena);
             String estado = cliente.getEntrada().readUTF();
             
             if("valido".equals(estado)){
-                respuesta=true;
+                respuesta="t";
             }else if ("invalido".equals(estado)){
-                respuesta = false;
+                respuesta = "f";
             }
             
         } catch (IOException ex) {
