@@ -33,7 +33,7 @@ public class ThreadServidor extends Thread {
     /**
      * Contador estático para asignar turnos únicos a cada cliente
      */
-    private static AtomicInteger contadorTurnos;
+    private static AtomicInteger contadorTurnos = new AtomicInteger(1);
 
     /**
      * Número de turno asignado a este cliente
@@ -51,7 +51,6 @@ public class ThreadServidor extends Thread {
      */
     public ThreadServidor(Socket socketCliente1, Socket socketCliente2, ControlServidor controlServidor) {
         String nombreUsuario = "";
-        contadorTurnos = new AtomicInteger(1);
         this.servidor = new Servidor(socketCliente1, socketCliente2, nombreUsuario);
         this.controlServidor = controlServidor;
         // Asignar turno automáticamente al crear el hilo
@@ -93,7 +92,7 @@ public class ThreadServidor extends Thread {
      *
      * @return El número de turno asignado
      */
-    private int asignarTurno() {
+    private synchronized int asignarTurno() {
         int turno = contadorTurnos.getAndIncrement();
         controlServidor.mostrarMensajeConsolaServidor(
                 "Cliente " + servidor.getNombreUsuario() + " conectado - Turno asignado: " + turno
@@ -157,6 +156,9 @@ public class ThreadServidor extends Thread {
                 salida1.flush();
             }
 
+            salida1.writeUTF("pedirCoordenadas");
+            salida1.flush();
+
             if (controlServidor.verificarJuegoTerminado()) {
                 controlServidor.terminarJuego();
             }
@@ -171,6 +173,7 @@ public class ThreadServidor extends Thread {
     /**
      * Método que maneja cuando el jugador falla en Concentrese El turno pasa al
      * siguiente jugador
+     *
      * @param razon es el motivo por el cual fallo
      */
     public void manejarFallo(String razon) {
@@ -193,6 +196,8 @@ public class ThreadServidor extends Thread {
             }
 
             controlServidor.avanzarSiguienteTurnoConcentrese();
+            salida1.writeUTF("pedirCoordenadas");
+            salida1.flush();
 
         } catch (IOException e) {
             controlServidor.mostrarMensajeConsolaServidor(
@@ -277,7 +282,9 @@ public class ThreadServidor extends Thread {
                 String mensaje = entrada.readUTF();
                 String[] partes = mensaje.split(",");
                 String comando = partes[0];
-
+                System.out.println(mensaje);
+                System.out.println("/////////////////////////////////////////////////////////////////////");
+                System.out.println(comando);
                 switch (comando) {
                     case "eleccionJugador":
                         try {
@@ -286,6 +293,7 @@ public class ThreadServidor extends Thread {
                             int x2 = Integer.parseInt(partes[4]);
                             int y2 = Integer.parseInt(partes[5]);
                             procesarJugadaConcentrese(x1, y1, x2, y2);
+                            System.out.println("" + x1 + x2 + y1 + y2);
                         } catch (NumberFormatException e) {
                             manejarFallo("Escribio letran en vez de numeros");
                         }
@@ -294,6 +302,7 @@ public class ThreadServidor extends Thread {
 
                     case "consultarTurno":
                         verificarTurnoActivo();
+                        System.out.println("Pendejo anormal");
                         break;
 
                     case "login":
@@ -330,9 +339,6 @@ public class ThreadServidor extends Thread {
                                 ControlServidor.setCantidadClientesLogeados(ControlServidor.getCantidadClientesLogeados() + 1);
                                 controlServidor.verificarJugadoresMostrarBotonJugar();
 
-                                salida1.writeUTF("" + this.numeroTurno);
-                                salida1.flush();
-
                             } else {
                                 controlServidor.mostrarMensajeConsolaServidor(
                                         "Error: Usuario '" + usuario + "' ya estaba registrado como conectado"
@@ -348,6 +354,11 @@ public class ThreadServidor extends Thread {
                             salida1.flush();
                         }
                         break;
+                    case "empezado":
+                        salida1.writeUTF("" + this.numeroTurno);
+                        salida1.flush();
+                        salida1.writeUTF("pedirCoordenadas");
+                        salida1.flush();
                 }
             }
 

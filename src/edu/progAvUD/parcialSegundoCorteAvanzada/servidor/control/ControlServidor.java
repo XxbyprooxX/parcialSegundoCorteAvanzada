@@ -13,7 +13,7 @@ import java.util.Vector;
  * @author Cristianlol789
  */
 public class ControlServidor {
-    
+
     private ControlPrincipal controlPrincipal;
 
     /**
@@ -26,7 +26,7 @@ public class ControlServidor {
      * representa mediante un hilo de tipo {@link ThreadServidor}.
      */
     private static Vector<ThreadServidor> clientesActivos;
-    
+
     private static int cantidadClientesLogeados;
 
     /**
@@ -72,7 +72,7 @@ public class ControlServidor {
             server2 = new ServerSocket(Servidor.getPUERTO_2());
             controlPrincipal.mostrarMensajeConsolaServidor(".::Servidor activo :");
             controlPrincipal.mostrarMensajeConsolaServidor("Sistema de turnos iniciado");
-            
+
             while (listening) {
                 Socket socket1 = null;
                 Socket socket2 = null;
@@ -84,7 +84,7 @@ public class ControlServidor {
                     controlPrincipal.mostrarMensajeConsolaServidor("Accept failed: " + server1 + ", " + e.getMessage());
                     continue;
                 }
-                
+
                 ThreadServidor usuario = new ThreadServidor(socket1, socket2, this);
                 agregarCliente(usuario); // Usar el método con control de turnos
                 usuario.start(); // inicia el hilo que manejará la comunicación con este cliente
@@ -119,7 +119,7 @@ public class ControlServidor {
         // Desregistrar el usuario del control de sesiones
         String nombreUsuario = threadCliente.getServidor().getNombreUsuario();
         desregistrarUsuarioConectado(nombreUsuario);
-        
+
         controlPrincipal.mostrarMensajeConsolaServidor("Cliente removido: " + threadCliente.getInformacionCliente());
         controlPrincipal.mostrarMensajeConsolaServidor("Total de clientes restantes: " + clientesActivos.size());
 
@@ -162,7 +162,7 @@ public class ControlServidor {
      * @param usuario nombre del usuario que se desconectó
      */
     public synchronized void desregistrarUsuarioConectado(String usuario) {
-        if (usuario.isBlank() && usuariosConectados.remove(usuario)) {
+        if (!usuario.isBlank() && usuariosConectados.remove(usuario)) {
             controlPrincipal.mostrarMensajeConsolaServidor(
                     "Usuario '" + usuario + "' desconectado. Total usuarios activos: " + usuariosConectados.size()
             );
@@ -213,7 +213,7 @@ public class ControlServidor {
     public synchronized void avanzarSiguienteTurnoConcentrese() {
         // Encontrar el siguiente jugador conectado
         int siguienteTurno = encontrarSiguienteJugadorActivo();
-        
+
         if (siguienteTurno != -1) {
             this.turnoActivo = siguienteTurno;
             controlPrincipal.mostrarMensajeConsolaServidor("Turno de Concentrese pasa a: " + this.turnoActivo);
@@ -274,7 +274,7 @@ public class ControlServidor {
     public void mostrarClientesConectados() {
         controlPrincipal.mostrarMensajeConsolaServidor("=== CLIENTES CONECTADOS ===");
         controlPrincipal.mostrarMensajeConsolaServidor("Turno activo: " + turnoActivo);
-        
+
         if (clientesActivos.isEmpty()) {
             controlPrincipal.mostrarMensajeConsolaServidor("No hay clientes conectados");
         } else {
@@ -323,25 +323,25 @@ public class ControlServidor {
      * Método mejorado para verificar parejas con mejor logging
      */
     public boolean verificarPareja(int x1, int y1, String carta1, int x2, int y2, String carta2) {
-        
+
         if (x1 == x2 && y1 == y2) {
             return false;
         }
-        
+
         boolean esPareja = carta1 != null && carta1.equals(carta2);
-        
+
         if (esPareja) {
             paresEncontrados++;
-                controlPrincipal.mostrarMensajeConsolaServidor(
-                        "Progreso: " + paresEncontrados + "/" + totalPares + " pares encontrados"
-                );
-                controlPrincipal.mostrarMensajeError("No se puede enviar el mensaje");
+            controlPrincipal.mostrarMensajeConsolaServidor(
+                    "Progreso: " + paresEncontrados + "/" + totalPares + " pares encontrados"
+            );
+            controlPrincipal.mostrarMensajeError("No se puede enviar el mensaje");
         } else {
             controlPrincipal.mostrarMensajeConsolaServidor(
                     "No es pareja: '" + carta1 + "' ≠ '" + carta2 + "'"
             );
         }
-        
+
         controlPrincipal.mostrarMensajeConsolaServidor("=========================");
         return esPareja;
     }
@@ -417,7 +417,7 @@ public class ControlServidor {
                 controlPrincipal.mostrarMensajeConsolaServidor("Error al notificar reinicio: " + e.getMessage());
             }
         }
-        
+
         notificarCambioTurno();
     }
 
@@ -478,7 +478,7 @@ public class ControlServidor {
     public static void setClientesActivos(Vector<ThreadServidor> clientesActivos) {
         ControlServidor.clientesActivos = clientesActivos;
     }
-    
+
     public void asignarIps(String puerto1, String puerto2) {
         try {
             int puerto1Int = Integer.parseInt(puerto1);
@@ -486,10 +486,10 @@ public class ControlServidor {
             Servidor.setPUERTO_1(puerto1Int);
             Servidor.setPUERTO_2(puerto2Int);
         } catch (NumberFormatException e) {
-            
+
         }
     }
-    
+
     public boolean buscarUsuarioYContrasenaExistente(String usuario, String contrasena) {
         return controlPrincipal.buscarUsuarioYContrasenaExistente(usuario, contrasena);
     }
@@ -510,7 +510,7 @@ public class ControlServidor {
             }
             int valorCarta = matrizCartas[y][x];
             return String.valueOf(valorCarta);
-            
+
         } catch (Exception e) {
             return "";
         }
@@ -525,25 +525,32 @@ public class ControlServidor {
     public synchronized boolean usuarioYaConectado(String usuario) {
         return usuariosConectados.contains(usuario);
     }
-    
+
     public String obtenerJugadorPorCredenciales(String usuario) {
         return controlPrincipal.obtenerJugadorPorCredenciales(usuario);
     }
-    
+
     public void verificarJugadoresMostrarBotonJugar() {
         if (cantidadClientesLogeados >= 2) {
             controlPrincipal.ocultarBotonIniciarJuego(true);
+            for (ThreadServidor cliente : clientesActivos) {
+                try {
+                    cliente.getServidor().getServidorInformacionSalida1().writeUTF("pedirCoordenadas");
+                    cliente.getServidor().getServidorInformacionSalida1().flush();
+                } catch (IOException e) {
+                    controlPrincipal.mostrarMensajeConsolaServidor("Error al notificar reinicio: " + e.getMessage());
+                }
+            }
         } else {
             controlPrincipal.ocultarBotonIniciarJuego(false);
         }
     }
-    
+
     public static int getCantidadClientesLogeados() {
         return cantidadClientesLogeados;
     }
-    
+
     public static void setCantidadClientesLogeados(int cantidadClientesLogeados) {
         ControlServidor.cantidadClientesLogeados = cantidadClientesLogeados;
     }
-    
 }
