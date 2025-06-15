@@ -32,18 +32,24 @@ public class PanelConsolaServidor extends javax.swing.JPanel {
 
         jScrollPane1 = new javax.swing.JScrollPane();
         jTextAreaConsola = new javax.swing.JTextArea();
+        jButtonEmpezarJuego = new javax.swing.JButton();
 
         setLayout(new java.awt.BorderLayout());
 
+        jTextAreaConsola.setEditable(false);
         jTextAreaConsola.setColumns(20);
         jTextAreaConsola.setRows(5);
         jScrollPane1.setViewportView(jTextAreaConsola);
 
         add(jScrollPane1, java.awt.BorderLayout.CENTER);
+
+        jButtonEmpezarJuego.setText("Empezar Juego");
+        add(jButtonEmpezarJuego, java.awt.BorderLayout.PAGE_END);
     }// </editor-fold>//GEN-END:initComponents
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    public javax.swing.JButton jButtonEmpezarJuego;
     private javax.swing.JScrollPane jScrollPane1;
     public javax.swing.JTextArea jTextAreaConsola;
     // End of variables declaration//GEN-END:variables

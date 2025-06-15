@@ -42,6 +42,7 @@ public class PanelJuegoChat extends javax.swing.JPanel {
 
         add(jPanel1, java.awt.BorderLayout.PAGE_END);
 
+        jTextAreaMensajes.setEditable(false);
         jTextAreaMensajes.setColumns(20);
         jTextAreaMensajes.setRows(5);
         jScrollPane1.setViewportView(jTextAreaMensajes);
