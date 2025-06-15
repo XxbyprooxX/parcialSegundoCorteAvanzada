@@ -198,4 +198,12 @@ public class ControlPrincipal {
         new Thread(() -> controlServidor.runServer()).start();
     }
 
+    public boolean buscarUsuarioYContrasenaExistente(String usuario, String contrasena) {
+        return false;
+    }
+    
+    public String obtenerJugadorPorCredenciales(String usuario) {
+        return controlJugador.obtenerJugadorPorCredenciales(usuario);
+    }
+
 }

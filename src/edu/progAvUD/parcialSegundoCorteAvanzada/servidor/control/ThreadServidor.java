@@ -1,5 +1,6 @@
 package edu.progAvUD.parcialSegundoCorteAvanzada.servidor.control;
 
+import edu.progAvUD.parcialSegundoCorteAvanzada.servidor.modelo.JugadorVO;
 import edu.progAvUD.parcialSegundoCorteAvanzada.servidor.modelo.Servidor;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -17,6 +18,12 @@ public class ThreadServidor extends Thread {
      * Objeto que representa la conexión con el cliente
      */
     private Servidor servidor;
+
+    /**
+     * Jugador asignado a este hilo después del login exitoso
+     */
+    private JugadorVO jugadorAsignado;
+
     /**
      * Controlador principal del servidor para acceder a la consola y a la lista
      * de usuarios
@@ -47,7 +54,37 @@ public class ThreadServidor extends Thread {
         this.servidor = new Servidor(socketCliente1, socketCliente2, nombreUsuario);
         this.controlServidor = controlServidor;
         // Asignar turno automáticamente al crear el hilo
-        this.numeroTurno = asignarTurno();
+    }
+
+    /**
+     * Método que asigna un jugador después del login exitoso
+     *
+     * @param usuario Nombre de usuario para buscar el jugador
+     * @return true si se asignó correctamente, false en caso contrario
+     */
+    private boolean asignarJugador(String usuario) {
+        try {
+            // Buscar el jugador en la base de datos o lista de jugadores
+            String[] infoJugador = controlServidor.obtenerJugadorPorCredenciales(usuario).split(",");
+            
+            if (infoJugador != null) {
+                this.jugadorAsignado = new JugadorVO(infoJugador[0], infoJugador[1], infoJugador[2], infoJugador[3], 0, 0, 0);
+                // Resetear las estadísticas del jugador para la nueva partida
+                this.jugadorAsignado.setCantidadIntentos(0);
+                this.jugadorAsignado.setCantidadParejasResueltas(0);
+
+                controlServidor.mostrarMensajeConsolaServidor(
+                        "Jugador asignado: " + infoJugador[0]
+                        + " (Usuario: " + infoJugador[2] + ")"
+                );
+                return true;
+            }
+        } catch (Exception e) {
+            controlServidor.mostrarMensajeConsolaServidor(
+                    "Error al asignar jugador: " + e.getMessage()
+            );
+        }
+        return false;
     }
 
     /**
@@ -70,7 +107,7 @@ public class ThreadServidor extends Thread {
             // Enviar información del turno al cliente
             DataOutputStream salida1 = this.servidor.getServidorInformacionSalida1();
             if (salida1 != null) {
-                salida1.writeUTF("TURNO_ASIGNADO:" + this.numeroTurno);
+                salida1.writeUTF("turnoAsignado:" + this.numeroTurno);
                 salida1.flush();
             }
 
@@ -99,24 +136,16 @@ public class ThreadServidor extends Thread {
             // Obtener el turno actual que debe estar activo
             int turnoActivo = controlServidor.getTurnoActivo();
 
-            if (this.numeroTurno == turnoActivo) {
-                // Es el turno de este cliente
-                DataOutputStream salida1 = this.servidor.getServidorInformacionSalida1();
-                if (salida1 != null) {
-                    salida1.writeUTF("ES_TU_TURNO");
-                    salida1.flush();
-                }
-                controlServidor.mostrarMensajeConsolaServidor(
-                        "Turno activo: Cliente " + servidor.getNombreUsuario() + " (Turno #" + this.numeroTurno + ")"
-                );
-            } else {
-                // No es su turno, debe esperar
-                DataOutputStream salida1 = this.servidor.getServidorInformacionSalida1();
-                if (salida1 != null) {
-                    salida1.writeUTF("ESPERAR_TURNO:" + turnoActivo);
-                    salida1.flush();
-                }
+            // Es el turno de este cliente
+            DataOutputStream salida1 = this.servidor.getServidorInformacionSalida1();
+            if (salida1 != null) {
+                salida1.writeUTF("jugadorTurno," + turnoActivo);
+                salida1.flush();
             }
+            controlServidor.mostrarMensajeConsolaServidor(
+                    "Turno activo: Cliente " + servidor.getNombreUsuario() + " (Turno #" + this.numeroTurno + ")"
+            );
+
         } catch (IOException e) {
             controlServidor.mostrarMensajeConsolaServidor(
                     "Error al verificar turno activo: " + e.getMessage()
@@ -130,15 +159,30 @@ public class ThreadServidor extends Thread {
      */
     public void manejarAcierto() {
         try {
+            // Actualizar estadísticas del jugador
+            if (jugadorAsignado != null) {
+                jugadorAsignado.setCantidadParejasResueltas(jugadorAsignado.getCantidadParejasResueltas() + 1);
+                jugadorAsignado.setCantidadIntentos(jugadorAsignado.getCantidadIntentos() + 1);
+            }
+
+            String nombreMostrar = (jugadorAsignado != null) ? jugadorAsignado.getNombreJugador() : servidor.getNombreUsuario();
             controlServidor.mostrarMensajeConsolaServidor(
-                    "¡" + servidor.getNombreUsuario() + " acertó! Mantiene su turno #" + this.numeroTurno
+                    "¡" + nombreMostrar + " acertó! Mantiene su turno #" + this.numeroTurno
+                    + " | Parejas resueltas: " + (jugadorAsignado != null ? jugadorAsignado.getCantidadParejasResueltas() : "N/A")
             );
 
             // El jugador mantiene el turno, solo notificar el acierto
             DataOutputStream salida1 = this.servidor.getServidorInformacionSalida1();
             if (salida1 != null) {
-                salida1.writeUTF("ACIERTO_MANTIENE_TURNO");
+                salida1.writeUTF("acerto");
                 salida1.flush();
+
+                // Enviar estadísticas actualizadas
+                if (jugadorAsignado != null) {
+                    salida1.writeUTF("estadisticas:" + jugadorAsignado.getCantidadParejasResueltas()
+                            + "," + jugadorAsignado.getCantidadIntentos());
+                    salida1.flush();
+                }
             }
 
             // Verificar si el juego ha terminado (todas las cartas emparejadas)
@@ -159,18 +203,31 @@ public class ThreadServidor extends Thread {
      */
     public void manejarFallo() {
         try {
+            // Actualizar estadísticas del jugador
+            if (jugadorAsignado != null) {
+                jugadorAsignado.setCantidadIntentos(jugadorAsignado.getCantidadIntentos() + 1);
+            }
+
+            String nombreMostrar = (jugadorAsignado != null) ? jugadorAsignado.getNombreJugador() : servidor.getNombreUsuario();
             controlServidor.mostrarMensajeConsolaServidor(
-                    servidor.getNombreUsuario() + " falló. Turno pasa al siguiente jugador"
+                    nombreMostrar + " falló. Turno pasa al siguiente jugador"
+                    + " | Intentos: " + (jugadorAsignado != null ? jugadorAsignado.getCantidadIntentos() : "N/A")
             );
 
             // Notificar al cliente que falló
             DataOutputStream salida1 = this.servidor.getServidorInformacionSalida1();
             if (salida1 != null) {
-                salida1.writeUTF("FALLO_PIERDE_TURNO");
+                salida1.writeUTF("fallo");
                 salida1.flush();
+
+                // Enviar estadísticas actualizadas
+                if (jugadorAsignado != null) {
+                    salida1.writeUTF("estadisticas:" + jugadorAsignado.getCantidadParejasResueltas()
+                            + "," + jugadorAsignado.getCantidadIntentos());
+                    salida1.flush();
+                }
             }
 
-            // Avanzar al siguiente turno
             controlServidor.avanzarSiguienteTurnoConcentrese();
 
         } catch (IOException e) {
@@ -185,34 +242,16 @@ public class ThreadServidor extends Thread {
      *
      * @param x1 Coordenada X de la primera carta
      * @param y1 Coordenada Y de la primera carta
-     * @param carta1 Contenido de la primera carta como String
      * @param x2 Coordenada X de la segunda carta
      * @param y2 Coordenada Y de la segunda carta
-     * @param carta2 Contenido de la segunda carta como String
      */
-    public void procesarJugadaConcentrese(int x1, int y1, String carta1, int x2, int y2, String carta2) {
-        // Verificar que es el turno del jugador
-        if (this.numeroTurno != controlServidor.getTurnoActivo()) {
-            try {
-                DataOutputStream salida1 = this.servidor.getServidorInformacionSalida1();
-                if (salida1 != null) {
-                    salida1.writeUTF("ERROR_NO_ES_TU_TURNO");
-                    salida1.flush();
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            return;
-        }
+    public void procesarJugadaConcentrese(int x1, int y1, int x2, int y2) {
 
-        controlServidor.mostrarMensajeConsolaServidor(
-                servidor.getNombreUsuario() + " jugó: Pos1(" + x1 + "," + y1 + ")=" + carta1 
-                + " y Pos2(" + x2 + "," + y2 + ")=" + carta2
-        );
+        String tipoCarta1 = null;
+        String tipoCarta2 = null;
 
-        // Validar si las cartas forman una pareja
-        boolean esPareja = controlServidor.verificarPareja(x1, y1, carta1, x2, y2, carta2);
-        
+        boolean esPareja = controlServidor.verificarPareja(x1, y1, tipoCarta1, x2, y2, tipoCarta2);
+
         if (esPareja) {
             manejarAcierto();
         } else {
@@ -263,75 +302,52 @@ public class ThreadServidor extends Thread {
             this.servidor.setServidorInformacionSalida1(salida1);
             DataOutputStream salida2 = new DataOutputStream(this.servidor.getServidorCliente2().getOutputStream());
             this.servidor.setServidorInformacionSalida2(salida2);
-            servidor.setNombreUsuario(entrada.readUTF());
 
             // Gestionar turnos después de establecer la conexión
             gestionarTurnosConcentrese();
 
             // Ciclo principal de escucha de mensajes del cliente
-            String mensaje;
-            while ((mensaje = entrada.readUTF()) != null) {
-                String[] partes = mensaje.split(":");
+            while (true) {
+                String mensaje = entrada.readUTF();
+                String[] partes = mensaje.split(",");
                 String comando = partes[0];
 
                 switch (comando) {
-                    case "JUGADA_CONCENTRESE":
-                        // Formato: JUGADA_CONCENTRESE:x1:y1:carta1:x2:y2:carta2
-                        if (partes.length == 7) {
-                            try {
-                                int x1 = Integer.parseInt(partes[1]);
-                                int y1 = Integer.parseInt(partes[2]);
-                                String carta1 = partes[3];
-                                int x2 = Integer.parseInt(partes[4]);
-                                int y2 = Integer.parseInt(partes[5]);
-                                String carta2 = partes[6];
-                                
-                                procesarJugadaConcentrese(x1, y1, carta1, x2, y2, carta2);
-                            } catch (NumberFormatException e) {
-                                controlServidor.mostrarMensajeConsolaServidor(
-                                    "Error: Coordenadas inválidas recibidas de " + servidor.getNombreUsuario()
-                                );
-                                // Enviar error al cliente
-                                salida1 = this.servidor.getServidorInformacionSalida1();
-                                if (salida1 != null) {
-                                    salida1.writeUTF("ERROR_COORDENADAS_INVALIDAS");
-                                    salida1.flush();
-                                }
-                            }
-                        } else {
-                            controlServidor.mostrarMensajeConsolaServidor(
-                                "Error: Formato de jugada inválido de " + servidor.getNombreUsuario()
-                            );
-                            // Enviar error al cliente
-                            salida1 = this.servidor.getServidorInformacionSalida1();
-                            if (salida1 != null) {
-                                salida1.writeUTF("ERROR_FORMATO_JUGADA");
-                                salida1.flush();
-                            }
-                        }
+                    case "eleccionJugador":
+                        int x1 = Integer.parseInt(partes[1]);
+                        int y1 = Integer.parseInt(partes[2]);
+                        int x2 = Integer.parseInt(partes[4]);
+                        int y2 = Integer.parseInt(partes[5]);
+                        procesarJugadaConcentrese(x1, y1, x2, y2);
                         break;
 
-                    case "CONSULTAR_TURNO":
+                    case "consultarTurno":
                         verificarTurnoActivo();
                         break;
 
-                    case "CONSULTAR_ESTADO_JUEGO":
+                    case "consultarEstadoJuego":
                         controlServidor.enviarEstadoJuego(this);
                         break;
 
-                    default:
-                        // Procesar otros mensajes del cliente
-                        controlServidor.mostrarMensajeConsolaServidor(
-                                "Mensaje de " + servidor.getNombreUsuario() + ": " + mensaje
-                        );
-                        break;
+                    case "login":
+                        String usuario = partes[1];
+                        String contrasena = partes[2];
+                        boolean jugadorExiste = controlServidor.buscarUsuarioYContrasenaExistente(usuario, contrasena);
+                        if (jugadorExiste && asignarJugador(usuario)) {
+                            
+                            servidor.setNombreUsuario(usuario);
+                            this.numeroTurno = asignarTurno();
+                            salida1.writeUTF("valido");
+                            salida1.flush();
+                        } else {
+                            salida1.writeUTF("invalido");
+                            salida1.flush();
+                        }
                 }
             }
 
         } catch (IOException e) {
-            controlServidor.mostrarMensajeConsolaServidor(
-                    "Cliente " + servidor.getNombreUsuario() + " desconectado"
-            );
+            controlServidor.mostrarMensajeConsolaServidor("Cliente " + servidor.getNombreUsuario() + " desconectado");
             // Remover cliente de la lista al desconectarse
             controlServidor.removerCliente(this);
             e.printStackTrace();

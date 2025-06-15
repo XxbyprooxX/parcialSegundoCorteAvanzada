@@ -326,7 +326,7 @@ public class ControlServidor {
         // Notificar a todos los clientes que el juego terminó
         for (ThreadServidor cliente : clientesActivos) {
             try {
-                cliente.getServidor().getServidorInformacionSalida1().writeUTF("JUEGO_TERMINADO");
+                cliente.getServidor().getServidorInformacionSalida1().writeUTF("juegoTerminado");
                 cliente.getServidor().getServidorInformacionSalida1().flush();
             } catch (IOException e) {
                 controlPrincipal.mostrarMensajeConsolaServidor("Error al notificar fin de juego: " + e.getMessage());
@@ -355,7 +355,7 @@ public class ControlServidor {
         // Notificar a todos los clientes
         for (ThreadServidor cliente : clientesActivos) {
             try {
-                cliente.getServidor().getServidorInformacionSalida1().writeUTF("JUEGO_REINICIADO");
+                cliente.getServidor().getServidorInformacionSalida1().writeUTF("juegoReiniciado");
                 cliente.getServidor().getServidorInformacionSalida1().flush();
             } catch (IOException e) {
                 controlPrincipal.mostrarMensajeConsolaServidor("Error al notificar reinicio: " + e.getMessage());
@@ -402,7 +402,7 @@ public class ControlServidor {
      */
     public void enviarEstadoJuego(ThreadServidor cliente) {
         try {
-            String estado = "ESTADO_JUEGO:" + paresEncontrados + ":" + totalPares + ":" + turnoActivo;
+            String estado = "estadoJuego:" + paresEncontrados + ":" + totalPares + ":" + turnoActivo;
             cliente.getServidor().getServidorInformacionSalida1().writeUTF(estado);
             cliente.getServidor().getServidorInformacionSalida1().flush();
         } catch (IOException e) {
@@ -447,6 +447,13 @@ public class ControlServidor {
         } catch (NumberFormatException e) {
 
         }
-        System.out.println(Servidor.getPUERTO_1() + ", " + Servidor.getPUERTO_2());
+    }
+    
+    public boolean buscarUsuarioYContrasenaExistente(String usuario, String contrasena){
+        return controlPrincipal.buscarUsuarioYContrasenaExistente(usuario, contrasena);
+    }
+    
+    public String obtenerJugadorPorCredenciales(String usuario) {
+        return controlPrincipal.obtenerJugadorPorCredenciales(usuario);
     }
 }

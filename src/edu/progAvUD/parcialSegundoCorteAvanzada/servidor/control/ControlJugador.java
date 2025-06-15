@@ -4,9 +4,12 @@ import edu.progAvUD.parcialSegundoCorteAvanzada.servidor.modelo.JugadorDAO;
 import edu.progAvUD.parcialSegundoCorteAvanzada.servidor.modelo.JugadorVO;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Controlador de jugador corregido con mejor manejo de errores
+ *
  * @author Cristianlol789
  */
 public class ControlJugador {
@@ -60,6 +63,7 @@ public class ControlJugador {
 
     /**
      * Pide la lista completa de los jugadores
+     *
      * @return la lista con los jugadores que están en la dataBase
      */
     public ArrayList<JugadorVO> darListaJugadores() {
@@ -72,7 +76,9 @@ public class ControlJugador {
     }
 
     /**
-     * Se encarga de verificar que en la base de datos no estén repetidos los mismos Jugadores
+     * Se encarga de verificar que en la base de datos no estén repetidos los
+     * mismos Jugadores
+     *
      * @param jugador le llega el jugador para comprobar si está o no repetido
      * @return un true o false para saber si está o no repetido
      */
@@ -82,7 +88,7 @@ public class ControlJugador {
             if (jugadores == null || jugadores.isEmpty()) {
                 return true; // Si no hay jugadores, no está repetido
             }
-            
+
             for (JugadorVO jugadorExistente : jugadores) {
                 String cedula1 = jugador.getCedula() != null ? jugador.getCedula().trim() : "";
                 String cedula2 = jugadorExistente.getCedula() != null ? jugadorExistente.getCedula().trim() : "";
@@ -91,8 +97,8 @@ public class ControlJugador {
                 String usuario2 = jugadorExistente.getUsuario() != null ? jugadorExistente.getUsuario().trim().toLowerCase() : "";
 
                 // Verificar duplicados por cédula o usuario
-                if ((!cedula1.isEmpty() && cedula1.equals(cedula2)) || 
-                    (!usuario1.isEmpty() && usuario1.equals(usuario2))) {
+                if ((!cedula1.isEmpty() && cedula1.equals(cedula2))
+                        || (!usuario1.isEmpty() && usuario1.equals(usuario2))) {
                     return false; // Está repetido
                 }
             }
@@ -104,7 +110,9 @@ public class ControlJugador {
     }
 
     /**
-     * Se encarga de consultar la cantidad de filas o Jugadores que hay en la base de datos
+     * Se encarga de consultar la cantidad de filas o Jugadores que hay en la
+     * base de datos
+     *
      * @return el valor total de Jugadores o -1 en caso de error
      */
     public int consultarCantidadJugadores() {
@@ -118,6 +126,7 @@ public class ControlJugador {
 
     /**
      * Inserta un nuevo jugador en la base de datos.
+     *
      * @param jugador objeto jugadorVO con los datos a insertar.
      */
     public void insertarJugador(JugadorVO jugador) {
@@ -129,10 +138,12 @@ public class ControlJugador {
     }
 
     /**
-     * Solicita al usuario un dato faltante y valida si es numérico según el tipo.
-     * Reintenta en caso de error.
+     * Solicita al usuario un dato faltante y valida si es numérico según el
+     * tipo. Reintenta en caso de error.
+     *
      * @param mensaje texto para solicitar el dato.
-     * @param tipo indica si debe parsear a long ("cedula") o validar otros tipos;
+     * @param tipo indica si debe parsear a long ("cedula") o validar otros
+     * tipos;
      * @return cadena con el valor ingresado ya validado.
      */
     private String obtenerDatoFaltante(String mensaje, String tipo) {
@@ -172,7 +183,40 @@ public class ControlJugador {
                 return obtenerDatoFaltante(mensaje, tipo);
             }
         }
-        
+
         return dato.trim();
+    }
+
+    public boolean consultarUsuarioYContrasenaExistente(String usuario, String contrasena) {
+        JugadorVO jugador = new JugadorVO();
+        try {
+            jugador = jugadorDao.consultarUsuarioJugador(usuario, jugador);
+            if (jugador.getContrasena().equals(contrasena)) {
+                return true;
+            } else {
+                controlPrincipal.mostrarMensajeError("La contrasena no coincide");
+            }
+        } catch (SQLException ex) {
+            controlPrincipal.mostrarMensajeError("No existe el usuario");
+        }
+        return false;
+    }
+
+    /**
+     * Método que obtiene un objeto JugadorVO basado en las credenciales de
+     * login
+     *
+     * @param usuario Nombre de usuario
+     * @return JugadorVO si las credenciales son válidas, null en caso contrario
+     */
+    public String obtenerJugadorPorCredenciales(String usuario) {
+        JugadorVO jugador = new JugadorVO();
+        try {
+            jugador = jugadorDao.consultarUsuarioJugador(usuario, jugador);
+            return jugador.getNombreJugador() + "," + jugador.getCedula() + "," + jugador.getUsuario() + "," + jugador.getContrasena();
+        } catch (SQLException ex) {
+            controlPrincipal.mostrarMensajeError("No existe el usuario");
+        }
+        return "Error";
     }
 }
