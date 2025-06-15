@@ -76,4 +76,8 @@ public class ControlPrincipal {
     public void crearCliente(){
         controlCliente.crearCliente();
     }
+    
+    public boolean enviarCredencialesCliente(String usuario, String contrasena){
+        return controlCliente.enviarCredencialesCliente(usuario, contrasena);
+    }
 }

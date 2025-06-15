@@ -8,6 +8,7 @@ import edu.progAvUD.parcialSegundoCorteAvanzada.cliente.modelo.Cliente;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.net.Socket;
 
 /**
@@ -56,6 +57,25 @@ public class ControlCliente {
         }
 
     }
+    
+    public boolean enviarCredencialesCliente(String usuario, String contrasena){
+        boolean respuesta = false;
+        try {
+            cliente.getSalida().writeUTF("login,"+usuario+","+contrasena);
+            String estado = cliente.getEntrada().readUTF();
+            
+            if("valido".equals(estado)){
+                respuesta=true;
+            }else if ("invalido".equals(estado)){
+                respuesta = false;
+            }
+            
+        } catch (IOException ex) {
+            controlPrincipal.mostrarMensajeError("Ocurrio algun error al mandar credenciales");
+        }
+        return respuesta;
+    }
+
 
     public void crearCliente() {
         this.cliente = new Cliente();

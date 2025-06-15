@@ -23,24 +23,42 @@ public class ControlGrafico implements ActionListener {
         this.ventanaPrincipal = new VentanaPrincipal();
 
         ventanaPrincipal.mostrarPanel(ventanaPrincipal.panelInicial);
-        
+
         ventanaPrincipal.panelInicial.jButtonPropiedadesSocket.addActionListener(this);
+        ventanaPrincipal.panelLogin.jButtonInciarSesion.addActionListener(this);
 
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        if(e.getSource() == ventanaPrincipal.panelInicial.jButtonPropiedadesSocket){
+        if (e.getSource() == ventanaPrincipal.panelInicial.jButtonPropiedadesSocket) {
             controlPrincipal.cargarDatosSocket();
             controlPrincipal.crearCliente();
             controlPrincipal.conectarAServer();
+            ventanaPrincipal.mostrarPanel(ventanaPrincipal.panelLogin);
+        }
+        if (e.getSource() == ventanaPrincipal.panelLogin.jButtonInciarSesion) {
+
+            String usuario = ventanaPrincipal.panelLogin.jTextFieldUsuario.getText();
+            char[] contrasenaChars = ventanaPrincipal.panelLogin.jPasswordField.getPassword();
+            String contrasena = new String(contrasenaChars);
+            
+            if(controlPrincipal.enviarCredencialesCliente(usuario, contrasena)){
+                ventanaPrincipal.mostrarMensajeExito("Has iniciado sesion con exito");
+                ventanaPrincipal.mostrarPanel(ventanaPrincipal.panelJuegoChat);
+            } else{
+                ventanaPrincipal.mostrarMensajeError("Credenciales incorrectas intente de nuevo");
+            }
+            
+            
+            
             
         }
     }
 
     public File pedirArchivoPropiedades() {
         return ventanaPrincipal.pedirArchivoPropiedades();
-        
+
     }
 
     /**
