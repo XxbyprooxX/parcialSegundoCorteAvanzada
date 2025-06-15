@@ -316,6 +316,7 @@ public class ThreadServidor extends Thread {
         } catch (IOException e) {
             controlServidor.mostrarMensajeConsolaServidor("Cliente " + servidor.getNombreUsuario() + " desconectado");
             ControlServidor.setCantidadClientesLogeados(ControlServidor.getCantidadClientesLogeados() - 1);
+            controlServidor.verificarJugadoresMostrarBotonJugar();
             controlServidor.removerCliente(this);
         }
     }
