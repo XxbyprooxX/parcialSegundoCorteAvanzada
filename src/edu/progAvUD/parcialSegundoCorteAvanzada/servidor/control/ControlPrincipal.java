@@ -199,7 +199,7 @@ public class ControlPrincipal {
     }
 
     public boolean buscarUsuarioYContrasenaExistente(String usuario, String contrasena) {
-        return false;
+        return controlJugador.consultarUsuarioYContrasenaExistente(usuario, contrasena);
     }
     
     public String obtenerJugadorPorCredenciales(String usuario) {
