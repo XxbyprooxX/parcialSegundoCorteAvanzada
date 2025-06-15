@@ -332,15 +332,10 @@ public class ControlServidor {
         
         if (esPareja) {
             paresEncontrados++;
-//            try {
-//                cliente.getServidor().getServidorInformacionSalida1().writeUTF("parejaEncontrada");
-//                cliente.getServidor().getServidorInformacionSalida1().flush();
                 controlPrincipal.mostrarMensajeConsolaServidor(
                         "Progreso: " + paresEncontrados + "/" + totalPares + " pares encontrados"
                 );
-//            } catch (IOException ex) {
                 controlPrincipal.mostrarMensajeError("No se puede enviar el mensaje");
-//            }
         } else {
             controlPrincipal.mostrarMensajeConsolaServidor(
                     "No es pareja: '" + carta1 + "' ≠ '" + carta2 + "'"
@@ -454,21 +449,6 @@ public class ControlServidor {
      */
     public int getTotalPares() {
         return totalPares;
-    }
-
-    /**
-     * Envía el estado actual del juego a un cliente específico
-     *
-     * @param cliente el cliente al que enviar el estado
-     */
-    public void enviarEstadoJuego(ThreadServidor cliente) {
-        try {
-            String estado = "estadoJuego:" + paresEncontrados + ":" + totalPares + ":" + turnoActivo;
-            cliente.getServidor().getServidorInformacionSalida1().writeUTF(estado);
-            cliente.getServidor().getServidorInformacionSalida1().flush();
-        } catch (IOException e) {
-            controlPrincipal.mostrarMensajeConsolaServidor("Error al enviar estado del juego: " + e.getMessage());
-        }
     }
 
     /**

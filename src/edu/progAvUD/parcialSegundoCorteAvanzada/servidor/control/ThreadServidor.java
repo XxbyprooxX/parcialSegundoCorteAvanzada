@@ -7,6 +7,8 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -123,13 +125,13 @@ public class ThreadServidor extends Thread {
         int turnoActivo = controlServidor.getTurnoActivo();
         boolean esMiTurno = (this.numeroTurno == turnoActivo);
 
-        // Enviar información específica del cliente
-        controlServidor.mostrarMensajeConsolaServidor(
-                "Cliente " + servidor.getNombreUsuario()
-                + " - Turno propio: " + this.numeroTurno
-                + " - Turno activo: " + turnoActivo
-                + " - Es mi turno: " + esMiTurno
-        );
+        try {
+            DataOutputStream salida1 = this.servidor.getServidorInformacionSalida1();
+            salida1.writeUTF("" + turnoActivo);
+            salida1.flush();
+        } catch (IOException ex) {
+
+        }
     }
 
     /**
@@ -210,7 +212,7 @@ public class ThreadServidor extends Thread {
      * @param y2 Coordenada Y de la segunda carta
      */
     public void procesarJugadaConcentrese(int x1, int y1, int x2, int y2) {
-        
+
         String tipoCarta1 = controlServidor.obtenerTipoCartaEnPosicion(x1, y1);
         String tipoCarta2 = controlServidor.obtenerTipoCartaEnPosicion(x2, y2);
 
@@ -291,10 +293,6 @@ public class ThreadServidor extends Thread {
                         verificarTurnoActivo();
                         break;
 
-                    case "consultarEstadoJuego":
-                        controlServidor.enviarEstadoJuego(this);
-                        break;
-
                     case "login":
                         String usuario = partes[1];
                         String contrasena = partes[2];
@@ -328,6 +326,10 @@ public class ThreadServidor extends Thread {
                                 gestionarTurnosConcentrese();
                                 ControlServidor.setCantidadClientesLogeados(ControlServidor.getCantidadClientesLogeados() + 1);
                                 controlServidor.verificarJugadoresMostrarBotonJugar();
+
+                                salida1.writeUTF("" + this.numeroTurno);
+                                salida1.flush();
+
                             } else {
                                 controlServidor.mostrarMensajeConsolaServidor(
                                         "Error: Usuario '" + usuario + "' ya estaba registrado como conectado"

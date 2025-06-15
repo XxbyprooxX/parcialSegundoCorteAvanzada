@@ -129,59 +129,6 @@ public class JugadorDAO {
     }
 
     /**
-     * Consulta jugadores por un factor específico usando PreparedStatement
-     *
-     * @param factorBusqueda el campo por el cual buscar (cedula, usuario, etc.)
-     * @param datoBuscado valor a buscar
-     * @return ArrayList con los jugadores encontrados
-     * @throws SQLException Si ocurre un error al ejecutar la consulta
-     */
-    public ArrayList<JugadorVO> consultarJugadores(String factorBusqueda, String datoBuscado) throws SQLException {
-        // Validar que el factor de búsqueda sea uno de los campos permitidos
-        if (!esFactorBusquedaValido(factorBusqueda)) {
-            throw new SQLException("Factor de búsqueda no válido: " + factorBusqueda);
-        }
-
-        String consulta = "SELECT * FROM jugadores WHERE " + factorBusqueda + " = ?";
-        connection = ConexionBD.getConnection();
-        preparedStatement = connection.prepareStatement(consulta);
-        preparedStatement.setString(1, datoBuscado);
-        resultSet = preparedStatement.executeQuery();
-
-        ArrayList<JugadorVO> jugadores = new ArrayList<>();
-        while (resultSet.next()) {
-            JugadorVO jugador = new JugadorVO();
-            jugador.setNombreJugador(resultSet.getString("nombreJugador"));
-            jugador.setCedula(resultSet.getString("cedula"));
-            jugador.setUsuario(resultSet.getString("usuario"));
-            jugador.setContrasena(resultSet.getString("contrasena"));
-            jugadores.add(jugador);
-        }
-
-        // Cerrar recursos
-        if (resultSet != null) {
-            resultSet.close();
-        }
-        if (preparedStatement != null) {
-            preparedStatement.close();
-        }
-        ConexionBD.desconectar();
-
-        return jugadores;
-    }
-
-    /**
-     * Valida que el factor de búsqueda sea uno de los campos permitidos
-     *
-     * @param factor el factor a validar
-     * @return true si es válido, false en caso contrario
-     */
-    private boolean esFactorBusquedaValido(String factor) {
-        return factor.equals("nombreJugador") || factor.equals("cedula")
-                || factor.equals("usuario") || factor.equals("contrasena");
-    }
-
-    /**
      * Consulta la cantidad total de jugadores en la base de datos
      *
      * @return Número de jugadores registrados
@@ -276,7 +223,6 @@ public class JugadorDAO {
 
         preparedStatement.executeUpdate();
 
-        // Cerrar recursos
         if (preparedStatement != null) {
             preparedStatement.close();
         }
