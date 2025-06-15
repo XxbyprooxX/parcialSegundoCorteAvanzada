@@ -23,6 +23,10 @@ public class ControlGrafico implements ActionListener {
         ventanaPrincipal.panelInicial.jButtonPropiedadesJugadores.setEnabled(false);
         ventanaPrincipal.panelInicial.jButtonPropiedadesSockets.setEnabled(false);
         ventanaPrincipal.mostrarPanel(ventanaPrincipal.panelInicial);
+        
+        ventanaPrincipal.panelConsolaServidor.jButtonEmpezarJuego.setVisible(false);
+        ventanaPrincipal.panelConsolaServidor.jButtonEmpezarJuego.addActionListener(this);
+        
     }
 
     public void mostrarMensajeError(String mensaje) {
@@ -72,6 +76,9 @@ public class ControlGrafico implements ActionListener {
             ventanaPrincipal.panelInicial.jButtonPropiedadesJugadores.setEnabled(true);
             ventanaPrincipal.panelInicial.jButtonPropiedadesSockets.setEnabled(false);
         }
+        if(e.getSource() == ventanaPrincipal.panelConsolaServidor.jButtonEmpezarJuego){
+            
+        }
             
     }
 
@@ -82,6 +89,11 @@ public class ControlGrafico implements ActionListener {
      */
     public void mostrarMensajeConsolaServidor(String mensaje) {
         ventanaPrincipal.mostrarMensajeConsolaServidor(mensaje);
+    }
+    
+    
+    public void ocultarBotonIniciarJuego(boolean estado){
+        ventanaPrincipal.panelConsolaServidor.jButtonEmpezarJuego.setVisible(estado);
     }
     
 }

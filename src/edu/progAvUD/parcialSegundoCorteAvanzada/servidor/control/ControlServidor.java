@@ -76,6 +76,7 @@ public class ControlServidor {
                 ThreadServidor usuario = new ThreadServidor(socket1, socket2, this);
                 agregarCliente(usuario); // Usar el método con control de turnos
                 usuario.start(); // inicia el hilo que manejará la comunicación con este cliente
+                verificarJugadoresMostrarBotonJugar();
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -455,5 +456,13 @@ public class ControlServidor {
     
     public String obtenerJugadorPorCredenciales(String usuario) {
         return controlPrincipal.obtenerJugadorPorCredenciales(usuario);
+    }
+    
+    public void verificarJugadoresMostrarBotonJugar(){
+        if(turnoActivo>=2){
+            controlPrincipal.ocultarBotonIniciarJuego(true);
+        } else{
+            controlPrincipal.ocultarBotonIniciarJuego(false);
+        }
     }
 }

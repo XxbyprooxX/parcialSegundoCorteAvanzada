@@ -205,5 +205,9 @@ public class ControlPrincipal {
     public String obtenerJugadorPorCredenciales(String usuario) {
         return controlJugador.obtenerJugadorPorCredenciales(usuario);
     }
+    
+    public void ocultarBotonIniciarJuego(boolean estado){
+        controlGrafico.ocultarBotonIniciarJuego(estado);
+    }
 
 }
