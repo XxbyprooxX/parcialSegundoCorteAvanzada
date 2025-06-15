@@ -7,8 +7,6 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.Socket;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -173,8 +171,9 @@ public class ThreadServidor extends Thread {
     /**
      * Método que maneja cuando el jugador falla en Concentrese El turno pasa al
      * siguiente jugador
+     * @param razon es el motivo por el cual fallo
      */
-    public void manejarFallo() {
+    public void manejarFallo(String razon) {
         try {
             if (jugadorAsignado != null) {
                 jugadorAsignado.setCantidadIntentos(jugadorAsignado.getCantidadIntentos() + 1);
@@ -189,7 +188,7 @@ public class ThreadServidor extends Thread {
             // Notificar al cliente que falló
             DataOutputStream salida1 = this.servidor.getServidorInformacionSalida1();
             if (salida1 != null) {
-                salida1.writeUTF("fallo");
+                salida1.writeUTF("fallo," + razon);
                 salida1.flush();
             }
 
@@ -217,7 +216,7 @@ public class ThreadServidor extends Thread {
 
         // Verificar si se pudieron obtener las cartas
         if (tipoCarta1.equals("") || tipoCarta2.equals("")) {
-            manejarFallo();
+            manejarFallo("Estas coordenadas estaban fuera del rango");
             return;
         }
 
@@ -226,7 +225,7 @@ public class ThreadServidor extends Thread {
         if (esPareja) {
             manejarAcierto();
         } else {
-            manejarFallo();
+            manejarFallo("No son parejas");
         }
     }
 
@@ -288,7 +287,7 @@ public class ThreadServidor extends Thread {
                             int y2 = Integer.parseInt(partes[5]);
                             procesarJugadaConcentrese(x1, y1, x2, y2);
                         } catch (NumberFormatException e) {
-                            manejarFallo();
+                            manejarFallo("Escribio letran en vez de numeros");
                         }
 
                         break;
