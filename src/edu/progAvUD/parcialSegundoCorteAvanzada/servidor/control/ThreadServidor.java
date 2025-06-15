@@ -220,7 +220,7 @@ public class ThreadServidor extends Thread {
             return;
         }
 
-        boolean esPareja = controlServidor.verificarPareja(x1, y1, tipoCarta1, x2, y2, tipoCarta2, this);
+        boolean esPareja = controlServidor.verificarPareja(x1, y1, tipoCarta1, x2, y2, tipoCarta2);
 
         if (esPareja) {
             manejarAcierto();

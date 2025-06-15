@@ -7,8 +7,6 @@ import java.net.Socket;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.Vector;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -324,7 +322,7 @@ public class ControlServidor {
     /**
      * Método mejorado para verificar parejas con mejor logging
      */
-    public boolean verificarPareja(int x1, int y1, String carta1, int x2, int y2, String carta2, ThreadServidor cliente) {
+    public boolean verificarPareja(int x1, int y1, String carta1, int x2, int y2, String carta2) {
         
         if (x1 == x2 && y1 == y2) {
             return false;
@@ -334,15 +332,15 @@ public class ControlServidor {
         
         if (esPareja) {
             paresEncontrados++;
-            try {
-                cliente.getServidor().getServidorInformacionSalida1().writeUTF("parejaEncontrada");
-                cliente.getServidor().getServidorInformacionSalida1().flush();
+//            try {
+//                cliente.getServidor().getServidorInformacionSalida1().writeUTF("parejaEncontrada");
+//                cliente.getServidor().getServidorInformacionSalida1().flush();
                 controlPrincipal.mostrarMensajeConsolaServidor(
                         "Progreso: " + paresEncontrados + "/" + totalPares + " pares encontrados"
                 );
-            } catch (IOException ex) {
+//            } catch (IOException ex) {
                 controlPrincipal.mostrarMensajeError("No se puede enviar el mensaje");
-            }
+//            }
         } else {
             controlPrincipal.mostrarMensajeConsolaServidor(
                     "No es pareja: '" + carta1 + "' ≠ '" + carta2 + "'"

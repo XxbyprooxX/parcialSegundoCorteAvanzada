@@ -4,16 +4,23 @@
  */
 package edu.progAvUD.parcialSegundoCorteAvanzada.cliente.control;
 
+import java.io.DataInputStream;
+
 /**
  *
  * @author Andres Felipe
  */
-public class ClienteHilo extends Thread {
+public class ThreadCliente extends Thread {
+    
+    public DataInputStream entrada;
     
     public ControlCliente controlCliente;
 
-    public ClienteHilo(ControlCliente controlCliente) {
+    public ThreadCliente(DataInputStream entrada, ControlCliente controlCliente) {
+        this.entrada = entrada;
         this.controlCliente = controlCliente;
     }
+
+   
     
 }

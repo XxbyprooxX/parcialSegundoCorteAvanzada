@@ -18,7 +18,7 @@ import java.net.Socket;
 public class ControlCliente {
 
     private Cliente cliente;
-    private ClienteHilo clienteHilo;
+    private ThreadCliente clienteHilo;
     private ControlPrincipal controlPrincipal;
 
     public ControlCliente(ControlPrincipal controlPrincipal) {
