@@ -66,7 +66,7 @@ public class ThreadServidor extends Thread {
         try {
             // Buscar el jugador en la base de datos o lista de jugadores
             String[] infoJugador = controlServidor.obtenerJugadorPorCredenciales(usuario).split(",");
-            
+
             if (infoJugador != null) {
                 this.jugadorAsignado = new JugadorVO(infoJugador[0], infoJugador[1], infoJugador[2], infoJugador[3], 0, 0, 0);
                 // Resetear las estadísticas del jugador para la nueva partida
@@ -94,7 +94,9 @@ public class ThreadServidor extends Thread {
      */
     private int asignarTurno() {
         int turno = contadorTurnos.getAndIncrement();
-        controlServidor.mostrarMensajeConsolaServidor("Cliente conectado - Turno asignado: " + turno);
+        controlServidor.mostrarMensajeConsolaServidor(
+                "Cliente " + servidor.getNombreUsuario() + " conectado - Turno asignado: " + turno
+        );
         return turno;
     }
 
@@ -104,22 +106,26 @@ public class ThreadServidor extends Thread {
      */
     public void gestionarTurnosConcentrese() {
         try {
-            // Enviar información del turno al cliente
+            // Enviar información del turno específico del cliente
             DataOutputStream salida1 = this.servidor.getServidorInformacionSalida1();
             if (salida1 != null) {
+                // Enviar el turno asignado a ESTE cliente específico
                 salida1.writeUTF("turnoAsignado:" + this.numeroTurno);
+                salida1.flush();
+
+                // Enviar si es el turno activo de este cliente
+                boolean esMiTurno = (this.numeroTurno == controlServidor.getTurnoActivo());
+                salida1.writeUTF("jugadorTurno," + this.numeroTurno + "," + esMiTurno);
                 salida1.flush();
             }
 
             // Mostrar información en la consola del servidor
             controlServidor.mostrarMensajeConsolaServidor(
                     "Cliente: " + servidor.getNombreUsuario()
-                    + " | Turno: " + this.numeroTurno
-                    + " | Estado: Conectado"
+                    + " | Turno asignado: " + this.numeroTurno
+                    + " | Turno activo global: " + controlServidor.getTurnoActivo()
+                    + " | Es mi turno: " + (this.numeroTurno == controlServidor.getTurnoActivo())
             );
-
-            // Verificar si es el turno de este cliente
-            verificarTurnoActivo();
 
         } catch (IOException e) {
             controlServidor.mostrarMensajeConsolaServidor(
@@ -135,15 +141,21 @@ public class ThreadServidor extends Thread {
         try {
             // Obtener el turno actual que debe estar activo
             int turnoActivo = controlServidor.getTurnoActivo();
+            boolean esMiTurno = (this.numeroTurno == turnoActivo);
 
-            // Es el turno de este cliente
+            // Enviar información específica del cliente
             DataOutputStream salida1 = this.servidor.getServidorInformacionSalida1();
             if (salida1 != null) {
-                salida1.writeUTF("jugadorTurno," + turnoActivo);
+                // Formato: "jugadorTurno,miTurno,turnoActivo,esMiTurno"
+                salida1.writeUTF("jugadorTurno," + this.numeroTurno + "," + turnoActivo + "," + esMiTurno);
                 salida1.flush();
             }
+
             controlServidor.mostrarMensajeConsolaServidor(
-                    "Turno activo: Cliente " + servidor.getNombreUsuario() + " (Turno #" + this.numeroTurno + ")"
+                    "Cliente " + servidor.getNombreUsuario()
+                    + " - Turno propio: " + this.numeroTurno
+                    + " - Turno activo: " + turnoActivo
+                    + " - Es mi turno: " + esMiTurno
             );
 
         } catch (IOException e) {
@@ -303,9 +315,8 @@ public class ThreadServidor extends Thread {
             DataOutputStream salida2 = new DataOutputStream(this.servidor.getServidorCliente2().getOutputStream());
             this.servidor.setServidorInformacionSalida2(salida2);
 
-            // Gestionar turnos después de establecer la conexión
-            gestionarTurnosConcentrese();
-
+            // NO llamar a gestionarTurnosConcentrese() aquí
+            // gestionarTurnosConcentrese(); // ❌ QUITAR ESTA LÍNEA
             // Ciclo principal de escucha de mensajes del cliente
             while (true) {
                 String mensaje = entrada.readUTF();
@@ -333,16 +344,22 @@ public class ThreadServidor extends Thread {
                         String usuario = partes[1];
                         String contrasena = partes[2];
                         boolean jugadorExiste = controlServidor.buscarUsuarioYContrasenaExistente(usuario, contrasena);
+
                         if (jugadorExiste && asignarJugador(usuario)) {
-                            
                             servidor.setNombreUsuario(usuario);
-                            this.numeroTurno = asignarTurno();
+                            this.numeroTurno = asignarTurno(); // ✅ Asignar turno
+
                             salida1.writeUTF("valido");
                             salida1.flush();
+
+                            // ✅ AHORA SÍ gestionar turnos después del login exitoso
+                            gestionarTurnosConcentrese();
+
                         } else {
                             salida1.writeUTF("invalido");
                             salida1.flush();
                         }
+                        break;
                 }
             }
 

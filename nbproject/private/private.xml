@@ -4,10 +4,8 @@
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
             <file>file:/C:/Users/User/Documents/NetBeansProjects/parcialSegundoCorteAvanzada/src/edu/progAvUD/parcialSegundoCorteAvanzada/servidor/control/ControlPrincipal.java</file>
-            <file>file:/C:/Users/User/Documents/NetBeansProjects/parcialSegundoCorteAvanzada/src/edu/progAvUD/parcialSegundoCorteAvanzada/servidor/data/scriptSQL.sql</file>
-            <file>file:/C:/Users/User/Documents/NetBeansProjects/parcialSegundoCorteAvanzada/src/edu/progAvUD/parcialSegundoCorteAvanzada/servidor/data/InfoJugadores.properties</file>
-            <file>file:/C:/Users/User/Documents/NetBeansProjects/parcialSegundoCorteAvanzada/src/edu/progAvUD/parcialSegundoCorteAvanzada/servidor/data/InfoBD.properties</file>
             <file>file:/C:/Users/User/Documents/NetBeansProjects/parcialSegundoCorteAvanzada/src/edu/progAvUD/parcialSegundoCorteAvanzada/servidor/control/ThreadServidor.java</file>
+            <file>file:/C:/Users/User/Documents/NetBeansProjects/parcialSegundoCorteAvanzada/src/edu/progAvUD/parcialSegundoCorteAvanzada/servidor/data/InfoJugadores.properties</file>
         </group>
     </open-files>
 </project-private>
