@@ -176,7 +176,6 @@ public class ThreadServidor extends Thread {
      */
     public void manejarFallo() {
         try {
-            // Actualizar estadísticas del jugador
             if (jugadorAsignado != null) {
                 jugadorAsignado.setCantidadIntentos(jugadorAsignado.getCantidadIntentos() + 1);
             }
@@ -282,11 +281,16 @@ public class ThreadServidor extends Thread {
 
                 switch (comando) {
                     case "eleccionJugador":
-                        int x1 = Integer.parseInt(partes[1]);
-                        int y1 = Integer.parseInt(partes[2]);
-                        int x2 = Integer.parseInt(partes[4]);
-                        int y2 = Integer.parseInt(partes[5]);
-                        procesarJugadaConcentrese(x1, y1, x2, y2);
+                        try {
+                            int x1 = Integer.parseInt(partes[1]);
+                            int y1 = Integer.parseInt(partes[2]);
+                            int x2 = Integer.parseInt(partes[4]);
+                            int y2 = Integer.parseInt(partes[5]);
+                            procesarJugadaConcentrese(x1, y1, x2, y2);
+                        } catch (NumberFormatException e) {
+                            manejarFallo();
+                        }
+
                         break;
 
                     case "consultarTurno":
