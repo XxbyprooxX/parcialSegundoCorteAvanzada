@@ -18,8 +18,9 @@ public class ControlServidor {
      * Lista de clientes actualmente conectados al servidor. Cada cliente se
      * representa mediante un hilo de tipo {@link ThreadServidor}.
      */
-    public static Vector<ThreadServidor> clientesActivos = new Vector<>();
+    private static Vector<ThreadServidor> clientesActivos;
 
+    private static int cantidadClientesLogeados;
     /**
      * Turno actualmente activo en el servidor
      */
@@ -43,6 +44,8 @@ public class ControlServidor {
      */
     public ControlServidor(ControlPrincipal controlPrincipal) {
         this.controlPrincipal = controlPrincipal;
+        clientesActivos = new Vector<>();
+        cantidadClientesLogeados = 0;
     }
 
     /**
@@ -76,7 +79,6 @@ public class ControlServidor {
                 ThreadServidor usuario = new ThreadServidor(socket1, socket2, this);
                 agregarCliente(usuario); // Usar el método con control de turnos
                 usuario.start(); // inicia el hilo que manejará la comunicación con este cliente
-                verificarJugadoresMostrarBotonJugar();
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -459,10 +461,19 @@ public class ControlServidor {
     }
     
     public void verificarJugadoresMostrarBotonJugar(){
-        if(turnoActivo>=2){
+        if(cantidadClientesLogeados >= 2){
             controlPrincipal.ocultarBotonIniciarJuego(true);
         } else{
             controlPrincipal.ocultarBotonIniciarJuego(false);
         }
     }
+
+    public static int getCantidadClientesLogeados() {
+        return cantidadClientesLogeados;
+    }
+
+    public static void setCantidadClientesLogeados(int cantidadClientesLogeados) {
+        ControlServidor.cantidadClientesLogeados = cantidadClientesLogeados;
+    }
+    
 }

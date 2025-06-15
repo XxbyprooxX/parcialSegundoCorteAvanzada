@@ -33,7 +33,7 @@ public class ThreadServidor extends Thread {
     /**
      * Contador estático para asignar turnos únicos a cada cliente
      */
-    private static AtomicInteger contadorTurnos = new AtomicInteger(1);
+    private static AtomicInteger contadorTurnos;
 
     /**
      * Número de turno asignado a este cliente
@@ -51,6 +51,7 @@ public class ThreadServidor extends Thread {
      */
     public ThreadServidor(Socket socketCliente1, Socket socketCliente2, ControlServidor controlServidor) {
         String nombreUsuario = "";
+        contadorTurnos = new AtomicInteger(1);
         this.servidor = new Servidor(socketCliente1, socketCliente2, nombreUsuario);
         this.controlServidor = controlServidor;
         // Asignar turno automáticamente al crear el hilo
@@ -301,6 +302,8 @@ public class ThreadServidor extends Thread {
                             salida1.flush();
 
                             gestionarTurnosConcentrese();
+                            ControlServidor.setCantidadClientesLogeados(ControlServidor.getCantidadClientesLogeados() + 1);
+                            controlServidor.verificarJugadoresMostrarBotonJugar();
 
                         } else {
                             salida1.writeUTF("invalido");
@@ -312,10 +315,7 @@ public class ThreadServidor extends Thread {
 
         } catch (IOException e) {
             controlServidor.mostrarMensajeConsolaServidor("Cliente " + servidor.getNombreUsuario() + " desconectado");
-            // Remover cliente de la lista al desconectarse
-            controlServidor.removerCliente(this);
-            e.printStackTrace();
-        } finally {
+            ControlServidor.setCantidadClientesLogeados(ControlServidor.getCantidadClientesLogeados() - 1);
             controlServidor.removerCliente(this);
         }
     }
