@@ -105,64 +105,30 @@ public class ThreadServidor extends Thread {
      * Concentrese
      */
     public void gestionarTurnosConcentrese() {
-        try {
-            // Enviar información del turno específico del cliente
-            DataOutputStream salida1 = this.servidor.getServidorInformacionSalida1();
-            if (salida1 != null) {
-                // Enviar el turno asignado a ESTE cliente específico
-                salida1.writeUTF("turnoAsignado:" + this.numeroTurno);
-                salida1.flush();
-
-                // Enviar si es el turno activo de este cliente
-                boolean esMiTurno = (this.numeroTurno == controlServidor.getTurnoActivo());
-                salida1.writeUTF("jugadorTurno," + this.numeroTurno + "," + esMiTurno);
-                salida1.flush();
-            }
-
-            // Mostrar información en la consola del servidor
-            controlServidor.mostrarMensajeConsolaServidor(
-                    "Cliente: " + servidor.getNombreUsuario()
-                    + " | Turno asignado: " + this.numeroTurno
-                    + " | Turno activo global: " + controlServidor.getTurnoActivo()
-                    + " | Es mi turno: " + (this.numeroTurno == controlServidor.getTurnoActivo())
-            );
-
-        } catch (IOException e) {
-            controlServidor.mostrarMensajeConsolaServidor(
-                    "Error al gestionar turno del cliente " + servidor.getNombreUsuario() + ": " + e.getMessage()
-            );
-        }
+        // Mostrar información en la consola del servidor
+        controlServidor.mostrarMensajeConsolaServidor(
+                "Cliente: " + servidor.getNombreUsuario()
+                + " | Turno asignado: " + this.numeroTurno
+                + " | Turno activo global: " + controlServidor.getTurnoActivo()
+                + " | Es mi turno: " + (this.numeroTurno == controlServidor.getTurnoActivo())
+        );
     }
 
     /**
      * Método que verifica si es el turno activo del cliente
      */
     public void verificarTurnoActivo() {
-        try {
-            // Obtener el turno actual que debe estar activo
-            int turnoActivo = controlServidor.getTurnoActivo();
-            boolean esMiTurno = (this.numeroTurno == turnoActivo);
+        // Obtener el turno actual que debe estar activo
+        int turnoActivo = controlServidor.getTurnoActivo();
+        boolean esMiTurno = (this.numeroTurno == turnoActivo);
 
-            // Enviar información específica del cliente
-            DataOutputStream salida1 = this.servidor.getServidorInformacionSalida1();
-            if (salida1 != null) {
-                // Formato: "jugadorTurno,miTurno,turnoActivo,esMiTurno"
-                salida1.writeUTF("jugadorTurno," + this.numeroTurno + "," + turnoActivo + "," + esMiTurno);
-                salida1.flush();
-            }
-
-            controlServidor.mostrarMensajeConsolaServidor(
-                    "Cliente " + servidor.getNombreUsuario()
-                    + " - Turno propio: " + this.numeroTurno
-                    + " - Turno activo: " + turnoActivo
-                    + " - Es mi turno: " + esMiTurno
-            );
-
-        } catch (IOException e) {
-            controlServidor.mostrarMensajeConsolaServidor(
-                    "Error al verificar turno activo: " + e.getMessage()
-            );
-        }
+        // Enviar información específica del cliente
+        controlServidor.mostrarMensajeConsolaServidor(
+                "Cliente " + servidor.getNombreUsuario()
+                + " - Turno propio: " + this.numeroTurno
+                + " - Turno activo: " + turnoActivo
+                + " - Es mi turno: " + esMiTurno
+        );
     }
 
     /**
@@ -188,16 +154,8 @@ public class ThreadServidor extends Thread {
             if (salida1 != null) {
                 salida1.writeUTF("acerto");
                 salida1.flush();
-
-                // Enviar estadísticas actualizadas
-                if (jugadorAsignado != null) {
-                    salida1.writeUTF("estadisticas:" + jugadorAsignado.getCantidadParejasResueltas()
-                            + "," + jugadorAsignado.getCantidadIntentos());
-                    salida1.flush();
-                }
             }
 
-            // Verificar si el juego ha terminado (todas las cartas emparejadas)
             if (controlServidor.verificarJuegoTerminado()) {
                 controlServidor.terminarJuego();
             }
@@ -231,13 +189,6 @@ public class ThreadServidor extends Thread {
             if (salida1 != null) {
                 salida1.writeUTF("fallo");
                 salida1.flush();
-
-                // Enviar estadísticas actualizadas
-                if (jugadorAsignado != null) {
-                    salida1.writeUTF("estadisticas:" + jugadorAsignado.getCantidadParejasResueltas()
-                            + "," + jugadorAsignado.getCantidadIntentos());
-                    salida1.flush();
-                }
             }
 
             controlServidor.avanzarSiguienteTurnoConcentrese();
@@ -315,9 +266,6 @@ public class ThreadServidor extends Thread {
             DataOutputStream salida2 = new DataOutputStream(this.servidor.getServidorCliente2().getOutputStream());
             this.servidor.setServidorInformacionSalida2(salida2);
 
-            // NO llamar a gestionarTurnosConcentrese() aquí
-            // gestionarTurnosConcentrese(); // ❌ QUITAR ESTA LÍNEA
-            // Ciclo principal de escucha de mensajes del cliente
             while (true) {
                 String mensaje = entrada.readUTF();
                 String[] partes = mensaje.split(",");
@@ -347,12 +295,11 @@ public class ThreadServidor extends Thread {
 
                         if (jugadorExiste && asignarJugador(usuario)) {
                             servidor.setNombreUsuario(usuario);
-                            this.numeroTurno = asignarTurno(); // ✅ Asignar turno
+                            this.numeroTurno = asignarTurno();
 
                             salida1.writeUTF("valido");
                             salida1.flush();
 
-                            // ✅ AHORA SÍ gestionar turnos después del login exitoso
                             gestionarTurnosConcentrese();
 
                         } else {
