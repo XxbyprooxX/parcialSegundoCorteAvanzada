@@ -4,6 +4,7 @@ import edu.progAvUD.parcialSegundoCorteAvanzada.servidor.vista.VentanaPrincipal;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import javax.swing.JToggleButton;
 
 /**
  *
@@ -77,7 +78,8 @@ public class ControlGrafico implements ActionListener {
             ventanaPrincipal.panelInicial.jButtonPropiedadesSockets.setEnabled(false);
         }
         if(e.getSource() == ventanaPrincipal.panelConsolaServidor.jButtonEmpezarJuego){
-            
+            anadirCartasJuego();
+            ventanaPrincipal.mostrarPanel(ventanaPrincipal.panelJuego);
         }
             
     }
@@ -94,6 +96,12 @@ public class ControlGrafico implements ActionListener {
     
     public void ocultarBotonIniciarJuego(boolean estado){
         ventanaPrincipal.panelConsolaServidor.jButtonEmpezarJuego.setVisible(estado);
+    }
+    
+    public void anadirCartasJuego(){
+        for(int i=0;i<40;i++){
+            ventanaPrincipal.panelJuego.anadirBoton(i);
+        }
     }
     
 }

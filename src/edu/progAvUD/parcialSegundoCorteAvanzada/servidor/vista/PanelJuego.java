@@ -1,6 +1,7 @@
 package edu.progAvUD.parcialSegundoCorteAvanzada.servidor.vista;
 
 import java.awt.Font;
+import javax.swing.ImageIcon;
 import javax.swing.JToggleButton;
 
 /**
@@ -9,18 +10,20 @@ import javax.swing.JToggleButton;
  */
 public class PanelJuego extends javax.swing.JPanel {
 
-    public JToggleButton[] cartas = new JToggleButton[40];
+    public JToggleButton[] cartas;
     
     /**
      * Creates new form PanelJuego
      */
     public PanelJuego() {
         initComponents();
+        this.cartas = new JToggleButton[40];
     }
     
     public void anadirBoton(int numeroBoton){
-        JToggleButton carta = new JToggleButton("?");
-        carta.setFont(new Font("Arial", Font.PLAIN, 30 ));
+        JToggleButton carta = new JToggleButton();
+        ImageIcon iconNormal = new ImageIcon(System.getProperty("user.dir") + "/src/edu/progAvUD/parcialSegundoCorteAvanzada/servidor/imagenes/dorso.png");
+        carta.setIcon(iconNormal);
         cartas[numeroBoton]=carta;
         jPanelBotones.add(carta);
         revalidate();
