@@ -58,36 +58,48 @@ public class PanelJuego extends javax.swing.JPanel {
     private void initComponents() {
 
         jPanel1 = new javax.swing.JPanel();
-        jPanel4 = new javax.swing.JPanel();
-        jLabel3 = new javax.swing.JLabel();
-        jLabelNumeroIntentos = new javax.swing.JLabel();
-        jPanel3 = new javax.swing.JPanel();
+        jPanel6 = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
+        jLabelJugador = new javax.swing.JLabel();
+        jPanel8 = new javax.swing.JPanel();
+        jLabel6 = new javax.swing.JLabel();
+        jLabelNumeroIntentos = new javax.swing.JLabel();
+        jPanel7 = new javax.swing.JPanel();
+        jLabel9 = new javax.swing.JLabel();
         jLabelNumeroParejas = new javax.swing.JLabel();
         jLabel5 = new javax.swing.JLabel();
         jPanelBotones = new javax.swing.JPanel();
 
         setLayout(new java.awt.BorderLayout());
 
-        jPanel1.setLayout(new java.awt.GridLayout(1, 2));
-
-        jLabel3.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        jLabel3.setText("Numero de Intentos:");
-        jPanel4.add(jLabel3);
-
-        jLabelNumeroIntentos.setText("jLabel4");
-        jPanel4.add(jLabelNumeroIntentos);
-
-        jPanel1.add(jPanel4);
+        jPanel1.setLayout(new java.awt.GridLayout(1, 0));
 
         jLabel1.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
-        jLabel1.setText("Numero de Parejas:");
-        jPanel3.add(jLabel1);
+        jLabel1.setText("Jugador:");
+        jPanel6.add(jLabel1);
 
-        jLabelNumeroParejas.setText("jLabel2");
-        jPanel3.add(jLabelNumeroParejas);
+        jLabelJugador.setText("jLabel2");
+        jPanel6.add(jLabelJugador);
 
-        jPanel1.add(jPanel3);
+        jPanel1.add(jPanel6);
+
+        jLabel6.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        jLabel6.setText("Numero de Intentos:");
+        jPanel8.add(jLabel6);
+
+        jLabelNumeroIntentos.setText("jLabel8");
+        jPanel8.add(jLabelNumeroIntentos);
+
+        jPanel1.add(jPanel8);
+
+        jLabel9.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        jLabel9.setText("Numero de Parejas:");
+        jPanel7.add(jLabel9);
+
+        jLabelNumeroParejas.setText("jLabel10");
+        jPanel7.add(jLabelNumeroParejas);
+
+        jPanel1.add(jPanel7);
 
         add(jPanel1, java.awt.BorderLayout.PAGE_END);
 
@@ -103,13 +115,16 @@ public class PanelJuego extends javax.swing.JPanel {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel jLabel9;
+    public javax.swing.JLabel jLabelJugador;
     public javax.swing.JLabel jLabelNumeroIntentos;
     public javax.swing.JLabel jLabelNumeroParejas;
     private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel3;
-    private javax.swing.JPanel jPanel4;
+    private javax.swing.JPanel jPanel6;
+    private javax.swing.JPanel jPanel7;
+    private javax.swing.JPanel jPanel8;
     public javax.swing.JPanel jPanelBotones;
     // End of variables declaration//GEN-END:variables
 }
