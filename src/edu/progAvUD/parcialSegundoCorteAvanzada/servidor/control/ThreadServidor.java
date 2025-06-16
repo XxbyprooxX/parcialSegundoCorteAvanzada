@@ -310,6 +310,7 @@ public class ThreadServidor extends Thread {
                 String mensaje = entrada.readUTF();
                 String[] partes = mensaje.split(",");
                 String comando = partes[0];
+                System.out.println("Comando" +  mensaje);
                 switch (comando) {
                     case "eleccionJugador":
                         controlServidor.actualizarPanelEstadisticas(this);
@@ -328,8 +329,9 @@ public class ThreadServidor extends Thread {
 
                             mensaje = entrada.readUTF();
                             partes = mensaje.split(",");
-
-                            System.out.println("Mensaje: " + mensaje);
+                            
+                            System.out.println("Coordenadas 2" + mensaje);
+                            
                             int x2 = Integer.parseInt(partes[1]);
                             int y2 = Integer.parseInt(partes[2]);
                             System.out.println("Cordenadas de la carta 2: " + x2 + ", " + y2);
