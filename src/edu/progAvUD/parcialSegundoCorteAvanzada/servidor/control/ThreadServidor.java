@@ -160,9 +160,6 @@ public class ThreadServidor extends Thread {
                 salida1.flush();
             }
 
-            salida1.writeUTF("pedirCoordenadas");
-            salida1.flush();
-
             if (controlServidor.verificarJuegoTerminado()) {
                 controlServidor.terminarJuego();
             }
@@ -200,8 +197,6 @@ public class ThreadServidor extends Thread {
             }
 
             controlServidor.avanzarSiguienteTurnoConcentrese();
-            salida1.writeUTF("pedirCoordenadas");
-            salida1.flush();
 
         } catch (IOException e) {
             controlServidor.mostrarMensajeConsolaServidor(
@@ -310,7 +305,6 @@ public class ThreadServidor extends Thread {
                 String mensaje = entrada.readUTF();
                 String[] partes = mensaje.split(",");
                 String comando = partes[0];
-                System.out.println("Comando" +  mensaje);
                 switch (comando) {
                     case "eleccionJugador":
                         controlServidor.actualizarPanelEstadisticas(this);
@@ -329,9 +323,8 @@ public class ThreadServidor extends Thread {
 
                             mensaje = entrada.readUTF();
                             partes = mensaje.split(",");
-                            
-                            System.out.println("Coordenadas 2" + mensaje);
-                            
+
+                            System.out.println("Mensaje: " + mensaje);
                             int x2 = Integer.parseInt(partes[1]);
                             int y2 = Integer.parseInt(partes[2]);
                             System.out.println("Cordenadas de la carta 2: " + x2 + ", " + y2);
@@ -413,6 +406,8 @@ public class ThreadServidor extends Thread {
                     case "pedirGanador":
                         String info = controlServidor.enviarGanador();
                         salida1.writeUTF(info);
+                    case "siguienteTurno":
+                        controlServidor.iniciarJuego();
                 }
             }
 
