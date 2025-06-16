@@ -349,7 +349,6 @@ public class ControlServidor {
             controlPrincipal.mostrarMensajeConsolaServidor(
                     "Progreso: " + paresEncontrados + "/" + totalPares + " pares encontrados"
             );
-            controlPrincipal.mostrarMensajeError("No se puede enviar el mensaje");
         } else {
             controlPrincipal.mostrarMensajeConsolaServidor(
                     "No es pareja: '" + carta1 + "' ≠ '" + carta2 + "'"

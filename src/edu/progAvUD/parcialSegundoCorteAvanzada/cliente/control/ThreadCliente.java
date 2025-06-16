@@ -30,6 +30,7 @@ public class ThreadCliente extends Thread {
     public void run() {
 
         try {
+            controlCliente.mostrarMensajeChatJuego("Esperando a empezar el juego, espere que el servidor empiece el juego");
             turno = entrada.readInt();
             System.out.println("Turno: " + turno);
         } catch (IOException ex) {
@@ -40,22 +41,69 @@ public class ThreadCliente extends Thread {
 
             try {
                 String opcione = entrada.readUTF();
+                String[] partesOpcion = opcione.split(",");
+                int turnoActual;
 
-                switch (opcione) {
+                switch (partesOpcion[0]) {
                     case "pedirCoordenadas":
                         System.out.println("Se pidieron Coordenadas");
+
                         salida.writeUTF("consultarTurno");
-                        int turnoActual = entrada.readInt();
+                        turnoActual = entrada.readInt();
                         System.out.println("Turno Actual: " + turnoActual);
 
                         enviarPosicionCartas(turnoActual);
                         break;
+                    case "acerto":
+                        salida.writeUTF("consultarTurno");
+                        turnoActual = entrada.readInt();
+                        System.out.println("Turno Actual: " + turnoActual);
+                        
+                        if (turnoActual != turno) {
+                            return;
+                        }
+
+                        controlCliente.mostrarMensajeChatJuego("Acertaste, vuelve a ingresar otras Coordenadas");
+                        salida.writeUTF("pedirDatosJugador");
+                        String[] datos = entrada.readUTF().split(",");
+
+                        controlCliente.mostrarMensajeChatJuego("Intentos realizados:" + datos[0]
+                                + " | Cantidad de Aciertos: " + datos[1]
+                                + " | Porcentaje de eficiencia :" + datos[2]);
+
+                        break;
+                    case "fallo":
+                        salida.writeUTF("consultarTurno");
+                        turnoActual = entrada.readInt();
+                        System.out.println("Turno Actual: " + turnoActual);
+                        
+                        if (turnoActual != turno) {
+                            return;
+                        }
+
+                        controlCliente.mostrarMensajeChatJuego("Fallaste, debido a que " + partesOpcion[1] + ", se paso el turno al siguiente jugador");
+
+                        salida.writeUTF("pedirDatosJugador");
+                        String[] datos1 = entrada.readUTF().split(",");
+
+                        controlCliente.mostrarMensajeChatJuego("Intentos realizados:" + datos1[0]
+                                + " | Cantidad de Aciertos: " + datos1[1]
+                                + " | Porcentaje de eficiencia :" + datos1[2]);
+
+                        break;
+                    case "juegoTerminado":
+
+                        salida.writeUTF("pedirGanador");
+                        controlCliente.mostrarMensajeChatJuego(entrada.readUTF());
+
+                        break;
                     default:
-                       ;
+                        controlCliente.mostrarMensajeError("La opcion no esta dentro de las opciones");
+                        break;
                 }
 
             } catch (IOException ex) {
-                controlCliente.mostrarMensajeError("Ocurrio un erroe en opcione de ThreadHilo");
+                controlCliente.mostrarMensajeError("Ocurrio un error en opcione de ThreadHilo");
                 System.exit(0);
             }
 
