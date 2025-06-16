@@ -126,4 +126,10 @@ public class ControlGrafico implements ActionListener {
     public void deseleccionarCarta(int idCarta){
         ventanaPrincipal.panelJuego.deseleccionarCarta(idCarta);
     }
+    
+    public void actualizarPanelEstadisticas(String numeroIntentos, String numeroParejas, String nombreUsuario){
+        ventanaPrincipal.panelJuego.jLabelNumeroIntentos.setText(numeroIntentos);
+        ventanaPrincipal.panelJuego.jLabelNumeroParejas.setText(numeroParejas);
+        ventanaPrincipal.panelJuego.jLabelJugador.setText(nombreUsuario);
+    }
 }

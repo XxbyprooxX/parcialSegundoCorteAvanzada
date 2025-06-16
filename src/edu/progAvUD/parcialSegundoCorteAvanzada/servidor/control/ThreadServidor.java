@@ -40,6 +40,8 @@ public class ThreadServidor extends Thread {
      */
     private int numeroTurno;
 
+    private int[] estadisticas;
+
     /**
      * Constructor del hilo servidor que inicia la conexión con los clientes.
      *
@@ -53,7 +55,10 @@ public class ThreadServidor extends Thread {
         String nombreUsuario = "";
         this.servidor = new Servidor(socketCliente1, socketCliente2, nombreUsuario);
         this.controlServidor = controlServidor;
-        // Asignar turno automáticamente al crear el hilo
+        this.estadisticas = new int[3];
+        estadisticas[0] = 0;
+        estadisticas[1] = 0;
+        estadisticas[2] = 0;
     }
 
     /**
@@ -214,26 +219,31 @@ public class ThreadServidor extends Thread {
      */
     public String procesarJugadaConcentrese(int x1, int y1) {
 
-        String tipoCarta1 = controlServidor.obtenerTipoCartaEnPosicion(x1-1, y1-1);
+        String tipoCarta1 = controlServidor.obtenerTipoCartaEnPosicion(x1 - 1, y1 - 1);
         return tipoCarta1;
     }
 
     public void compararCartas(String tipoCarta1, String tipoCarta2, int x1, int y1, int x2, int y2) {
+
+        estadisticas[0] = estadisticas[0] + 1;
+
         if (tipoCarta1.equals("") || tipoCarta2.equals("")) {
             manejarFallo("Estas coordenadas estaban fuera del rango");
+            actualizarPorcentajeAciertos();
             return;
         }
 
         boolean esPareja = controlServidor.verificarPareja(x1, y1, tipoCarta1, x2, y2, tipoCarta2);
 
         if (esPareja) {
+            estadisticas[1] = estadisticas[1] + 1;
+            actualizarPorcentajeAciertos();
             manejarAcierto();
         } else {
             try {
-                Thread.sleep(3000); // Pausa la ejecución por 3000 milisegundos (3 segundos)
+                Thread.sleep(3000);
             } catch (InterruptedException e) {
-                // Manejar la excepción InterruptedException que se lanza si el hilo es interrumpido mientras duerme
-                Thread.currentThread().interrupt(); // Re-interrumpir el hilo para que se propague la interrupción
+                Thread.currentThread().interrupt();
             }
             if (x1 >= 1 && x1 <= 8 && y1 >= 1 && y1 <= 5) {
                 int idCarta1 = (y1 - 1) * 8 + (x1 - 1);
@@ -243,8 +253,13 @@ public class ThreadServidor extends Thread {
                 int idCarta2 = (y2 - 1) * 8 + (x2 - 1);
                 controlServidor.deseleccionarCarta(idCarta2);
             }
+            actualizarPorcentajeAciertos();
             manejarFallo("No son parejas");
         }
+    }
+
+    public void actualizarPorcentajeAciertos() {
+        estadisticas[2] = Math.round((estadisticas[1] / estadisticas[0]) * 100);
     }
 
     /**
@@ -297,6 +312,7 @@ public class ThreadServidor extends Thread {
                 String comando = partes[0];
                 switch (comando) {
                     case "eleccionJugador":
+                        controlServidor.actualizarPanelEstadisticas(this);
                         try {
                             System.out.println("Comando: " + comando);
                             int x1 = Integer.parseInt(partes[1]);
@@ -325,14 +341,17 @@ public class ThreadServidor extends Thread {
                             }
 
                             compararCartas(tipoCata1, tipoCata2, x1, y1, x2, y2);
-
+                            controlServidor.actualizarPanelEstadisticas(this);
                         } catch (NumberFormatException e) {
-                            manejarFallo("Escribio letran en vez de numeros");
+                            manejarFallo("Escribio letras en vez de numeros");
                         }
 
                         break;
 
                     case "consultarTurno":
+                        if (controlServidor.getTurnoActivo() == numeroTurno){
+                            controlServidor.actualizarPanelEstadisticas(this);
+                        }
                         verificarTurnoActivo();
                         break;
 
@@ -387,6 +406,8 @@ public class ThreadServidor extends Thread {
                             salida1.flush();
                         }
                         break;
+                    case "pedirDatosJugador":
+                        salida1.writeUTF("" + estadisticas[0] + "," + estadisticas[1] + "," + estadisticas[2]);
                 }
             }
 
@@ -397,4 +418,9 @@ public class ThreadServidor extends Thread {
             controlServidor.removerCliente(this);
         }
     }
+
+    public int[] getEstadisticas() {
+        return estadisticas;
+    }
+
 }

@@ -563,6 +563,9 @@ public class ControlServidor {
 
         for (ThreadServidor cliente : clientesActivos) {
             try {
+                if (cliente.getNumeroTurno() == turnoActivo){
+                    actualizarPanelEstadisticas(cliente);
+                }
                 cliente.getServidor().getServidorInformacionSalida1().writeUTF("pedirCoordenadas");
                 cliente.getServidor().getServidorInformacionSalida1().flush();
             } catch (IOException e) {
@@ -577,5 +580,13 @@ public class ControlServidor {
     
     public void deseleccionarCarta(int idCarta){
         controlPrincipal.deseleccionarCarta(idCarta);
+    }
+    
+    public void actualizarPanelEstadisticas(ThreadServidor threadServidor){
+        int[] estadisticas = threadServidor.getEstadisticas();
+        String numeroIntentos = String.valueOf(estadisticas[0]);
+        String numeroParejas = String.valueOf(estadisticas[1]);
+        String nombreUsuario = threadServidor.getServidor().getNombreUsuario();
+        controlPrincipal.actualizarPanelEstadisticas(numeroIntentos, numeroParejas, nombreUsuario);
     }
 }

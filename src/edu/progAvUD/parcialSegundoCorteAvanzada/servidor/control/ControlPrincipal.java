@@ -257,4 +257,8 @@ public class ControlPrincipal {
     public void deseleccionarCarta(int idCarta){
         controlGrafico.deseleccionarCarta(idCarta);
     }
+    
+    public void actualizarPanelEstadisticas(String numeroIntentos, String numeroParejas, String nombreUsuario){
+        controlGrafico.actualizarPanelEstadisticas(numeroIntentos, numeroParejas, nombreUsuario);
+    }
 }
