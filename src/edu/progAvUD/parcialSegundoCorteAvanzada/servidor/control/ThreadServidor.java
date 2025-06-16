@@ -337,6 +337,8 @@ public class ThreadServidor extends Thread {
 
                                 gestionarTurnosConcentrese();
                                 ControlServidor.setCantidadClientesLogeados(ControlServidor.getCantidadClientesLogeados() + 1);
+                                salida1.writeInt(numeroTurno);
+                                salida1.flush();
                                 controlServidor.verificarJugadoresMostrarBotonJugar();
 
                             } else {
