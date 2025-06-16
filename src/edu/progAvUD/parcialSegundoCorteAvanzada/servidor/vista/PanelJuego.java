@@ -35,6 +35,18 @@ public class PanelJuego extends javax.swing.JPanel {
         carta.setSelectedIcon(iconSeleccionado);
         revalidate();
     }
+    
+    public void seleccionarCarta(int idCarta){
+        JToggleButton carta = cartas[idCarta];
+        carta.setSelected(true);
+        revalidate();
+    }
+    
+    public void deseleccionarCarta(int idCarta){
+        JToggleButton carta = cartas[idCarta];
+        carta.setSelected(false);
+        revalidate();
+    }
 
     /**
      * This method is called from within the constructor to initialize the form.
