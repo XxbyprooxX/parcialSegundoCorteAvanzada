@@ -4,6 +4,7 @@ import edu.progAvUD.parcialSegundoCorteAvanzada.servidor.modelo.Servidor;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.Vector;
@@ -563,7 +564,7 @@ public class ControlServidor {
 
         for (ThreadServidor cliente : clientesActivos) {
             try {
-                if (cliente.getNumeroTurno() == turnoActivo){
+                if (cliente.getNumeroTurno() == turnoActivo) {
                     actualizarPanelEstadisticas(cliente);
                 }
                 cliente.getServidor().getServidorInformacionSalida1().writeUTF("pedirCoordenadas");
@@ -573,20 +574,48 @@ public class ControlServidor {
             }
         }
     }
-    
-    public void seleccionarCarta(int idCarta){
+
+    public void seleccionarCarta(int idCarta) {
         controlPrincipal.seleccionarCarta(idCarta);
     }
-    
-    public void deseleccionarCarta(int idCarta){
+
+    public void deseleccionarCarta(int idCarta) {
         controlPrincipal.deseleccionarCarta(idCarta);
     }
-    
-    public void actualizarPanelEstadisticas(ThreadServidor threadServidor){
+
+    public void actualizarPanelEstadisticas(ThreadServidor threadServidor) {
         int[] estadisticas = threadServidor.getEstadisticas();
         String numeroIntentos = String.valueOf(estadisticas[0]);
         String numeroParejas = String.valueOf(estadisticas[1]);
         String nombreUsuario = threadServidor.getServidor().getNombreUsuario();
         controlPrincipal.actualizarPanelEstadisticas(numeroIntentos, numeroParejas, nombreUsuario);
     }
+
+    public String enviarGanador() {
+        ArrayList<ThreadServidor> ganadores = new ArrayList<>();
+        int mayorPorcentaje = -1;
+
+        for (ThreadServidor cliente : clientesActivos) {
+            int[] estadisticas = cliente.getEstadisticas();
+            int porcentajeAcierto = estadisticas[2];
+
+            if (porcentajeAcierto > mayorPorcentaje) {
+                mayorPorcentaje = porcentajeAcierto;
+                ganadores.clear();
+                ganadores.add(cliente);
+            } else if (porcentajeAcierto == mayorPorcentaje) {
+                ganadores.add(cliente);
+            }
+        }
+
+        StringBuilder info = new StringBuilder();
+        info.append("Ganador(es) con un porcentaje de acierto del ").append(mayorPorcentaje).append("%:\n");
+
+        for (ThreadServidor ganador : ganadores) {
+            info.append("- ").append(ganador.getInformacionCliente()).append("\n");
+        }
+
+        return info.toString();
+    }
+
 }

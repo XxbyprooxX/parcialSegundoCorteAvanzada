@@ -408,6 +408,9 @@ public class ThreadServidor extends Thread {
                         break;
                     case "pedirDatosJugador":
                         salida1.writeUTF("" + estadisticas[0] + "," + estadisticas[1] + "," + estadisticas[2]);
+                    case "pedirGanador":
+                        String info = controlServidor.enviarGanador();
+                        salida1.writeUTF(info);
                 }
             }
 
