@@ -214,7 +214,7 @@ public class ThreadServidor extends Thread {
      */
     public String procesarJugadaConcentrese(int x1, int y1) {
 
-        String tipoCarta1 = controlServidor.obtenerTipoCartaEnPosicion(x1, y1);
+        String tipoCarta1 = controlServidor.obtenerTipoCartaEnPosicion(x1-1, y1-1);
         return tipoCarta1;
     }
 
