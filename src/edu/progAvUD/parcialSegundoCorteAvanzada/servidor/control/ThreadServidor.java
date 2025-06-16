@@ -120,11 +120,10 @@ public class ThreadServidor extends Thread {
     public void verificarTurnoActivo() {
         // Obtener el turno actual que debe estar activo
         int turnoActivo = controlServidor.getTurnoActivo();
-        boolean esMiTurno = (this.numeroTurno == turnoActivo);
 
         try {
             DataOutputStream salida1 = this.servidor.getServidorInformacionSalida1();
-            salida1.writeUTF("" + turnoActivo);
+            salida1.writeInt(turnoActivo);
             salida1.flush();
         } catch (IOException ex) {
 
@@ -285,15 +284,20 @@ public class ThreadServidor extends Thread {
                 switch (comando) {
                     case "eleccionJugador":
                         try {
+                            System.out.println("Comando: "+comando);
                             int x1 = Integer.parseInt(partes[1]);
                             int y1 = Integer.parseInt(partes[2]);
+                            System.out.println("Cordenadas de la carta 1: "+ x1+", "+ y1);
+                            
                             String tipoCata1 = procesarJugadaConcentrese(x1, y1);
                             
                             mensaje = entrada.readUTF();
                             partes = mensaje.split(",");
                             
+                            System.out.println("Mensaje: "+mensaje);
                             int x2 = Integer.parseInt(partes[1]);
                             int y2 = Integer.parseInt(partes[2]);
+                            System.out.println("Cordenadas de la carta 2: "+ x2+", "+ y2);
                             String tipoCata2 = procesarJugadaConcentrese(x2, y2);
                             
                             compararCartas(tipoCata1, tipoCata2, x1, y1, x2, y2);

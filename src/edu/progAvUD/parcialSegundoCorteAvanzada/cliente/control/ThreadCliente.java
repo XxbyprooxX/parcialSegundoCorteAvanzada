@@ -30,46 +30,75 @@ public class ThreadCliente extends Thread {
     public void run() {
 
         try {
-            this.turno = entrada.readInt();
+            turno = entrada.readInt();
+            System.out.println("Turno: " + turno);
         } catch (IOException ex) {
-            controlCliente.mostrarMensajeError("Ocurrio un error al leer el turno");
+            controlCliente.mostrarMensajeError("Ocurrio un erroe en el turno");
         }
 
-        String llegada;
         while (true) {
+
             try {
-                // Leer el código de operación enviado por el servidor
-                llegada = entrada.readUTF();
-                String[] llegadas = llegada.split(",");
+                String opcione = entrada.readUTF();
 
-                if (llegadas[0].equals(turno + "")) {
-                    switch (llegadas[1]) {
-                        case "pedirCoordenadas":
-                            controlCliente.mostrarMensajeChatJuego("Es tu turno. Escribe la cordenada en x de la primera carta a escoger: ");
-                            controlCliente.permitirEntradaTextoChatJuego();
-                            if (controlCliente.getPasoActivoCoordenadas() == 4) {
-                                salida.writeUTF("eleccionJugador," + controlCliente.getCoordenadasCartas());
-                            }
-                            break;
-                        case "Hola":
-                            
-                            break;
-                    }
+                switch (opcione) {
+                    case "pedirCoordenadas":
+                        System.out.println("Se pidieron Coordenadas");
+                        salida.writeUTF("consultarTurno");
+                        int turnoActual = entrada.readInt();
+                        System.out.println("Turno Actual: " + turnoActual);
 
-                } else {
-                    controlCliente.bloquearEntradaTextoChatJuego();
+                        enviarPosicionCartas(turnoActual);
+
+                        break;
+                    default:
+                       ;
                 }
 
-            } catch (IOException e) {
-                // Manejo de error si ocurre una excepción de entrada/salida
-                controlCliente.mostrarMensajeError("Error en la comunicación con el servidor");
-                System.exit(0); // Finaliza la aplicación
+            } catch (IOException ex) {
+                controlCliente.mostrarMensajeError("Ocurrio un erroe en opcione de ThreadHilo");
+                System.exit(0);
+            }
+
+        }
+
+    }
+
+    public void enviarPosicionCartas(int turnoActual) throws IOException {
+        if (turnoActual != turno) {
+            controlCliente.bloquearEntradaTextoChatJuego();
+            return;
+        }
+
+        controlCliente.permitirEntradaTextoChatJuego();
+
+        // Solicitar primera coordenada
+        controlCliente.mostrarMensajeChatJuego("Es tu turno. Ingresa la coordenada en x de la primera carta");
+        esperarEntradaCoordenada();
+
+        // Solicitar segunda coordenada
+        controlCliente.mostrarMensajeChatJuego("Ingresa la coordenada en x de la segunda carta");
+        esperarEntradaCoordenada();
+    }
+
+    private void esperarEntradaCoordenada() throws IOException {
+        while (true) {
+            if (controlCliente.getPasoActivoCoordenadas() == 2) {
+                String mensajeSalida ="eleccionJugador," + controlCliente.getCoordenadasCartas();
+                System.out.println("MensajeSalida: " + mensajeSalida);
+                salida.writeUTF(mensajeSalida);
+                controlCliente.setPasoActivoCoordenadas(0);
+                controlCliente.setCoordenadasCartas("");
+                break; // termina el bucle una vez enviada la coordenada
+            }
+            try {
+                Thread.sleep(100); // pausa para no saturar CPU
+            } catch (InterruptedException ex) {
+                controlCliente.mostrarMensajeError("Error al esperar coordenada: " + ex.getMessage());
+                Thread.currentThread().interrupt(); // buena práctica al capturar InterruptedException
                 break;
             }
         }
-
-        // Mensaje mostrado si se rompe el bucle (generalmente por desconexión)
-        controlCliente.mostrarMensajeError("Se desconectó el servidor");
     }
 
 }
