@@ -570,4 +570,12 @@ public class ControlServidor {
             }
         }
     }
+    
+    public void seleccionarCarta(int idCarta){
+        controlPrincipal.seleccionarCarta(idCarta);
+    }
+    
+    public void deseleccionarCarta(int idCarta){
+        controlPrincipal.deseleccionarCarta(idCarta);
+    }
 }

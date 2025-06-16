@@ -118,4 +118,12 @@ public class ControlGrafico implements ActionListener {
 
         }
     }
+    
+    public void seleccionarCarta(int idCarta){
+        ventanaPrincipal.panelJuego.seleccionarCarta(idCarta);
+    }
+    
+    public void deseleccionarCarta(int idCarta){
+        ventanaPrincipal.panelJuego.deseleccionarCarta(idCarta);
+    }
 }

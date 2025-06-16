@@ -250,4 +250,11 @@ public class ControlPrincipal {
         controlServidor.iniciarJuego();
     }
     
+    public void seleccionarCarta(int idCarta){
+        controlGrafico.seleccionarCarta(idCarta);
+    }
+    
+    public void deseleccionarCarta(int idCarta){
+        controlGrafico.deseleccionarCarta(idCarta);
+    }
 }
