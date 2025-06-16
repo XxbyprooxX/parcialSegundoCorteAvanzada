@@ -49,7 +49,6 @@ public class ThreadCliente extends Thread {
                         System.out.println("Turno Actual: " + turnoActual);
 
                         enviarPosicionCartas(turnoActual);
-
                         break;
                     default:
                        ;
@@ -64,27 +63,27 @@ public class ThreadCliente extends Thread {
 
     }
 
-    public void enviarPosicionCartas(int turnoActual) throws IOException {
+    public synchronized void enviarPosicionCartas(int turnoActual) throws IOException {
         if (turnoActual != turno) {
             controlCliente.bloquearEntradaTextoChatJuego();
             return;
         }
 
+        // PRIMERA coordenada
         controlCliente.permitirEntradaTextoChatJuego();
-
-        // Solicitar primera coordenada
-        controlCliente.mostrarMensajeChatJuego("Es tu turno. Ingresa la coordenada en x de la primera carta");
+        controlCliente.mostrarMensajeChatJuego("Es tu turno. Ingresa la coordenada X de la primera carta");
         esperarEntradaCoordenada();
 
-        // Solicitar segunda coordenada
-        controlCliente.mostrarMensajeChatJuego("Ingresa la coordenada en x de la segunda carta");
+        // SEGUNDA coordenada
+        controlCliente.permitirEntradaTextoChatJuego();                  // ← aquí
+        controlCliente.mostrarMensajeChatJuego("Ingresa la coordenada X de la segunda carta");
         esperarEntradaCoordenada();
     }
 
     private void esperarEntradaCoordenada() throws IOException {
         while (true) {
             if (controlCliente.getPasoActivoCoordenadas() == 2) {
-                String mensajeSalida ="eleccionJugador," + controlCliente.getCoordenadasCartas();
+                String mensajeSalida = "eleccionJugador," + controlCliente.getCoordenadasCartas();
                 System.out.println("MensajeSalida: " + mensajeSalida);
                 salida.writeUTF(mensajeSalida);
                 controlCliente.setPasoActivoCoordenadas(0);
@@ -95,7 +94,6 @@ public class ThreadCliente extends Thread {
                 Thread.sleep(100); // pausa para no saturar CPU
             } catch (InterruptedException ex) {
                 controlCliente.mostrarMensajeError("Error al esperar coordenada: " + ex.getMessage());
-                Thread.currentThread().interrupt(); // buena práctica al capturar InterruptedException
                 break;
             }
         }

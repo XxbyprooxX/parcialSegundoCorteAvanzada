@@ -218,6 +218,19 @@ public class ControlServidor {
             this.turnoActivo = siguienteTurno;
             controlPrincipal.mostrarMensajeConsolaServidor("Turno de Concentrese pasa a: " + this.turnoActivo);
             notificarCambioTurno();
+
+            // Enviar "pedirCoordenadas" al cliente con el turno activo
+            for (ThreadServidor cliente : clientesActivos) {
+                if (cliente.getNumeroTurno() == this.turnoActivo) {
+                    try {
+                        cliente.getServidor().getServidorInformacionSalida1().writeUTF("pedirCoordenadas");
+                        cliente.getServidor().getServidorInformacionSalida1().flush();
+                    } catch (Exception e) {
+                        controlPrincipal.mostrarMensajeConsolaServidor("Error al enviar pedirCoordenadas: " + e.getMessage());
+                    }
+                    break;
+                }
+            }
         } else {
             controlPrincipal.mostrarMensajeConsolaServidor("No hay más jugadores activos");
         }
