@@ -211,15 +211,15 @@ public class ThreadServidor extends Thread {
      *
      * @param x1 Coordenada X de la primera carta
      * @param y1 Coordenada Y de la primera carta
-     * @param x2 Coordenada X de la segunda carta
-     * @param y2 Coordenada Y de la segunda carta
+     * @return devuelve la carta
      */
-    public void procesarJugadaConcentrese(int x1, int y1, int x2, int y2) {
+    public String procesarJugadaConcentrese(int x1, int y1) {
 
         String tipoCarta1 = controlServidor.obtenerTipoCartaEnPosicion(x1, y1);
-        String tipoCarta2 = controlServidor.obtenerTipoCartaEnPosicion(x2, y2);
-
-        // Verificar si se pudieron obtener las cartas
+        return tipoCarta1;
+    }
+    
+    public void compararCartas(String tipoCarta1, String tipoCarta2, int x1, int y1, int x2, int y2){
         if (tipoCarta1.equals("") || tipoCarta2.equals("")) {
             manejarFallo("Estas coordenadas estaban fuera del rango");
             return;
@@ -282,18 +282,22 @@ public class ThreadServidor extends Thread {
                 String mensaje = entrada.readUTF();
                 String[] partes = mensaje.split(",");
                 String comando = partes[0];
-                System.out.println(mensaje);
-                System.out.println("/////////////////////////////////////////////////////////////////////");
-                System.out.println(comando);
                 switch (comando) {
                     case "eleccionJugador":
                         try {
                             int x1 = Integer.parseInt(partes[1]);
                             int y1 = Integer.parseInt(partes[2]);
-                            int x2 = Integer.parseInt(partes[4]);
-                            int y2 = Integer.parseInt(partes[5]);
-                            procesarJugadaConcentrese(x1, y1, x2, y2);
-                            System.out.println("" + x1 + x2 + y1 + y2);
+                            String tipoCata1 = procesarJugadaConcentrese(x1, y1);
+                            
+                            mensaje = entrada.readUTF();
+                            partes = mensaje.split(",");
+                            
+                            int x2 = Integer.parseInt(partes[1]);
+                            int y2 = Integer.parseInt(partes[2]);
+                            String tipoCata2 = procesarJugadaConcentrese(x2, y2);
+                            
+                            compararCartas(tipoCata1, tipoCata2, x1, y1, x2, y2);
+                            
                         } catch (NumberFormatException e) {
                             manejarFallo("Escribio letran en vez de numeros");
                         }
@@ -302,7 +306,6 @@ public class ThreadServidor extends Thread {
 
                     case "consultarTurno":
                         verificarTurnoActivo();
-                        System.out.println("Pendejo anormal");
                         break;
 
                     case "login":
@@ -356,11 +359,6 @@ public class ThreadServidor extends Thread {
                             salida1.flush();
                         }
                         break;
-                    case "empezado":
-                        salida1.writeUTF("" + this.numeroTurno);
-                        salida1.flush();
-                        salida1.writeUTF("pedirCoordenadas");
-                        salida1.flush();
                 }
             }
 

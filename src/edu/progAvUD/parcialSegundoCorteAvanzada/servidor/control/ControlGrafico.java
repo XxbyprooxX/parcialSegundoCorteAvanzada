@@ -80,6 +80,7 @@ public class ControlGrafico implements ActionListener {
             controlPrincipal.asignarOrdenMatrizCartas();
             anadirCartasJuego();
             ponerImagenCartas();
+            controlPrincipal.iniciarJuego();
             ventanaPrincipal.mostrarPanel(ventanaPrincipal.panelJuego);
         }
 

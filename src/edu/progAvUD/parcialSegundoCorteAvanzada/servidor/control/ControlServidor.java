@@ -533,14 +533,6 @@ public class ControlServidor {
     public void verificarJugadoresMostrarBotonJugar() {
         if (cantidadClientesLogeados >= 2) {
             controlPrincipal.ocultarBotonIniciarJuego(true);
-            for (ThreadServidor cliente : clientesActivos) {
-                try {
-                    cliente.getServidor().getServidorInformacionSalida1().writeUTF("pedirCoordenadas");
-                    cliente.getServidor().getServidorInformacionSalida1().flush();
-                } catch (IOException e) {
-                    controlPrincipal.mostrarMensajeConsolaServidor("Error al notificar reinicio: " + e.getMessage());
-                }
-            }
         } else {
             controlPrincipal.ocultarBotonIniciarJuego(false);
         }
@@ -552,5 +544,17 @@ public class ControlServidor {
 
     public static void setCantidadClientesLogeados(int cantidadClientesLogeados) {
         ControlServidor.cantidadClientesLogeados = cantidadClientesLogeados;
+    }
+
+    public void iniciarJuego() {
+
+        for (ThreadServidor cliente : clientesActivos) {
+            try {
+                cliente.getServidor().getServidorInformacionSalida1().writeUTF("pedirCoordenadas");
+                cliente.getServidor().getServidorInformacionSalida1().flush();
+            } catch (IOException e) {
+                controlPrincipal.mostrarMensajeConsolaServidor("Error al notificar reinicio: " + e.getMessage());
+            }
+        }
     }
 }

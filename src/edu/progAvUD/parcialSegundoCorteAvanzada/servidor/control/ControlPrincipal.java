@@ -246,4 +246,8 @@ public class ControlPrincipal {
         return matrizCartas;
     }  
     
+    public void iniciarJuego(){
+        controlServidor.iniciarJuego();
+    }
+    
 }
