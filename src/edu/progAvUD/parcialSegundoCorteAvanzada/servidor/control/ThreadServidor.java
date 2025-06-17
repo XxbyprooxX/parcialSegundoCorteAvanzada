@@ -130,7 +130,7 @@ public class ThreadServidor extends Thread {
             DataOutputStream salida1 = this.servidor.getServidorInformacionSalida1();
             salida1.writeInt(turnoActivo);
             salida1.flush();
-            
+
             System.out.println("Se envia el turno activo desde el threadServidor");
         } catch (IOException ex) {
 
@@ -160,7 +160,7 @@ public class ThreadServidor extends Thread {
             if (salida1 != null) {
                 salida1.writeUTF("acerto");
                 salida1.flush();
-                
+
                 System.out.println("Se envio acerto desde ThreadServidor");
             }
 
@@ -199,7 +199,7 @@ public class ThreadServidor extends Thread {
                 salida1.writeUTF("fallo," + razon);
                 salida1.flush();
             }
-            
+
             System.out.println("Se envio el fallo desde el metodo manejarFallo de threadServidor");
             controlServidor.avanzarSiguienteTurnoConcentrese();
 
@@ -218,6 +218,10 @@ public class ThreadServidor extends Thread {
      * @return devuelve la carta
      */
     public String procesarJugadaConcentrese(int x1, int y1) {
+
+        if (controlServidor.esCartaYaEmparejada(x1 - 1, y1 - 1)) {
+            return "emparejada";
+        }
 
         String tipoCarta1 = controlServidor.obtenerTipoCartaEnPosicion(x1 - 1, y1 - 1);
         return tipoCarta1;
@@ -310,7 +314,7 @@ public class ThreadServidor extends Thread {
                 String mensaje = entrada.readUTF();
                 String[] partes = mensaje.split(",");
                 String comando = partes[0];
-                
+
                 System.out.println("Se esta leyendo el mensaje enviado desde cliente " + mensaje);
                 switch (comando) {
                     case "eleccionJugador":
@@ -319,7 +323,7 @@ public class ThreadServidor extends Thread {
                             int x1 = Integer.parseInt(partes[1]);
                             int y1 = Integer.parseInt(partes[2]);
 
-                            String tipoCata1 = procesarJugadaConcentrese(x1, y1);
+                            String tipoCarta1 = procesarJugadaConcentrese(x1, y1);
 
                             if (x1 >= 1 && x1 <= 8 && y1 >= 1 && y1 <= 5) {
                                 int idCarta1 = (y1 - 1) * 8 + (x1 - 1);
@@ -328,19 +332,28 @@ public class ThreadServidor extends Thread {
 
                             mensaje = entrada.readUTF();
                             partes = mensaje.split(",");
-                            
+
                             System.out.println("Se leen las segundas coordenadas enviadas por la persona " + mensaje);
 
                             int x2 = Integer.parseInt(partes[1]);
                             int y2 = Integer.parseInt(partes[2]);
-                            String tipoCata2 = procesarJugadaConcentrese(x2, y2);
+                            String tipoCarta2 = procesarJugadaConcentrese(x2, y2);
 
+                            if (tipoCarta2.equals("emparejada") || tipoCarta1.equals("emparejada")) {
+                                // Deseleccionar la primera carta antes de fallar
+                                if (x1 >= 1 && x1 <= 8 && y1 >= 1 && y1 <= 5) {
+                                    int idCarta1 = (y1 - 1) * 8 + (x1 - 1);
+                                    controlServidor.deseleccionarCarta(idCarta1);
+                                }
+                                manejarFallo("La carta ya estaba volteada/emparejada");
+                                break;
+                            }
                             if (x2 >= 1 && x2 <= 8 && y2 >= 1 && y2 <= 5) {
                                 int idCarta2 = (y2 - 1) * 8 + (x2 - 1);
                                 controlServidor.seleccionarCarta(idCarta2);
                             }
 
-                            compararCartas(tipoCata1, tipoCata2, x1, y1, x2, y2);
+                            compararCartas(tipoCarta1, tipoCarta2, x1, y1, x2, y2);
                             controlServidor.actualizarPanelEstadisticas(this);
                         } catch (NumberFormatException e) {
                             manejarFallo("Escribio letras en vez de numeros");
@@ -349,7 +362,7 @@ public class ThreadServidor extends Thread {
                         break;
 
                     case "consultarTurno":
-                        if (controlServidor.getTurnoActivo() == numeroTurno){
+                        if (controlServidor.getTurnoActivo() == numeroTurno) {
                             controlServidor.actualizarPanelEstadisticas(this);
                         }
                         verificarTurnoActivo();
@@ -366,7 +379,7 @@ public class ThreadServidor extends Thread {
                             );
                             salida1.writeUTF("yaConectado");
                             salida1.flush();
-                            
+
                             System.out.println("Se envio ya conectado desde el case de logn del run");
                             break;
                         }
@@ -382,7 +395,7 @@ public class ThreadServidor extends Thread {
 
                                 salida1.writeUTF("valido");
                                 salida1.flush();
-                                
+
                                 System.out.println("Se envio valido desde el case de login");
 
                                 controlServidor.mostrarMensajeConsolaServidor(
@@ -391,10 +404,10 @@ public class ThreadServidor extends Thread {
 
                                 gestionarTurnosConcentrese();
                                 ControlServidor.setCantidadClientesLogeados(ControlServidor.getCantidadClientesLogeados() + 1);
-                                
+
                                 salida1.writeInt(numeroTurno);
                                 salida1.flush();
-                                
+
                                 System.out.println("Se envio el turno de la persona asignado por la maquina desde el login");
                                 controlServidor.verificarJugadoresMostrarBotonJugar();
 
@@ -404,7 +417,7 @@ public class ThreadServidor extends Thread {
                                 );
                                 salida1.writeUTF("yaConectado");
                                 salida1.flush();
-                                
+
                                 System.out.println("Se envio ya conectado desde el login");
                             }
                         } else {
@@ -442,5 +455,4 @@ public class ThreadServidor extends Thread {
     public int[] getEstadisticas() {
         return estadisticas;
     }
-
 }

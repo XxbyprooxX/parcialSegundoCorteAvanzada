@@ -17,6 +17,8 @@ public class ControlServidor {
 
     private ControlPrincipal controlPrincipal;
 
+    private static Set<String> cartasEmparejadas;
+
     /**
      * Set que mantiene registro de los usuarios que han iniciado sesión
      */
@@ -55,6 +57,7 @@ public class ControlServidor {
         this.controlPrincipal = controlPrincipal;
         clientesActivos = new Vector<>();
         usuariosConectados = new HashSet<>();
+        cartasEmparejadas = new HashSet<>();
         cantidadClientesLogeados = 0;
     }
 
@@ -107,6 +110,11 @@ public class ControlServidor {
         controlPrincipal.mostrarMensajeConsolaServidor("Cliente agregado: " + threadCliente);
         controlPrincipal.mostrarMensajeConsolaServidor("Total de clientes conectados: " + clientesActivos.size());
         controlPrincipal.mostrarMensajeConsolaServidor("Turno asignado: " + threadCliente.getNumeroTurno());
+    }
+
+    public synchronized boolean esCartaYaEmparejada(int x, int y) {
+        String coordenada = x + "," + y;
+        return cartasEmparejadas.contains(coordenada);
     }
 
     /**
@@ -224,10 +232,10 @@ public class ControlServidor {
             for (ThreadServidor cliente : clientesActivos) {
                 if (cliente.getNumeroTurno() == this.turnoActivo) {
                     try {
-                        
+
                         cliente.getServidor().getServidorInformacionSalida1().writeUTF("pedirCoordenadas");
                         cliente.getServidor().getServidorInformacionSalida1().flush();
-                        
+
                         System.out.println("Se estan pidiendo coordenadas desde el controlServidor, al momento de avanzar siguiente turno");
                     } catch (Exception e) {
                         controlPrincipal.mostrarMensajeConsolaServidor("Error al enviar pedirCoordenadas: " + e.getMessage());
@@ -349,6 +357,9 @@ public class ControlServidor {
 
         if (esPareja) {
             paresEncontrados++;
+            cartasEmparejadas.add((x1 - 1) + "," + (y1 - 1));
+            cartasEmparejadas.add((x2 - 1) + "," + (y2 - 1));
+
             controlPrincipal.mostrarMensajeConsolaServidor(
                     "Progreso: " + paresEncontrados + "/" + totalPares + " pares encontrados"
             );
@@ -400,7 +411,7 @@ public class ControlServidor {
             try {
                 cliente.getServidor().getServidorInformacionSalida1().writeUTF("juegoTerminado");
                 cliente.getServidor().getServidorInformacionSalida1().flush();
-                
+
                 System.out.println("Se envia salida en terminar turno como juegoTerminado, desde ControlServidor");
             } catch (IOException e) {
                 controlPrincipal.mostrarMensajeConsolaServidor("Error al notificar fin de juego: " + e.getMessage());
@@ -424,6 +435,7 @@ public class ControlServidor {
     public void reiniciarJuegoConcentrese() {
         paresEncontrados = 0;
         turnoActivo = 1;
+        cartasEmparejadas.clear();
         controlPrincipal.mostrarMensajeConsolaServidor("Juego de Concentrese reiniciado");
 
         // Notificar a todos los clientes
@@ -431,7 +443,7 @@ public class ControlServidor {
             try {
                 cliente.getServidor().getServidorInformacionSalida1().writeUTF("juegoReiniciado");
                 cliente.getServidor().getServidorInformacionSalida1().flush();
-                
+
                 System.out.println("Se envia salida de juegoReiniciado desde el metodo reiniciarJuegoConcentrese, desde ControlServidor");
             } catch (IOException e) {
                 controlPrincipal.mostrarMensajeConsolaServidor("Error al notificar reinicio: " + e.getMessage());
@@ -575,7 +587,7 @@ public class ControlServidor {
                 }
                 cliente.getServidor().getServidorInformacionSalida1().writeUTF("pedirCoordenadas");
                 cliente.getServidor().getServidorInformacionSalida1().flush();
-                
+
                 System.out.println("Se piden coordenadas desde el metodo iniciarJuego del controlServidor");
             } catch (IOException e) {
                 controlPrincipal.mostrarMensajeConsolaServidor("Error al notificar reinicio: " + e.getMessage());
@@ -625,5 +637,4 @@ public class ControlServidor {
 
         return info.toString();
     }
-
 }

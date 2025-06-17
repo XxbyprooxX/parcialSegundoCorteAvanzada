@@ -28,7 +28,7 @@ public class ThreadCliente extends Thread {
             controlCliente.mostrarMensajeChatJuego("Esperando a empezar el juego, espere que el servidor empiece el juego");
             turno = entrada.readInt();
             
-            System.out.println("Cliente leyendo el turno asignado desde servidor" + turno);
+            System.out.println("Cliente leyendo el turno asignado desde servidor " + turno);
         } catch (IOException ex) {
             controlCliente.mostrarMensajeError("Ocurrio un erroe en el turno");
         }
