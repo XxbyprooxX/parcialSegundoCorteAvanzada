@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package edu.progAvUD.parcialSegundoCorteAvanzada.cliente.control;
 
 import edu.progAvUD.parcialSegundoCorteAvanzada.cliente.modelo.Cliente;
@@ -35,7 +31,6 @@ public class ControlCliente {
         } catch (NumberFormatException e) {
 
         }
-        System.out.println(Cliente.getIP_SERVER() + ", " + Cliente.getPUERTO_1() + ", " + Cliente.getPUERTO_2());
     }
 
     public void conectarAServer() {

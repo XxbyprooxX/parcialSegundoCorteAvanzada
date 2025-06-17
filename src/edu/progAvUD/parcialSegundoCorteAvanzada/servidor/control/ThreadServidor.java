@@ -130,6 +130,8 @@ public class ThreadServidor extends Thread {
             DataOutputStream salida1 = this.servidor.getServidorInformacionSalida1();
             salida1.writeInt(turnoActivo);
             salida1.flush();
+            
+            System.out.println("Se envia el turno activo desde el threadServidor");
         } catch (IOException ex) {
 
         }
@@ -158,6 +160,8 @@ public class ThreadServidor extends Thread {
             if (salida1 != null) {
                 salida1.writeUTF("acerto");
                 salida1.flush();
+                
+                System.out.println("Se envio acerto desde ThreadServidor");
             }
 
             if (controlServidor.verificarJuegoTerminado()) {
@@ -195,7 +199,8 @@ public class ThreadServidor extends Thread {
                 salida1.writeUTF("fallo," + razon);
                 salida1.flush();
             }
-
+            
+            System.out.println("Se envio el fallo desde el metodo manejarFallo de threadServidor");
             controlServidor.avanzarSiguienteTurnoConcentrese();
 
         } catch (IOException e) {
@@ -305,14 +310,14 @@ public class ThreadServidor extends Thread {
                 String mensaje = entrada.readUTF();
                 String[] partes = mensaje.split(",");
                 String comando = partes[0];
+                
+                System.out.println("Se esta leyendo el mensaje enviado desde cliente " + mensaje);
                 switch (comando) {
                     case "eleccionJugador":
                         controlServidor.actualizarPanelEstadisticas(this);
                         try {
-                            System.out.println("Comando: " + comando);
                             int x1 = Integer.parseInt(partes[1]);
                             int y1 = Integer.parseInt(partes[2]);
-                            System.out.println("Cordenadas de la carta 1: " + x1 + ", " + y1);
 
                             String tipoCata1 = procesarJugadaConcentrese(x1, y1);
 
@@ -323,11 +328,11 @@ public class ThreadServidor extends Thread {
 
                             mensaje = entrada.readUTF();
                             partes = mensaje.split(",");
+                            
+                            System.out.println("Se leen las segundas coordenadas enviadas por la persona " + mensaje);
 
-                            System.out.println("Mensaje: " + mensaje);
                             int x2 = Integer.parseInt(partes[1]);
                             int y2 = Integer.parseInt(partes[2]);
-                            System.out.println("Cordenadas de la carta 2: " + x2 + ", " + y2);
                             String tipoCata2 = procesarJugadaConcentrese(x2, y2);
 
                             if (x2 >= 1 && x2 <= 8 && y2 >= 1 && y2 <= 5) {
@@ -361,6 +366,8 @@ public class ThreadServidor extends Thread {
                             );
                             salida1.writeUTF("yaConectado");
                             salida1.flush();
+                            
+                            System.out.println("Se envio ya conectado desde el case de logn del run");
                             break;
                         }
 
@@ -375,6 +382,8 @@ public class ThreadServidor extends Thread {
 
                                 salida1.writeUTF("valido");
                                 salida1.flush();
+                                
+                                System.out.println("Se envio valido desde el case de login");
 
                                 controlServidor.mostrarMensajeConsolaServidor(
                                         "Login exitoso para usuario: " + usuario + " (Turno: " + this.numeroTurno + ")"
@@ -382,8 +391,11 @@ public class ThreadServidor extends Thread {
 
                                 gestionarTurnosConcentrese();
                                 ControlServidor.setCantidadClientesLogeados(ControlServidor.getCantidadClientesLogeados() + 1);
+                                
                                 salida1.writeInt(numeroTurno);
                                 salida1.flush();
+                                
+                                System.out.println("Se envio el turno de la persona asignado por la maquina desde el login");
                                 controlServidor.verificarJugadoresMostrarBotonJugar();
 
                             } else {
@@ -392,6 +404,8 @@ public class ThreadServidor extends Thread {
                                 );
                                 salida1.writeUTF("yaConectado");
                                 salida1.flush();
+                                
+                                System.out.println("Se envio ya conectado desde el login");
                             }
                         } else {
                             controlServidor.mostrarMensajeConsolaServidor(
@@ -399,14 +413,17 @@ public class ThreadServidor extends Thread {
                             );
                             salida1.writeUTF("invalido");
                             salida1.flush();
+                            System.out.println("Se envio login invalido desde el login");
                         }
                         break;
                     case "pedirDatosJugador":
                         salida1.writeUTF("" + estadisticas[0] + "," + estadisticas[1] + "," + estadisticas[2]);
+                        System.out.println("Se envia los datos del jugador");
                         break;
                     case "pedirGanador":
                         String info = controlServidor.enviarGanador();
                         salida1.writeUTF(info);
+                        System.out.println("Se envia al ganador");
                         break;
                     case "siguienteTurno":
                         controlServidor.iniciarJuego();

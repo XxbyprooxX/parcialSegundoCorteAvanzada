@@ -224,8 +224,11 @@ public class ControlServidor {
             for (ThreadServidor cliente : clientesActivos) {
                 if (cliente.getNumeroTurno() == this.turnoActivo) {
                     try {
+                        
                         cliente.getServidor().getServidorInformacionSalida1().writeUTF("pedirCoordenadas");
                         cliente.getServidor().getServidorInformacionSalida1().flush();
+                        
+                        System.out.println("Se estan pidiendo coordenadas desde el controlServidor, al momento de avanzar siguiente turno");
                     } catch (Exception e) {
                         controlPrincipal.mostrarMensajeConsolaServidor("Error al enviar pedirCoordenadas: " + e.getMessage());
                     }
@@ -397,6 +400,8 @@ public class ControlServidor {
             try {
                 cliente.getServidor().getServidorInformacionSalida1().writeUTF("juegoTerminado");
                 cliente.getServidor().getServidorInformacionSalida1().flush();
+                
+                System.out.println("Se envia salida en terminar turno como juegoTerminado, desde ControlServidor");
             } catch (IOException e) {
                 controlPrincipal.mostrarMensajeConsolaServidor("Error al notificar fin de juego: " + e.getMessage());
             }
@@ -426,6 +431,8 @@ public class ControlServidor {
             try {
                 cliente.getServidor().getServidorInformacionSalida1().writeUTF("juegoReiniciado");
                 cliente.getServidor().getServidorInformacionSalida1().flush();
+                
+                System.out.println("Se envia salida de juegoReiniciado desde el metodo reiniciarJuegoConcentrese, desde ControlServidor");
             } catch (IOException e) {
                 controlPrincipal.mostrarMensajeConsolaServidor("Error al notificar reinicio: " + e.getMessage());
             }
@@ -568,6 +575,8 @@ public class ControlServidor {
                 }
                 cliente.getServidor().getServidorInformacionSalida1().writeUTF("pedirCoordenadas");
                 cliente.getServidor().getServidorInformacionSalida1().flush();
+                
+                System.out.println("Se piden coordenadas desde el metodo iniciarJuego del controlServidor");
             } catch (IOException e) {
                 controlPrincipal.mostrarMensajeConsolaServidor("Error al notificar reinicio: " + e.getMessage());
             }

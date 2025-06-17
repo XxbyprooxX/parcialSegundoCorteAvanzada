@@ -1,11 +1,6 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package edu.progAvUD.parcialSegundoCorteAvanzada.cliente.control;
 
 import java.io.DataInputStream;
-import java.io.DataOutput;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
@@ -32,7 +27,8 @@ public class ThreadCliente extends Thread {
         try {
             controlCliente.mostrarMensajeChatJuego("Esperando a empezar el juego, espere que el servidor empiece el juego");
             turno = entrada.readInt();
-            System.out.println("Turno: " + turno);
+            
+            System.out.println("Cliente leyendo el turno asignado desde servidor" + turno);
         } catch (IOException ex) {
             controlCliente.mostrarMensajeError("Ocurrio un erroe en el turno");
         }
@@ -40,76 +36,91 @@ public class ThreadCliente extends Thread {
         while (true) {
 
             try {
-                String opcione = entrada.readUTF();
-                System.out.println("Opcione:" + opcione);
+                String opcion = entrada.readUTF();
                 
-                String[] partesOpcion = opcione.split(",");
+                String[] partesOpcion = opcion.split(",");
                 int turnoActual;
+                
+                System.out.println("Se leen la opcion que llega desde el servidor" + opcion);
 
                 switch (partesOpcion[0]) {
                     case "pedirCoordenadas":
-                        System.out.println("Se pidieron Coordenadas");
 
                         salida.writeUTF("consultarTurno");
                         turnoActual = entrada.readInt();
-                        System.out.println("Turno Actual: " + turnoActual);
+                        
+                        System.out.println("Se consulta el turno actual");
+                        
+                        System.out.println("Se lee el turno actual de quien esta jugando " + turnoActual);
 
                         enviarPosicionCartas(turnoActual);
                         break;
                     case "acerto":
                         salida.writeUTF("consultarTurno");
                         turnoActual = entrada.readInt();
-                        System.out.println("Turno Actual: " + turnoActual);
                         
-//                        if (turnoActual != turno) {
-//                            return;
-//                        }
+                        System.out.println("Se consulta el turno actual");
+                        System.out.println("Se lee el turno actual de quien esta jugando " + turnoActual);
+                        if (turnoActual != turno) {
+                            return;
+                        }
 
                         controlCliente.mostrarMensajeChatJuego("Acertaste, vuelve a ingresar otras Coordenadas");
                         salida.writeUTF("pedirDatosJugador");
+                        
+                        System.out.println("Se piden los datos del jugador ");
                         String datosA = entrada.readUTF();
-                        System.out.println("Datos: "+datosA);
                         String[] datosAA = datosA.split(",");
                         
-                        
+                        System.out.println("Se reciben los datos del jugador que acerto " + datosA);
 
                         controlCliente.mostrarMensajeChatJuego("Intentos realizados:" + datosAA[0]
                                 + " | Cantidad de Aciertos: " + datosAA[1]
                                 + " | Porcentaje de eficiencia :" + datosAA[2]);
                         
                         salida.writeUTF("siguienteTurno");
-
+                        
+                        System.out.println("Se manda que se pase al siguiente turno");
                         break;
                     case "fallo":
                         
                         salida.writeUTF("consultarTurno");
                         turnoActual = entrada.readInt();
-                        System.out.println("Turno Actual: " + turnoActual);
                         
-//                        if (turnoActual != turno) {
-//                            return;
-//                        }
+                        System.out.println("Se consulta el turno actual");
+                        System.out.println("Se lee el turno actual de quien esta jugando " + turnoActual);
+                        
+                        if (turnoActual != turno) {
+                            return;
+                        }
 
                         controlCliente.mostrarMensajeChatJuego("Fallaste, debido a que " + partesOpcion[1] + ", se paso el turno al siguiente jugador");
 
                         salida.writeUTF("pedirDatosJugador");
                         
+                        System.out.println("Se piden los datos del jugador");
                         
                         String datosB = entrada.readUTF();
-                        System.out.println("Datos: "+datosB);
                         String[] datosBB = datosB.split(",");
+                        
+                        System.out.println("Se piden los datos del jugador que fallo " + datosB);
 
                         controlCliente.mostrarMensajeChatJuego("Intentos realizados:" + datosBB[0]
                                 + " | Cantidad de Aciertos: " + datosBB[1]
                                 + " | Porcentaje de eficiencia :" + datosBB[2]);
                         
                         salida.writeUTF("siguienteTurno");
+                        
+                        System.out.println("Se manda a que pase al siguiente turno");
 
                         break;
                     case "juegoTerminado":
 
                         salida.writeUTF("pedirGanador");
                         controlCliente.mostrarMensajeChatJuego(entrada.readUTF());
+                        
+                        System.out.println("Se consulta el ganador");
+                        System.out.println("Se recibio el juego termino");
 
                         break;
                     default:
@@ -147,8 +158,9 @@ public class ThreadCliente extends Thread {
         while (true) {
             if (controlCliente.getPasoActivoCoordenadas() == 2) {
                 String mensajeSalida = "eleccionJugador," + controlCliente.getCoordenadasCartas();
-                System.out.println("MensajeSalida: " + mensajeSalida);
                 salida.writeUTF(mensajeSalida);
+                
+                System.out.println("Se envian las coordenadas del cliente ");
                 controlCliente.setPasoActivoCoordenadas(0);
                 controlCliente.setCoordenadasCartas("");
                 break; // termina el bucle una vez enviada la coordenada
