@@ -41,6 +41,8 @@ public class ThreadCliente extends Thread {
 
             try {
                 String opcione = entrada.readUTF();
+                System.out.println("Opcione:" + opcione);
+                
                 String[] partesOpcion = opcione.split(",");
                 int turnoActual;
 
@@ -59,36 +61,49 @@ public class ThreadCliente extends Thread {
                         turnoActual = entrada.readInt();
                         System.out.println("Turno Actual: " + turnoActual);
                         
-                        if (turnoActual != turno) {
-                            return;
-                        }
+//                        if (turnoActual != turno) {
+//                            return;
+//                        }
 
                         controlCliente.mostrarMensajeChatJuego("Acertaste, vuelve a ingresar otras Coordenadas");
                         salida.writeUTF("pedirDatosJugador");
-                        String[] datos = entrada.readUTF().split(",");
+                        String datosA = entrada.readUTF();
+                        System.out.println("Datos: "+datosA);
+                        String[] datosAA = datosA.split(",");
+                        
+                        
 
-                        controlCliente.mostrarMensajeChatJuego("Intentos realizados:" + datos[0]
-                                + " | Cantidad de Aciertos: " + datos[1]
-                                + " | Porcentaje de eficiencia :" + datos[2]);
+                        controlCliente.mostrarMensajeChatJuego("Intentos realizados:" + datosAA[0]
+                                + " | Cantidad de Aciertos: " + datosAA[1]
+                                + " | Porcentaje de eficiencia :" + datosAA[2]);
+                        
+                        salida.writeUTF("siguienteTurno");
 
                         break;
                     case "fallo":
+                        
                         salida.writeUTF("consultarTurno");
                         turnoActual = entrada.readInt();
                         System.out.println("Turno Actual: " + turnoActual);
                         
-                        if (turnoActual != turno) {
-                            return;
-                        }
+//                        if (turnoActual != turno) {
+//                            return;
+//                        }
 
                         controlCliente.mostrarMensajeChatJuego("Fallaste, debido a que " + partesOpcion[1] + ", se paso el turno al siguiente jugador");
 
                         salida.writeUTF("pedirDatosJugador");
-                        String[] datos1 = entrada.readUTF().split(",");
+                        
+                        
+                        String datosB = entrada.readUTF();
+                        System.out.println("Datos: "+datosB);
+                        String[] datosBB = datosB.split(",");
 
-                        controlCliente.mostrarMensajeChatJuego("Intentos realizados:" + datos1[0]
-                                + " | Cantidad de Aciertos: " + datos1[1]
-                                + " | Porcentaje de eficiencia :" + datos1[2]);
+                        controlCliente.mostrarMensajeChatJuego("Intentos realizados:" + datosBB[0]
+                                + " | Cantidad de Aciertos: " + datosBB[1]
+                                + " | Porcentaje de eficiencia :" + datosBB[2]);
+                        
+                        salida.writeUTF("siguienteTurno");
 
                         break;
                     case "juegoTerminado":
