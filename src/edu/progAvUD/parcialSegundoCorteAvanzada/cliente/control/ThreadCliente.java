@@ -56,12 +56,14 @@ public class ThreadCliente extends Thread {
                         enviarPosicionCartas(turnoActual);
                         break;
                     case "acerto":
+                        controlCliente.permitirEntradaTextoChatJuego();
                         salida.writeUTF("consultarTurno");
                         turnoActual = entrada.readInt();
                         
                         System.out.println("Se consulta el turno actual");
                         System.out.println("Se lee el turno actual de quien esta jugando " + turnoActual);
                         if (turnoActual != turno) {
+                            controlCliente.bloquearEntradaTextoChatJuego();
                             return;
                         }
 
@@ -83,7 +85,7 @@ public class ThreadCliente extends Thread {
                         System.out.println("Se manda que se pase al siguiente turno");
                         break;
                     case "fallo":
-                        
+                        controlCliente.permitirEntradaTextoChatJuego();
                         salida.writeUTF("consultarTurno");
                         turnoActual = entrada.readInt();
                         
@@ -91,6 +93,7 @@ public class ThreadCliente extends Thread {
                         System.out.println("Se lee el turno actual de quien esta jugando " + turnoActual);
                         
                         if (turnoActual != turno) {
+                            controlCliente.bloquearEntradaTextoChatJuego();
                             return;
                         }
 
