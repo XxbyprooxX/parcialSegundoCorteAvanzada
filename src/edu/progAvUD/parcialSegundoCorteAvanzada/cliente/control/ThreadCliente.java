@@ -95,6 +95,11 @@ public class ThreadCliente extends Thread {
                                 + " | Aciertos: " + datosAA[1]
                                 + " | Eficiencia: " + datosAA[2] + "%");
 
+                        if (turno == turnoActual) {
+                            controlCliente.permitirEntradaTextoChatJuego();
+                            controlCliente.setEsperandoPrimera(true);
+                        }
+
                         salida.writeUTF("siguienteTurno");
                         System.out.println("Se envía señal para pasar al siguiente turno.");
                         break;

@@ -169,7 +169,6 @@ public class ControlGrafico implements ActionListener {
             ventanaPrincipal.panelJuegoChat.jSpinnerCoordenadaY.setValue(1);
             try {
                 controlPrincipal.enviarPosicionCartas(coordenadaX1, coordenadaY1, x2, y2);
-                bloquearEntradaTextoChatJuego();
             } catch (IOException ex) {
                 mostrarMensajeError("Ocurrió un error al mandar las coordenadas");
             }
