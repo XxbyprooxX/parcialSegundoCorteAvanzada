@@ -2,13 +2,11 @@ package edu.progAvUD.parcialSegundoCorteAvanzada.servidor.vista;
 
 import edu.progAvUD.parcialSegundoCorteAvanzada.servidor.control.ControlGrafico;
 import java.io.File;
-import javax.swing.ImageIcon;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-import javax.swing.JToggleButton;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
 /**

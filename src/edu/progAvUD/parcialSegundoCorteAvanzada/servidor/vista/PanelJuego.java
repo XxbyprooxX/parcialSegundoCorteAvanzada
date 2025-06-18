@@ -1,51 +1,109 @@
 package edu.progAvUD.parcialSegundoCorteAvanzada.servidor.vista;
 
-import java.awt.Font;
 import javax.swing.ImageIcon;
 import javax.swing.JToggleButton;
+import java.awt.GridLayout; // Importar GridLayout para un mejor manejo de la disposición de botones
 
 /**
+ * La clase **`PanelJuego`** extiende `javax.swing.JPanel` y representa la
+ * interfaz visual del tablero de juego del "Concéntrese" en el lado del
+ * servidor. Contiene una colección de botones (`JToggleButton`) que actúan como
+ * las cartas del juego.
+ *
+ * Esta clase se encarga de la creación, visualización y manipulación de las
+ * cartas en la interfaz gráfica del servidor, permitiendo mostrar el estado
+ * actual del juego.
  *
  * @author Andres Felipe
  */
 public class PanelJuego extends javax.swing.JPanel {
 
-    public JToggleButton[] cartas;
-    
     /**
-     * Creates new form PanelJuego
+     * Un arreglo de `JToggleButton` que representa las cartas individuales en
+     * el tablero de juego. Cada `JToggleButton` corresponde a una carta que
+     * puede ser "volteada" (seleccionada) o "boca abajo" (deseleccionada).
+     */
+    public JToggleButton[] cartas;
+
+    /**
+     * Creates new form PanelJuego. Constructor de la clase `PanelJuego`.
+     * Inicializa los componentes de la interfaz de usuario generados por el
+     * constructor de formularios y crea el arreglo de `JToggleButton` para
+     * almacenar las 40 cartas del juego.
      */
     public PanelJuego() {
         initComponents();
-        this.cartas = new JToggleButton[40];
+        this.cartas = new JToggleButton[40]; // Se inicializa el arreglo para 40 cartas (8 columnas x 5 filas)
+        // Opcional: Configurar un layout para jPanelBotones si no está configurado en initComponents()
+        // Por ejemplo, para un tablero de 8x5:
+        // jPanelBotones.setLayout(new GridLayout(5, 8)); 
     }
-    
-    public void anadirBoton(int numeroBoton){
+
+    /**
+     * Añade un nuevo botón (`JToggleButton`) al panel de juego en la posición
+     * especificada. El botón se inicializa con una imagen de "dorso" (carta
+     * boca abajo).
+     *
+     * @param numeroBoton El índice en el arreglo `cartas` donde se almacenará y
+     * añadirá el nuevo botón. Debe ser un valor entre 0 y 39.
+     */
+    public void anadirBoton(int numeroBoton) {
         JToggleButton carta = new JToggleButton();
+        // Carga la imagen del dorso de la carta. Se asume que la ruta es correcta desde la raíz del proyecto.
         ImageIcon iconNormal = new ImageIcon(System.getProperty("user.dir") + "/src/edu/progAvUD/parcialSegundoCorteAvanzada/servidor/imagenes/dorso.png");
-        carta.setIcon(iconNormal);
-        cartas[numeroBoton]=carta;
-        jPanelBotones.add(carta);
-        revalidate();
+        carta.setIcon(iconNormal); // Establece la imagen por defecto (cuando la carta no está seleccionada)
+        cartas[numeroBoton] = carta; // Almacena la referencia del botón en el arreglo
+        jPanelBotones.add(carta); // Añade el botón al panel visual
+        revalidate(); // Revalida el layout del contenedor para asegurar que el nuevo botón se muestre
     }
-    
-    public void ponerImagenCarta(int idCarta, int idImagen){
+
+    /**
+     * Establece la imagen que se mostrará cuando una carta sea seleccionada
+     * (volteada). La imagen se carga dinámicamente según el `idImagen`
+     * proporcionado.
+     *
+     * @param idCarta El índice de la carta en el arreglo `cartas` a la que se
+     * le asignará la imagen.
+     * @param idImagen El identificador numérico de la imagen de la carta (ej.,
+     * "1.jpg", "2.jpg").
+     */
+    public void ponerImagenCarta(int idCarta, int idImagen) {
         JToggleButton carta = cartas[idCarta];
-        ImageIcon iconSeleccionado = new ImageIcon(System.getProperty("user.dir") + "/src/edu/progAvUD/parcialSegundoCorteAvanzada/servidor/imagenes/"+idImagen+".jpg");
-        carta.setSelectedIcon(iconSeleccionado);
-        revalidate();
+        // Carga la imagen específica de la carta según su ID.
+        ImageIcon iconSeleccionado = new ImageIcon(System.getProperty("user.dir") + "/src/edu/progAvUD/parcialSegundoCorteAvanzada/servidor/imagenes/" + idImagen + ".jpg");
+        carta.setSelectedIcon(iconSeleccionado); // Establece la imagen cuando la carta está seleccionada
+        revalidate(); // Revalida el layout para asegurar la actualización visual
     }
-    
-    public void seleccionarCarta(int idCarta){
+
+    /**
+     * Selecciona (voltea) visualmente una carta específica en el tablero de
+     * juego. Esto hace que la carta muestre su imagen de `selectedIcon`.
+     *
+     * @param idCarta El índice de la carta en el arreglo `cartas` que se va a
+     * seleccionar.
+     */
+    public void seleccionarCarta(int idCarta) {
         JToggleButton carta = cartas[idCarta];
-        carta.setSelected(true);
-        revalidate();
+        if (carta != null) { // Asegura que el botón existe
+            carta.setSelected(true); // Marca el botón como seleccionado, mostrando su imagen
+            revalidate(); // Revalida para actualizar la interfaz
+        }
     }
-    
-    public void deseleccionarCarta(int idCarta){
+
+    /**
+     * Deselecciona (voltea boca abajo) visualmente una carta específica en el
+     * tablero de juego. Esto hace que la carta vuelva a mostrar su imagen de
+     * `icon` (el dorso).
+     *
+     * @param idCarta El índice de la carta en el arreglo `cartas` que se va a
+     * deseleccionar.
+     */
+    public void deseleccionarCarta(int idCarta) {
         JToggleButton carta = cartas[idCarta];
-        carta.setSelected(false);
-        revalidate();
+        if (carta != null) { // Asegura que el botón existe
+            carta.setSelected(false); // Marca el botón como no seleccionado, mostrando el dorso
+            revalidate(); // Revalida para actualizar la interfaz
+        }
     }
 
     /**

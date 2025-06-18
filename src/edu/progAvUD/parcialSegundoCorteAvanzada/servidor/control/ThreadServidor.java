@@ -9,72 +9,93 @@ import java.net.Socket;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
+ * **`ThreadServidor`**: Un hilo dedicado a gestionar la comunicación y la
+ * lógica del juego para un cliente individual conectado al servidor. Cada
+ * instancia de esta clase representa la sesión de un jugador y maneja sus
+ * acciones durante el juego "Concéntrese".
  *
  * @author Cristianlol789
  */
 public class ThreadServidor extends Thread {
 
     /**
-     * Objeto que representa la conexión con el cliente
+     * Objeto que encapsula los **sockets de comunicación** (entrada/salida) con
+     * el cliente.
      */
     private Servidor servidor;
 
     /**
-     * Jugador asignado a este hilo después del login exitoso
+     * El objeto **`JugadorVO`** asignado a este hilo, que representa al jugador
+     * después de un inicio de sesión exitoso.
      */
     private JugadorVO jugadorAsignado;
 
     /**
-     * Controlador principal del servidor para acceder a la consola y a la lista
-     * de usuarios
+     * Una referencia al **`ControlServidor`** principal, permitiendo el acceso
+     * a la consola del servidor y a la lista de usuarios conectados.
      */
     private ControlServidor controlServidor;
 
     /**
-     * Contador estático para asignar turnos únicos a cada cliente
+     * Un **contador estático** y atómico para asignar turnos únicos y
+     * secuenciales a cada cliente conectado.
      */
     private static AtomicInteger contadorTurnos = new AtomicInteger(1);
 
     /**
-     * Número de turno asignado a este cliente
+     * El **número de turno** específico asignado a este cliente para el juego.
      */
     private int numeroTurno;
 
+    /**
+     * Un arreglo para almacenar las **estadísticas del jugador** durante la
+     * partida: `estadisticas[0]`: Número total de intentos de voltear cartas.
+     * `estadisticas[1]`: Número de parejas acertadas. `estadisticas[2]`:
+     * Porcentaje de aciertos (calculado).
+     */
     private int[] estadisticas;
 
     /**
-     * Constructor del hilo servidor que inicia la conexión con los clientes.
+     * Constructor para inicializar un nuevo hilo de servidor para un cliente.
+     * Configura la comunicación con los sockets proporcionados y establece las
+     * estadísticas iniciales del jugador.
      *
-     * @param socketCliente1 Socket de comunicación para entrada/salida del
-     * cliente.
-     * @param socketCliente2 Socket adicional para enviar mensajes desde el
+     * @param socketCliente1 El primer socket para la comunicación de
+     * entrada/salida principal del cliente.
+     * @param socketCliente2 El segundo socket, utilizado para enviar mensajes
+     * específicos desde el servidor.
+     * @param controlServidor La instancia del controlador principal del
      * servidor.
-     * @param controlServidor Referencia al controlador general del servidor.
      */
     public ThreadServidor(Socket socketCliente1, Socket socketCliente2, ControlServidor controlServidor) {
-        String nombreUsuario = "";
+        String nombreUsuario = ""; // El nombre de usuario se establecerá después del login
         this.servidor = new Servidor(socketCliente1, socketCliente2, nombreUsuario);
         this.controlServidor = controlServidor;
         this.estadisticas = new int[3];
-        estadisticas[0] = 0;
-        estadisticas[1] = 0;
-        estadisticas[2] = 0;
+        // Inicializa las estadísticas a cero
+        estadisticas[0] = 0; // Intentos totales
+        estadisticas[1] = 0; // Parejas resueltas
+        estadisticas[2] = 0; // Porcentaje de aciertos
     }
 
     /**
-     * Método que asigna un jugador después del login exitoso
+     * Asigna un objeto `JugadorVO` a este hilo después de una autenticación
+     * exitosa del usuario. Intenta recuperar la información del jugador de la
+     * base de datos o lista de jugadores del servidor.
      *
-     * @param usuario Nombre de usuario para buscar el jugador
-     * @return true si se asignó correctamente, false en caso contrario
+     * @param usuario El nombre de usuario utilizado para buscar el jugador.
+     * @return `true` si el jugador se asignó correctamente, `false` en caso
+     * contrario (ej. usuario no encontrado).
      */
     private boolean asignarJugador(String usuario) {
         try {
-            // Buscar el jugador en la base de datos o lista de jugadores
+            // Se asume que obtenerJugadorPorCredenciales devuelve una cadena formateada como "nombre,apellido,usuario,contraseña"
             String[] infoJugador = controlServidor.obtenerJugadorPorCredenciales(usuario).split(",");
 
-            if (infoJugador != null) {
+            if (infoJugador != null && infoJugador.length >= 4) { // Asegurarse de que la cadena tiene suficientes partes
+                // Se crea el objeto JugadorVO con la información obtenida
                 this.jugadorAsignado = new JugadorVO(infoJugador[0], infoJugador[1], infoJugador[2], infoJugador[3], 0, 0, 0);
-                // Resetear las estadísticas del jugador para la nueva partida
+                // Reiniciar las estadísticas de la partida para el nuevo jugador asignado
                 this.jugadorAsignado.setCantidadIntentos(0);
                 this.jugadorAsignado.setCantidadParejasResueltas(0);
 
@@ -93,9 +114,11 @@ public class ThreadServidor extends Thread {
     }
 
     /**
-     * Método que asigna un turno único a cada cliente conectado
+     * Asigna un **turno único y consecutivo** a cada cliente conectado. Utiliza
+     * un `AtomicInteger` para garantizar la asignación segura de turnos en
+     * entornos concurrentes.
      *
-     * @return El número de turno asignado
+     * @return El número de turno asignado a este cliente.
      */
     private synchronized int asignarTurno() {
         int turno = contadorTurnos.getAndIncrement();
@@ -106,8 +129,9 @@ public class ThreadServidor extends Thread {
     }
 
     /**
-     * Método que verifica los clientes conectados y gestiona sus turnos para
-     * Concentrese
+     * Muestra información relevante sobre el cliente y su turno en la consola
+     * del servidor. Esto incluye el nombre del cliente, su turno asignado, el
+     * turno activo global y si es su turno actualmente.
      */
     public void gestionarTurnosConcentrese() {
         // Mostrar información en la consola del servidor
@@ -120,32 +144,35 @@ public class ThreadServidor extends Thread {
     }
 
     /**
-     * Método que verifica si es el turno activo del cliente
+     * Envía el **turno activo actual** del juego a este cliente. Esto permite
+     * al cliente saber si es su turno o el de otro jugador.
      */
     public void verificarTurnoActivo() {
-        // Obtener el turno actual que debe estar activo
         int turnoActivo = controlServidor.getTurnoActivo();
 
         try {
             DataOutputStream salida1 = this.servidor.getServidorInformacionSalida1();
-            salida1.writeInt(turnoActivo);
-            salida1.flush();
-
-            System.out.println("Se envia el turno activo desde el threadServidor");
+            if (salida1 != null) {
+                salida1.writeInt(turnoActivo);
+                salida1.flush();
+                System.out.println("Se envía el turno activo desde el ThreadServidor");
+            }
         } catch (IOException ex) {
-
+            controlServidor.mostrarMensajeConsolaServidor("Error al enviar turno activo a " + servidor.getNombreUsuario() + ": " + ex.getMessage());
         }
     }
 
     /**
-     * Método que maneja cuando el jugador acierta una pareja en Concentrese El
-     * jugador mantiene su turno
+     * Maneja la lógica cuando el jugador acierta una pareja en el juego
+     * "Concéntrese". El jugador mantiene su turno y se actualizan sus
+     * estadísticas.
      */
     public void manejarAcierto() {
         try {
             // Actualizar estadísticas del jugador
             if (jugadorAsignado != null) {
                 jugadorAsignado.setCantidadParejasResueltas(jugadorAsignado.getCantidadParejasResueltas() + 1);
+                // El número de intentos también se incrementa con cada jugada, independientemente de si acierta o falla
                 jugadorAsignado.setCantidadIntentos(jugadorAsignado.getCantidadIntentos() + 1);
             }
 
@@ -155,31 +182,32 @@ public class ThreadServidor extends Thread {
                     + " | Parejas resueltas: " + (jugadorAsignado != null ? jugadorAsignado.getCantidadParejasResueltas() : "N/A")
             );
 
-            // El jugador mantiene el turno, solo notificar el acierto
+            // Notificar al cliente que ha acertado
             DataOutputStream salida1 = this.servidor.getServidorInformacionSalida1();
             if (salida1 != null) {
                 salida1.writeUTF("acerto");
                 salida1.flush();
-
-                System.out.println("Se envio acerto desde ThreadServidor");
+                System.out.println("Se envió 'acerto' desde ThreadServidor");
             }
 
+            // Verificar si el juego ha terminado después del acierto
             if (controlServidor.verificarJuegoTerminado()) {
                 controlServidor.terminarJuego();
             }
 
         } catch (IOException e) {
             controlServidor.mostrarMensajeConsolaServidor(
-                    "Error al manejar acierto: " + e.getMessage()
+                    "Error al manejar acierto para " + servidor.getNombreUsuario() + ": " + e.getMessage()
             );
         }
     }
 
     /**
-     * Método que maneja cuando el jugador falla en Concentrese El turno pasa al
-     * siguiente jugador
+     * Maneja la lógica cuando el jugador falla en encontrar una pareja en
+     * "Concéntrese". El turno pasa al siguiente jugador y se actualizan las
+     * estadísticas.
      *
-     * @param razon es el motivo por el cual fallo
+     * @param razon La razón por la cual la jugada resultó en un fallo.
      */
     public void manejarFallo(String razon) {
         try {
@@ -193,46 +221,63 @@ public class ThreadServidor extends Thread {
                     + " | Intentos: " + (jugadorAsignado != null ? jugadorAsignado.getCantidadIntentos() : "N/A")
             );
 
-            // Notificar al cliente que falló
+            // Notificar al cliente que falló, incluyendo la razón
             DataOutputStream salida1 = this.servidor.getServidorInformacionSalida1();
             if (salida1 != null) {
                 salida1.writeUTF("fallo," + razon);
                 salida1.flush();
             }
 
-            System.out.println("Se envio el fallo desde el metodo manejarFallo de threadServidor");
+            System.out.println("Se envió el fallo desde el método manejarFallo de ThreadServidor");
+            // Avanzar al siguiente turno
             controlServidor.avanzarSiguienteTurnoConcentrese();
 
         } catch (IOException e) {
             controlServidor.mostrarMensajeConsolaServidor(
-                    "Error al manejar fallo: " + e.getMessage()
+                    "Error al manejar fallo para " + servidor.getNombreUsuario() + ": " + e.getMessage()
             );
         }
     }
 
     /**
-     * Método que procesa una jugada de Concentrese con coordenadas y cartas
+     * Procesa la selección de una carta por parte del jugador en el juego
+     * "Concéntrese". Verifica si la carta ya está emparejada y devuelve el tipo
+     * de carta.
      *
-     * @param x1 Coordenada X de la primera carta
-     * @param y1 Coordenada Y de la primera carta
-     * @return devuelve la carta
+     * @param x1 Coordenada X (columna) de la carta seleccionada.
+     * @param y1 Coordenada Y (fila) de la carta seleccionada.
+     * @return El tipo de carta en la posición especificada, o "emparejada" si
+     * ya lo está.
      */
     public String procesarJugadaConcentrese(int x1, int y1) {
-
+        // Las coordenadas del cliente suelen ser 1-based, mientras que los arrays son 0-based
         if (controlServidor.esCartaYaEmparejada(x1 - 1, y1 - 1)) {
             return "emparejada";
         }
-
         String tipoCarta1 = controlServidor.obtenerTipoCartaEnPosicion(x1 - 1, y1 - 1);
         return tipoCarta1;
     }
 
+    /**
+     * Compara dos cartas seleccionadas por el jugador para determinar si forman
+     * una pareja. Gestiona el acierto o el fallo, actualiza las estadísticas y
+     * el turno.
+     *
+     * @param tipoCarta1 El tipo de la primera carta seleccionada.
+     * @param tipoCarta2 El tipo de la segunda carta seleccionada.
+     * @param x1 Coordenada X de la primera carta.
+     * @param y1 Coordenada Y de la primera carta.
+     * @param x2 Coordenada X de la segunda carta.
+     * @param y2 Coordenada Y de la segunda carta.
+     */
     public void compararCartas(String tipoCarta1, String tipoCarta2, int x1, int y1, int x2, int y2) {
 
+        // Incrementar el contador de intentos totales
         estadisticas[0] = estadisticas[0] + 1;
 
         if (tipoCarta1.equals("") || tipoCarta2.equals("")) {
-            manejarFallo("Estas coordenadas estaban fuera del rango");
+            // Esto podría indicar coordenadas fuera de rango o un error en la obtención del tipo de carta
+            manejarFallo("Coordenadas fuera de rango o error al obtener tipo de carta.");
             actualizarPorcentajeAciertos();
             return;
         }
@@ -240,15 +285,19 @@ public class ThreadServidor extends Thread {
         boolean esPareja = controlServidor.verificarPareja(x1, y1, tipoCarta1, x2, y2, tipoCarta2);
 
         if (esPareja) {
-            estadisticas[1] = estadisticas[1] + 1;
+            estadisticas[1] = estadisticas[1] + 1; // Incrementar parejas acertadas
             actualizarPorcentajeAciertos();
             manejarAcierto();
         } else {
             try {
+                // Pequeña pausa para que el cliente pueda ver las cartas antes de que se volteen de nuevo
                 Thread.sleep(3000);
             } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
+                Thread.currentThread().interrupt(); // Restaurar el estado de interrupción
+                controlServidor.mostrarMensajeConsolaServidor("Hilo interrumpido durante la espera de fallo.");
             }
+            // Deseleccionar (voltear) las cartas si no son pareja
+            // Asegurarse de que las coordenadas estén dentro del rango antes de deseleccionar
             if (x1 >= 1 && x1 <= 8 && y1 >= 1 && y1 <= 5) {
                 int idCarta1 = (y1 - 1) * 8 + (x1 - 1);
                 controlServidor.deseleccionarCarta(idCarta1);
@@ -258,18 +307,29 @@ public class ThreadServidor extends Thread {
                 controlServidor.deseleccionarCarta(idCarta2);
             }
             actualizarPorcentajeAciertos();
-            manejarFallo("No son parejas");
+            manejarFallo("Las cartas seleccionadas no forman una pareja.");
         }
     }
 
+    /**
+     * Calcula y actualiza el porcentaje de aciertos del jugador. Se almacena en
+     * `estadisticas[2]`. Si no hay intentos (`estadisticas[0] == 0`), el
+     * porcentaje es 0 para evitar división por cero.
+     */
     public void actualizarPorcentajeAciertos() {
-        estadisticas[2] = Math.round((estadisticas[1] / estadisticas[0]) * 100);
+        if (estadisticas[0] > 0) {
+            estadisticas[2] = Math.round(((float) estadisticas[1] / estadisticas[0]) * 100);
+        } else {
+            estadisticas[2] = 0; // Si no hay intentos, el porcentaje de aciertos es 0
+        }
     }
 
     /**
-     * Método que obtiene información del cliente y su turno
+     * Obtiene una cadena de texto con información relevante del cliente
+     * conectado.
      *
-     * @return String con la información del cliente
+     * @return Una `String` que contiene el nombre de usuario, el número de
+     * turno y la dirección IP del cliente.
      */
     public String getInformacionCliente() {
         return "Cliente: " + servidor.getNombreUsuario()
@@ -278,181 +338,240 @@ public class ThreadServidor extends Thread {
     }
 
     /**
-     * Getter para el número de turno
+     * Devuelve el número de turno asignado a este cliente.
      *
-     * @return el número de turno asignado
+     * @return El número de turno.
      */
     public int getNumeroTurno() {
         return this.numeroTurno;
     }
 
     /**
-     * Getter para el objeto Servidor
+     * Devuelve el objeto `Servidor` asociado a este hilo, que contiene los
+     * sockets de comunicación.
      *
-     * @return el objeto servidor asociado
+     * @return El objeto `Servidor`.
      */
     public Servidor getServidor() {
         return this.servidor;
     }
 
     /**
-     * Método que se ejecuta cuando se inicia el hilo. Establece los flujos de
-     * entrada/salida y maneja el ciclo de escucha del cliente.
+     * Retorna las estadísticas actuales del jugador asociado a este hilo.
+     *
+     * @return Un arreglo de enteros donde: `[0]` es el total de intentos, `[1]`
+     * es el número de parejas resueltas, `[2]` es el porcentaje de aciertos.
+     */
+    public int[] getEstadisticas() {
+        return estadisticas;
+    }
+
+    /**
+     * El método **`run()`** es el punto de entrada principal para la ejecución
+     * del hilo. Establece los flujos de entrada y salida de datos con el
+     * cliente y entra en un bucle infinito para escuchar los comandos enviados
+     * por el cliente y procesarlos.
+     *
+     * Los comandos manejados incluyen: - **`eleccionJugador`**: Procesa la
+     * selección de cartas de un jugador en el juego "Concéntrese". -
+     * **`consultarTurno`**: Permite al cliente verificar si es su turno. -
+     * **`login`**: Autentica al usuario y le asigna un turno si el login es
+     * exitoso. - **`pedirDatosJugador`**: Envía al cliente las estadísticas
+     * actuales del jugador. - **`pedirGanador`**: Envía la información del
+     * ganador del juego. - **`siguienteTurno`**: Inicia el juego (probablemente
+     * después de que todos los jugadores se hayan conectado).
+     *
+     * Si la conexión con el cliente se interrumpe (`IOException`), se muestra
+     * un mensaje en la consola, se reduce el contador de clientes conectados,
+     * se verifica la posibilidad de mostrar el botón de jugar y se remueve al
+     * cliente de la lista de clientes activos del servidor.
      */
     @Override
     public void run() {
-        controlServidor.mostrarMensajeConsolaServidor(".::Esperando Mensajes :");
+        controlServidor.mostrarMensajeConsolaServidor(".::Esperando Mensajes del cliente (" + servidor.getNombreUsuario() + ") ::.");
         try {
+            // Configurar los flujos de entrada y salida de datos
             DataInputStream entrada = new DataInputStream(this.servidor.getServidorCliente1().getInputStream());
             this.servidor.setServidorInformacionEntrada1(entrada);
             DataOutputStream salida1 = new DataOutputStream(this.servidor.getServidorCliente1().getOutputStream());
             this.servidor.setServidorInformacionSalida1(salida1);
+            // El segundo socket de salida puede ser para mensajes broadcast o específicos
             DataOutputStream salida2 = new DataOutputStream(this.servidor.getServidorCliente2().getOutputStream());
             this.servidor.setServidorInformacionSalida2(salida2);
 
+            // Bucle principal para escuchar y procesar mensajes del cliente
             while (true) {
-                String mensaje = entrada.readUTF();
-                String[] partes = mensaje.split(",");
-                String comando = partes[0];
+                String mensaje = entrada.readUTF(); // Lee el mensaje del cliente
+                String[] partes = mensaje.split(","); // Divide el mensaje en partes por coma
+                String comando = partes[0]; // El primer elemento es el comando
 
-                System.out.println("Se esta leyendo el mensaje enviado desde cliente " + mensaje);
+                System.out.println("Se está leyendo el mensaje enviado desde cliente " + servidor.getNombreUsuario() + ": " + mensaje);
+
                 switch (comando) {
                     case "eleccionJugador":
+                        // Actualiza el panel de estadísticas en la interfaz del servidor
                         controlServidor.actualizarPanelEstadisticas(this);
                         try {
+                            // Primera carta seleccionada
                             int x1 = Integer.parseInt(partes[1]);
                             int y1 = Integer.parseInt(partes[2]);
-
                             String tipoCarta1 = procesarJugadaConcentrese(x1, y1);
 
-                            if (x1 >= 1 && x1 <= 8 && y1 >= 1 && y1 <= 5) {
-                                int idCarta1 = (y1 - 1) * 8 + (x1 - 1);
-                                controlServidor.seleccionarCarta(idCarta1);
-                            }
-
+                            // Lee el segundo mensaje para la segunda carta seleccionada
                             mensaje = entrada.readUTF();
                             partes = mensaje.split(",");
+                            System.out.println("Se leen las segundas coordenadas enviadas por " + servidor.getNombreUsuario() + ": " + mensaje);
 
-                            System.out.println("Se leen las segundas coordenadas enviadas por la persona " + mensaje);
-
+                            // Segunda carta seleccionada
                             int x2 = Integer.parseInt(partes[1]);
                             int y2 = Integer.parseInt(partes[2]);
                             String tipoCarta2 = procesarJugadaConcentrese(x2, y2);
 
-                            if (tipoCarta2.equals("emparejada") || tipoCarta1.equals("emparejada")) {
-                                // Deseleccionar la primera carta antes de fallar
-                                if (x1 >= 1 && x1 <= 8 && y1 >= 1 && y1 <= 5) {
-                                    int idCarta1 = (y1 - 1) * 8 + (x1 - 1);
-                                    controlServidor.deseleccionarCarta(idCarta1);
-                                }
-                                manejarFallo("La carta ya estaba volteada/emparejada");
-                                break;
+                            // Selecciona las cartas en el modelo del servidor (las voltea visiblemente)
+                            // Se asume que las coordenadas son 1-based desde el cliente, se ajustan a 0-based para el array
+                            if (x1 >= 1 && x1 <= 8 && y1 >= 1 && y1 <= 5) {
+                                int idCarta1 = (y1 - 1) * 8 + (x1 - 1);
+                                controlServidor.seleccionarCarta(idCarta1);
                             }
                             if (x2 >= 1 && x2 <= 8 && y2 >= 1 && y2 <= 5) {
                                 int idCarta2 = (y2 - 1) * 8 + (x2 - 1);
                                 controlServidor.seleccionarCarta(idCarta2);
                             }
 
-                            compararCartas(tipoCarta1, tipoCarta2, x1, y1, x2, y2);
-                            controlServidor.actualizarPanelEstadisticas(this);
-                        } catch (NumberFormatException e) {
-                            manejarFallo("Escribio letras en vez de numeros");
-                        }
+                            // Si alguna de las cartas ya estaba emparejada, manejar como fallo
+                            if (tipoCarta1.equals("emparejada") || tipoCarta2.equals("emparejada")) {
+                                // Deseleccionar las cartas que sí se pudieron seleccionar para evitar que se queden visibles
+                                if (!tipoCarta1.equals("emparejada") && x1 >= 1 && x1 <= 8 && y1 >= 1 && y1 <= 5) {
+                                    int idCarta1ToDeselect = (y1 - 1) * 8 + (x1 - 1);
+                                    controlServidor.deseleccionarCarta(idCarta1ToDeselect);
+                                }
+                                if (!tipoCarta2.equals("emparejada") && x2 >= 1 && x2 <= 8 && y2 >= 1 && y2 <= 5) {
+                                    int idCarta2ToDeselect = (y2 - 1) * 8 + (x2 - 1);
+                                    controlServidor.deseleccionarCarta(idCarta2ToDeselect);
+                                }
+                                manejarFallo("Una o ambas cartas ya estaban emparejadas.");
+                                break; // Salir del switch para esperar el siguiente comando
+                            }
 
+                            // Compara las cartas y gestiona el acierto o fallo
+                            compararCartas(tipoCarta1, tipoCarta2, x1, y1, x2, y2);
+                            controlServidor.actualizarPanelEstadisticas(this); // Actualiza estadísticas después de la jugada
+
+                        } catch (NumberFormatException e) {
+                            manejarFallo("Se esperaba un número para las coordenadas, pero se recibió texto.");
+                            controlServidor.mostrarMensajeConsolaServidor("Error de formato numérico en coordenadas del cliente " + servidor.getNombreUsuario() + ": " + e.getMessage());
+                        }
                         break;
 
                     case "consultarTurno":
+                        // Si es el turno de este cliente, actualiza el panel de estadísticas
                         if (controlServidor.getTurnoActivo() == numeroTurno) {
                             controlServidor.actualizarPanelEstadisticas(this);
                         }
-                        verificarTurnoActivo();
+                        verificarTurnoActivo(); // Envía el turno activo al cliente
                         break;
 
                     case "login":
                         String usuario = partes[1];
                         String contrasena = partes[2];
 
-                        // Primero verificar si el usuario ya está conectado
+                        // Paso 1: Verificar si el usuario ya está conectado al servidor
                         if (controlServidor.usuarioYaConectado(usuario)) {
                             controlServidor.mostrarMensajeConsolaServidor(
-                                    "Intento de login fallido: Usuario '" + usuario + "' ya está conectado"
+                                    "Intento de login fallido para '" + usuario + "': El usuario ya está conectado."
                             );
-                            salida1.writeUTF("yaConectado");
+                            salida1.writeUTF("yaConectado"); // Notifica al cliente que ya está conectado
                             salida1.flush();
-
-                            System.out.println("Se envio ya conectado desde el case de logn del run");
-                            break;
+                            System.out.println("Se envió 'yaConectado' desde el caso 'login' del ThreadServidor.");
+                            break; // Sale del switch
                         }
 
-                        // Verificar credenciales
+                        // Paso 2: Verificar las credenciales (usuario y contraseña)
                         boolean jugadorExiste = controlServidor.buscarUsuarioYContrasenaExistente(usuario, contrasena);
 
                         if (jugadorExiste && asignarJugador(usuario)) {
-                            // Intentar registrar el usuario como conectado
+                            // Paso 3: Intentar registrar al usuario como conectado
                             if (controlServidor.registrarUsuarioConectado(usuario)) {
-                                servidor.setNombreUsuario(usuario);
-                                this.numeroTurno = asignarTurno();
-
-                                salida1.writeUTF("valido");
+                                servidor.setNombreUsuario(usuario); // Establece el nombre de usuario en el objeto Servidor
+                                this.numeroTurno = asignarTurno(); // Asigna un turno único
+                                salida1.writeUTF("valido"); // Notifica al cliente que el login fue exitoso
                                 salida1.flush();
-
-                                System.out.println("Se envio valido desde el case de login");
+                                System.out.println("Se envió 'valido' desde el caso 'login' del ThreadServidor.");
 
                                 controlServidor.mostrarMensajeConsolaServidor(
                                         "Login exitoso para usuario: " + usuario + " (Turno: " + this.numeroTurno + ")"
                                 );
+                                gestionarTurnosConcentrese(); // Muestra información del turno en consola
 
-                                gestionarTurnosConcentrese();
+                                // Incrementa el contador de clientes logeados y verifica si se puede iniciar el juego
                                 ControlServidor.setCantidadClientesLogeados(ControlServidor.getCantidadClientesLogeados() + 1);
 
-                                salida1.writeInt(numeroTurno);
+                                salida1.writeInt(numeroTurno); // Envía el número de turno asignado al cliente
                                 salida1.flush();
-
-                                System.out.println("Se envio el turno de la persona asignado por la maquina desde el login");
-                                controlServidor.verificarJugadoresMostrarBotonJugar();
-
+                                System.out.println("Se envió el turno asignado al cliente (" + numeroTurno + ") desde el login.");
+                                controlServidor.verificarJugadoresMostrarBotonJugar(); // Permite al servidor decidir si mostrar el botón de jugar
                             } else {
+                                // Esto ocurriría si hay una condición de carrera o un error lógico
                                 controlServidor.mostrarMensajeConsolaServidor(
-                                        "Error: Usuario '" + usuario + "' ya estaba registrado como conectado"
+                                        "Error: Usuario '" + usuario + "' ya estaba registrado como conectado inesperadamente."
                                 );
                                 salida1.writeUTF("yaConectado");
                                 salida1.flush();
-
-                                System.out.println("Se envio ya conectado desde el login");
+                                System.out.println("Se envió 'yaConectado' (error interno) desde el login.");
                             }
                         } else {
+                            // Login fallido por credenciales incorrectas
                             controlServidor.mostrarMensajeConsolaServidor(
                                     "Login fallido: Credenciales incorrectas para usuario: " + usuario
                             );
-                            salida1.writeUTF("invalido");
+                            salida1.writeUTF("invalido"); // Notifica al cliente que las credenciales son inválidas
                             salida1.flush();
-                            System.out.println("Se envio login invalido desde el login");
+                            System.out.println("Se envió 'invalido' desde el login.");
                         }
                         break;
+
                     case "pedirDatosJugador":
+                        // Envía las estadísticas actuales del jugador al cliente
                         salida1.writeUTF("" + estadisticas[0] + "," + estadisticas[1] + "," + estadisticas[2]);
-                        System.out.println("Se envia los datos del jugador");
+                        System.out.println("Se envían los datos del jugador (" + servidor.getNombreUsuario() + ").");
                         break;
+
                     case "pedirGanador":
-                        String info = controlServidor.enviarGanador();
-                        salida1.writeUTF(info);
-                        System.out.println("Se envia al ganador");
+                        // Solicita al controlador principal la información del ganador y la envía al cliente
+                        String infoGanador = controlServidor.enviarGanador();
+                        salida1.writeUTF(infoGanador);
+                        System.out.println("Se envía la información del ganador a " + servidor.getNombreUsuario() + ".");
                         break;
+
                     case "siguienteTurno":
+                        // Inicia el juego, presumiblemente después de que todos los jugadores se han unido y el administrador lo ha indicado
                         controlServidor.iniciarJuego();
+                        break;
+
+                    default:
+                        controlServidor.mostrarMensajeConsolaServidor("Comando desconocido recibido de " + servidor.getNombreUsuario() + ": " + comando);
                         break;
                 }
             }
-
         } catch (IOException e) {
-            controlServidor.mostrarMensajeConsolaServidor("Cliente " + servidor.getNombreUsuario() + " desconectado");
+            // Manejo de la desconexión del cliente
+            controlServidor.mostrarMensajeConsolaServidor("Cliente " + servidor.getNombreUsuario() + " desconectado. Error: " + e.getMessage());
+            // Reduce el contador de clientes logeados y actualiza el estado del servidor
             ControlServidor.setCantidadClientesLogeados(ControlServidor.getCantidadClientesLogeados() - 1);
-            controlServidor.verificarJugadoresMostrarBotonJugar();
-            controlServidor.removerCliente(this);
+            controlServidor.verificarJugadoresMostrarBotonJugar(); // Vuelve a verificar si el botón de jugar debe estar visible
+            controlServidor.removerCliente(this); // Remueve este hilo (cliente) de la lista de clientes activos
+        } finally {
+            // Asegurarse de cerrar los sockets en caso de una desconexión o error
+            try {
+                if (servidor.getServidorCliente1() != null && !servidor.getServidorCliente1().isClosed()) {
+                    servidor.getServidorCliente1().close();
+                }
+                if (servidor.getServidorCliente2() != null && !servidor.getServidorCliente2().isClosed()) {
+                    servidor.getServidorCliente2().close();
+                }
+            } catch (IOException e) {
+                controlServidor.mostrarMensajeConsolaServidor("Error al cerrar sockets del cliente " + servidor.getNombreUsuario() + ": " + e.getMessage());
+            }
         }
-    }
-
-    public int[] getEstadisticas() {
-        return estadisticas;
     }
 }
