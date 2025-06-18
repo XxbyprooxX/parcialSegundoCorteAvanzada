@@ -169,11 +169,7 @@ public class ThreadServidor extends Thread {
     public void manejarAcierto() {
         try {
             // Actualizar estadísticas del jugador
-            if (jugadorAsignado != null) {
-                jugadorAsignado.setCantidadParejasResueltas(jugadorAsignado.getCantidadParejasResueltas() + 1);
-                // El número de intentos también se incrementa con cada jugada, independientemente de si acierta o falla
-                jugadorAsignado.setCantidadIntentos(jugadorAsignado.getCantidadIntentos() + 1);
-            }
+            controlServidor.setParesEncontrados(controlServidor.getParesEncontrados()+1);
 
             String nombreMostrar = (jugadorAsignado != null) ? jugadorAsignado.getNombreJugador() : servidor.getNombreUsuario();
             controlServidor.mostrarMensajeConsolaServidor(

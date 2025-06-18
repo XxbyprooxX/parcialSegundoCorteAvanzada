@@ -52,19 +52,19 @@ public class ControlServidor {
     /**
      * El número de turno que está activo actualmente en el juego.
      */
-    private int turnoActivo = 1;
+    private int turnoActivo;
 
     /**
      * El número total de pares de cartas que existen en el juego. Este valor es
      * configurable.
      */
-    private int totalPares = 20;
+    private int totalPares;
 
     /**
      * El número de pares de cartas que han sido encontrados y emparejados hasta
      * el momento en el juego actual.
      */
-    private int paresEncontrados = 0;
+    private int paresEncontrados;
 
     /**
      * Constructor de la clase `ControlServidor`. Inicializa las colecciones y
@@ -80,6 +80,9 @@ public class ControlServidor {
         usuariosConectados = new HashSet<>();
         cartasEmparejadas = new HashSet<>();
         cantidadClientesLogeados = 0;
+        totalPares = 20;
+        paresEncontrados = 0;
+        turnoActivo = 1;
     }
 
     /**
@@ -118,7 +121,6 @@ public class ControlServidor {
                 usuario.start(); // Inicia el hilo para que comience a manejar la comunicación con el cliente.
             }
         } catch (IOException e) {
-            e.printStackTrace(); // Imprime el rastro de la pila en caso de un error de E/S grave.
             // Se puede mostrar mensaje en consola si se desea: controlPrincipal.mostrarMensajeConsolaServidor("error :" + e);
         }
     }
@@ -817,4 +819,9 @@ public class ControlServidor {
 
         return info.toString();
     }
+
+    public void setParesEncontrados(int paresEncontrados) {
+        this.paresEncontrados = paresEncontrados;
+    }
+    
 }
