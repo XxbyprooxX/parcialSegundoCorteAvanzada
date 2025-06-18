@@ -7,8 +7,17 @@ import java.io.File;
 import java.io.IOException;
 
 /**
+ * Clase encargada del control gráfico del cliente.
  *
- * @author Andres Felipe
+ * Esta clase conecta la interfaz gráfica (`VentanaPrincipal`) con las acciones
+ * del usuario, gestionando eventos y comunicándose con el `ControlPrincipal`.
+ * Es responsable de:
+ * - Cambiar entre paneles
+ * - Validar acciones del usuario
+ * - Mostrar mensajes
+ * - Capturar coordenadas del juego
+ *
+ * Autor: Andres Felipe
  */
 public class ControlGrafico implements ActionListener {
 
@@ -17,19 +26,29 @@ public class ControlGrafico implements ActionListener {
 
     private int coordenadaX1, coordenadaY1;
 
+    /**
+     * Constructor que inicializa la interfaz y registra los eventos.
+     *
+     * @param controlPrincipal Referencia al controlador principal
+     */
     public ControlGrafico(ControlPrincipal controlPrincipal) {
         this.controlPrincipal = controlPrincipal;
         this.ventanaPrincipal = new VentanaPrincipal();
 
+        // Mostrar panel inicial por defecto
         ventanaPrincipal.mostrarPanel(ventanaPrincipal.panelInicial);
 
+        // Registrar escuchas de botones
         ventanaPrincipal.panelInicial.jButtonPropiedadesSocket.addActionListener(this);
         ventanaPrincipal.panelLogin.jButtonInciarSesion.addActionListener(this);
-
         ventanaPrincipal.panelJuegoChat.jButtonEnviar.addActionListener(this);
-
     }
 
+    /**
+     * Maneja los eventos de los botones de la interfaz.
+     *
+     * @param e Evento de acción generado
+     */
     @Override
     public void actionPerformed(ActionEvent e) {
         if (e.getSource() == ventanaPrincipal.panelInicial.jButtonPropiedadesSocket) {
@@ -39,7 +58,6 @@ public class ControlGrafico implements ActionListener {
             ventanaPrincipal.mostrarPanel(ventanaPrincipal.panelLogin);
         }
         if (e.getSource() == ventanaPrincipal.panelLogin.jButtonInciarSesion) {
-
             String usuario = ventanaPrincipal.panelLogin.jTextFieldUsuario.getText();
             char[] contrasenaChars = ventanaPrincipal.panelLogin.jPasswordField.getPassword();
             String contrasena = new String(contrasenaChars);
@@ -47,16 +65,16 @@ public class ControlGrafico implements ActionListener {
             String respuesta = controlPrincipal.enviarCredencialesCliente(usuario, contrasena);
 
             if (respuesta.equalsIgnoreCase("logeado")) {
-                ventanaPrincipal.mostrarMensajeExito("Has iniciado sesion con exito");
+                ventanaPrincipal.mostrarMensajeExito("Has iniciado sesión con éxito");
                 ventanaPrincipal.mostrarPanel(ventanaPrincipal.panelJuegoChat);
                 bloquearEntradaTextoChatJuego();
                 controlPrincipal.crearThreadCliente();
             } else if (respuesta.equalsIgnoreCase("noLogeado")) {
-                ventanaPrincipal.mostrarMensajeError("Credenciales incorrectas intente de nuevo");
+                ventanaPrincipal.mostrarMensajeError("Credenciales incorrectas, intente de nuevo");
             } else if (respuesta.equals("")) {
                 ventanaPrincipal.mostrarMensajeError("No aplica");
             } else if (respuesta.equalsIgnoreCase("conectado")) {
-                ventanaPrincipal.mostrarMensajeError("Ya se encuentra logeado dentro del sistema");
+                ventanaPrincipal.mostrarMensajeError("Ya se encuentra logueado dentro del sistema");
             }
         }
         if (e.getSource() == ventanaPrincipal.panelJuegoChat.jButtonEnviar) {
@@ -64,47 +82,64 @@ public class ControlGrafico implements ActionListener {
         }
     }
 
+    /**
+     * Solicita al usuario que seleccione un archivo de propiedades para cargar configuración.
+     *
+     * @return Archivo seleccionado
+     */
     public File pedirArchivoPropiedades() {
         return ventanaPrincipal.pedirArchivoPropiedades();
-
     }
 
     /**
-     * Muestra un mensaje de error al usuario, generalmente mediante un cuadro
-     * de diálogo.
+     * Muestra un mensaje de error en la interfaz.
      *
-     * @param mensaje el mensaje de error que se desea mostrar.
+     * @param mensaje Mensaje de error
      */
     public void mostrarMensajeError(String mensaje) {
         ventanaPrincipal.mostrarMensajeError(mensaje);
     }
 
     /**
-     * Muestra un mensaje de éxito al usuario, generalmente cuando una acción se
-     * realiza correctamente.
+     * Muestra un mensaje de éxito en la interfaz.
      *
-     * @param mensaje el mensaje de éxito que se desea mostrar.
+     * @param mensaje Mensaje de éxito
      */
     public void mostrarMensajeExito(String mensaje) {
         ventanaPrincipal.mostrarMensajeExito(mensaje);
     }
 
+    /**
+     * Muestra un mensaje en el chat del juego.
+     *
+     * @param msg Mensaje a mostrar
+     */
     public void mostrarMensajeChatJuego(String msg) {
         ventanaPrincipal.panelJuegoChat.mostrarMensajeChatJuego(msg);
     }
 
+    /**
+     * Deshabilita la entrada del chat del juego (spinners y botón de enviar).
+     */
     public void bloquearEntradaTextoChatJuego() {
         ventanaPrincipal.panelJuegoChat.jButtonEnviar.setEnabled(false);
         ventanaPrincipal.panelJuegoChat.jSpinnerCoordenadaX.setEnabled(false);
         ventanaPrincipal.panelJuegoChat.jSpinnerCoordenadaY.setEnabled(false);
     }
 
+    /**
+     * Habilita la entrada del chat del juego (spinners y botón de enviar).
+     */
     public void permitirEntradaTextoChatJuego() {
         ventanaPrincipal.panelJuegoChat.jButtonEnviar.setEnabled(true);
         ventanaPrincipal.panelJuegoChat.jSpinnerCoordenadaX.setEnabled(true);
         ventanaPrincipal.panelJuegoChat.jSpinnerCoordenadaY.setEnabled(true);
     }
 
+    /**
+     * Solicita las coordenadas de las cartas seleccionadas por el usuario.
+     * Primero guarda la primera coordenada, luego la segunda y las envía al servidor.
+     */
     public void pedirCoordenadasCartas() {
         int x = (Integer) ventanaPrincipal.panelJuegoChat.jSpinnerCoordenadaX.getValue();
         int y = (Integer) ventanaPrincipal.panelJuegoChat.jSpinnerCoordenadaY.getValue();
@@ -115,7 +150,6 @@ public class ControlGrafico implements ActionListener {
             coordenadaY1 = y;
             ventanaPrincipal.panelJuegoChat.mostrarMensajeChatJuego(
                     "Primera coordenada: (" + x + "," + y + ")");
-            // Reiniciar spinners para la segunda entrada
             ventanaPrincipal.panelJuegoChat.jSpinnerCoordenadaX.setValue(1);
             ventanaPrincipal.panelJuegoChat.jSpinnerCoordenadaY.setValue(1);
             controlPrincipal.setEsperandoPrimera(false);
@@ -136,5 +170,4 @@ public class ControlGrafico implements ActionListener {
             controlPrincipal.setEsperandoPrimera(true);
         }
     }
-
 }

@@ -1,26 +1,39 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JPanel.java to edit this template
- */
 package edu.progAvUD.parcialSegundoCorteAvanzada.cliente.vista;
 
 /**
+ * PanelJuegoChat representa un panel gráfico dentro del cliente que contiene la
+ * interfaz para mostrar los mensajes del chat relacionados con el juego. Este
+ * panel permite visualizar los mensajes recibidos durante la interacción del
+ * usuario en la sesión de juego.
+ *
+ * La clase extiende javax.swing.JPanel, integrándose como un componente visual
+ * dentro de la interfaz gráfica del cliente.
  *
  * @author Andres Felipe
  */
 public class PanelJuegoChat extends javax.swing.JPanel {
 
     /**
-     * Creates new form PanelJuegoChat
+     * Constructor de la clase PanelJuegoChat. Inicializa los componentes
+     * gráficos del panel utilizando el método initComponents(), el cual
+     * configura los elementos visuales necesarios para la funcionalidad del
+     * chat.
      */
     public PanelJuegoChat() {
         initComponents();
     }
-    
+
+    /**
+     * Añade un mensaje al área de texto destinada a mostrar los mensajes del
+     * chat del juego. Este método agrega el mensaje recibido como parámetro al
+     * final del área de texto, seguido por un salto de línea para mantener la
+     * legibilidad de los mensajes.
+     *
+     * @param msg El mensaje que se desea mostrar en el área de chat.
+     */
     public void mostrarMensajeChatJuego(String msg) {
         jTextAreaMensajes.append(msg + "\n");
     }
-
 
     /**
      * This method is called from within the constructor to initialize the form.

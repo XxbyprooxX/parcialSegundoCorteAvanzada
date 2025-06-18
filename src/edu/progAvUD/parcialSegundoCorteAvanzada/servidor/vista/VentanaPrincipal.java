@@ -15,12 +15,26 @@ import javax.swing.filechooser.FileNameExtensionFilter;
  */
 public class VentanaPrincipal extends javax.swing.JFrame {
 
+    /**
+     *Es el panel del inicio de ejecucion
+     */
     public PanelInicial panelInicial;
+
+    /**
+     *Es el panel donde se ven las cartas
+     */
     public PanelJuego panelJuego;
+
+    /**
+     *Es el panel donde se muestran los mensajes del servidor
+     */
+    
     public PanelConsolaServidor panelConsolaServidor;
     /**
      * Creates new form VentanaPrincipal
+     * @param controlGrafico
      */
+    
     public VentanaPrincipal(ControlGrafico controlGrafico) {
         initComponents();
         this.panelInicial = new PanelInicial();
