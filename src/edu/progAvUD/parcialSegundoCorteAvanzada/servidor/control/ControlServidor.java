@@ -438,7 +438,7 @@ public class ControlServidor {
         boolean esPareja = carta1 != null && carta1.equals(carta2);
 
         if (esPareja) {
-            paresEncontrados++; // Incrementa el contador de pares encontrados.
+            // Incrementa el contador de pares encontrados.
             // Agrega las coordenadas de las cartas emparejadas al conjunto para evitar seleccionarlas de nuevo.
             cartasEmparejadas.add((x1 - 1) + "," + (y1 - 1));
             cartasEmparejadas.add((x2 - 1) + "," + (y2 - 1));
@@ -791,7 +791,7 @@ public class ControlServidor {
      * @return Una {@link String} que contiene los nombres de los jugadores
      * ganadores y su porcentaje de acierto.
      */
-    public String enviarGanador() {
+    public void enviarGanador() {
         ArrayList<ThreadServidor> ganadores = new ArrayList<>();
         int mayorPorcentaje = -1; // Inicializa con un valor bajo para encontrar el porcentaje más alto.
 
@@ -816,8 +816,22 @@ public class ControlServidor {
         for (ThreadServidor ganador : ganadores) {
             info.append("- ").append(ganador.getInformacionCliente()).append("\n");
         }
-
-        return info.toString();
+        
+        for (ThreadServidor cliente : clientesActivos) {
+            try {
+                cliente.getServidor().getServidorInformacionSalida1().writeUTF(info.toString());
+            } catch (IOException ex) {
+               controlPrincipal.mostrarMensajeError("Ocurrio un error al informar ganador");
+            }
+        }
+        
+        try {
+            Thread.sleep(6000);
+            System.exit(0);
+        } catch (InterruptedException ex) {
+            controlPrincipal.mostrarMensajeError("Ocurrio un error al hacer el sleep de ganador");
+        }
+        
     }
 
     public void setParesEncontrados(int paresEncontrados) {

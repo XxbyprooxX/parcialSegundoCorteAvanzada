@@ -283,7 +283,7 @@ public class ThreadServidor extends Thread {
         } else {
             try {
                 // Pequeña pausa para que el cliente pueda ver las cartas antes de que se volteen de nuevo
-                Thread.sleep(3000);
+                Thread.sleep(500);
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt(); // Restaurar el estado de interrupción
                 controlServidor.mostrarMensajeConsolaServidor("Hilo interrumpido durante la espera de fallo.");
@@ -519,8 +519,7 @@ public class ThreadServidor extends Thread {
 
                     case "pedirGanador":
                         // Solicita al controlador principal la información del ganador y la envía al cliente
-                        String infoGanador = controlServidor.enviarGanador();
-                        salida1.writeUTF(infoGanador);
+                        controlServidor.enviarGanador();
                         break;
 
                     case "siguienteTurno":

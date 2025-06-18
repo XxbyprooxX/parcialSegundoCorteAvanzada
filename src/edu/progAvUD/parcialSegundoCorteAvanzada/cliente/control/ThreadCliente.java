@@ -121,7 +121,7 @@ public class ThreadCliente extends Thread {
 
                     case "juegoTerminado":
                         salida.writeUTF("pedirGanador");
-                        controlCliente.mostrarMensajeChatJuego(entrada.readUTF());
+                        controlCliente.mostrarMensajeError(entrada.readUTF());
 
                         break;
 
