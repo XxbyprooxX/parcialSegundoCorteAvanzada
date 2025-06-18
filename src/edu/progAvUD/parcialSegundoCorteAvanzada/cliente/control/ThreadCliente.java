@@ -62,9 +62,6 @@ public class ThreadCliente extends Thread {
 
                         System.out.println("Se consulta el turno actual");
                         System.out.println("Se lee el turno actual de quien esta jugando " + turnoActual);
-                        if (turnoActual != turno) {
-                            return;
-                        }
 
                         controlCliente.mostrarMensajeChatJuego("Acertaste, vuelve a ingresar otras Coordenadas");
                         salida.writeUTF("pedirDatosJugador");
@@ -90,10 +87,6 @@ public class ThreadCliente extends Thread {
 
                         System.out.println("Se consulta el turno actual");
                         System.out.println("Se lee el turno actual de quien esta jugando " + turnoActual);
-
-                        if (turnoActual != turno) {
-                            return;
-                        }
 
                         controlCliente.mostrarMensajeChatJuego("Fallaste, debido a que " + partesOpcion[1] + ", se paso el turno al siguiente jugador");
 

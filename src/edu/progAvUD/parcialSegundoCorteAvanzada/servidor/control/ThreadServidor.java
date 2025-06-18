@@ -272,7 +272,6 @@ public class ThreadServidor extends Thread {
      */
     public void compararCartas(String tipoCarta1, String tipoCarta2, int x1, int y1, int x2, int y2) {
 
-        // Incrementar el contador de intentos totales
         estadisticas[0] = estadisticas[0] + 1;
 
         if (tipoCarta1.equals("") || tipoCarta2.equals("")) {
@@ -309,6 +308,7 @@ public class ThreadServidor extends Thread {
             actualizarPorcentajeAciertos();
             manejarFallo("Las cartas seleccionadas no forman una pareja.");
         }
+        controlServidor.actualizarPanelEstadisticas(this);
     }
 
     /**

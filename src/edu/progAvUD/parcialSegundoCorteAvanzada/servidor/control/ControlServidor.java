@@ -179,6 +179,7 @@ public class ControlServidor {
 
         if (clientesActivos.size() == 1) {
             controlPrincipal.mostrarMensajeError("Solo queda un jugador");
+            System.exit(0);
         }
     }
 
