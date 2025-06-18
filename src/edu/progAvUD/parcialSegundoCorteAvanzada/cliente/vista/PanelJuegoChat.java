@@ -33,7 +33,13 @@ public class PanelJuegoChat extends javax.swing.JPanel {
 
         jPanel1 = new javax.swing.JPanel();
         jButtonEnviar = new javax.swing.JButton();
-        jTextFieldMensaje = new javax.swing.JTextField();
+        jPanel2 = new javax.swing.JPanel();
+        jPanel3 = new javax.swing.JPanel();
+        jLabel3 = new javax.swing.JLabel();
+        jSpinnerCoordenadaX = new javax.swing.JSpinner();
+        jPanel4 = new javax.swing.JPanel();
+        jLabel4 = new javax.swing.JLabel();
+        jSpinnerCoordenadaY = new javax.swing.JSpinner();
         jScrollPane1 = new javax.swing.JScrollPane();
         jTextAreaMensajes = new javax.swing.JTextArea();
 
@@ -43,7 +49,28 @@ public class PanelJuegoChat extends javax.swing.JPanel {
 
         jButtonEnviar.setText("Enviar");
         jPanel1.add(jButtonEnviar, java.awt.BorderLayout.LINE_END);
-        jPanel1.add(jTextFieldMensaje, java.awt.BorderLayout.CENTER);
+
+        jPanel2.setLayout(new java.awt.GridLayout(1, 2));
+
+        jLabel3.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        jLabel3.setText("Coordenada X:");
+        jPanel3.add(jLabel3);
+
+        jSpinnerCoordenadaX.setModel(new javax.swing.SpinnerNumberModel(1, 1, 8, 1));
+        jPanel3.add(jSpinnerCoordenadaX);
+
+        jPanel2.add(jPanel3);
+
+        jLabel4.setFont(new java.awt.Font("Segoe UI", 1, 12)); // NOI18N
+        jLabel4.setText("CoordenadaY:");
+        jPanel4.add(jLabel4);
+
+        jSpinnerCoordenadaY.setModel(new javax.swing.SpinnerNumberModel(1, 1, 5, 1));
+        jPanel4.add(jSpinnerCoordenadaY);
+
+        jPanel2.add(jPanel4);
+
+        jPanel1.add(jPanel2, java.awt.BorderLayout.CENTER);
 
         add(jPanel1, java.awt.BorderLayout.PAGE_END);
 
@@ -58,9 +85,15 @@ public class PanelJuegoChat extends javax.swing.JPanel {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     public javax.swing.JButton jButtonEnviar;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel3;
+    private javax.swing.JPanel jPanel4;
     private javax.swing.JScrollPane jScrollPane1;
+    public javax.swing.JSpinner jSpinnerCoordenadaX;
+    public javax.swing.JSpinner jSpinnerCoordenadaY;
     public javax.swing.JTextArea jTextAreaMensajes;
-    public javax.swing.JTextField jTextFieldMensaje;
     // End of variables declaration//GEN-END:variables
 }

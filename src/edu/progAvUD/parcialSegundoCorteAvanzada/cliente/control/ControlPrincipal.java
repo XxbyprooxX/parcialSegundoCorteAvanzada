@@ -12,9 +12,8 @@ public class ControlPrincipal {
 
     private ControlGrafico controlGrafico;
     private ControlCliente controlCliente;
-
-    private String coordenadasCartas = "";
-    private int pasoActivoCoordenadas = 0;
+    
+    private boolean esperandoPrimera = true;
 
     public ControlPrincipal() {
         this.controlGrafico = new ControlGrafico(this);
@@ -88,12 +87,20 @@ public class ControlPrincipal {
         controlGrafico.mostrarMensajeChatJuego(msg);
     }
 
-    public String getCoordenadasCartas() {
-        return coordenadasCartas;
+    public ControlGrafico getControlGrafico() {
+        return controlGrafico;
     }
 
-    public void setCoordenadasCartas(String coordenadasCartas) {
-        this.coordenadasCartas = coordenadasCartas;
+    public void setControlGrafico(ControlGrafico controlGrafico) {
+        this.controlGrafico = controlGrafico;
+    }
+
+    public ControlCliente getControlCliente() {
+        return controlCliente;
+    }
+
+    public void setControlCliente(ControlCliente controlCliente) {
+        this.controlCliente = controlCliente;
     }
     
     public void bloquearEntradaTextoChatJuego(){
@@ -104,13 +111,18 @@ public class ControlPrincipal {
         controlGrafico.permitirEntradaTextoChatJuego();
     }
     
-
-    public int getPasoActivoCoordenadas() {
-        return pasoActivoCoordenadas;
+    public void enviarPosicionCartas(int x1, int y1, int x2, int y2) throws IOException{
+        controlCliente.enviarPosicionCartas(x1, y1, x2, y2);
     }
 
-    public void setPasoActivoCoordenadas(int pasoActivoCoordenadas) {
-        this.pasoActivoCoordenadas = pasoActivoCoordenadas;
+    public boolean isEsperandoPrimera() {
+        return esperandoPrimera;
     }
 
+    public void setEsperandoPrimera(boolean esperandoPrimera) {
+        this.esperandoPrimera = esperandoPrimera;
+    }
+    
+    
+    
 }

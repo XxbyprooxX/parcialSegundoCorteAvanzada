@@ -10,9 +10,11 @@ import java.util.Set;
 import java.util.Vector;
 
 /**
- * La clase `ControlServidor` gestiona la lógica principal del servidor para el juego de Concentrese (Memory Game).
- * Se encarga de la gestión de clientes, el sistema de turnos, el estado del juego (cartas emparejadas, progreso),
- * y la comunicación con la interfaz de usuario del servidor a través de {@link ControlPrincipal}.
+ * La clase `ControlServidor` gestiona la lógica principal del servidor para el
+ * juego de Concentrese (Memory Game). Se encarga de la gestión de clientes, el
+ * sistema de turnos, el estado del juego (cartas emparejadas, progreso), y la
+ * comunicación con la interfaz de usuario del servidor a través de
+ * {@link ControlPrincipal}.
  *
  * @author Cristianlol789
  */
@@ -21,25 +23,29 @@ public class ControlServidor {
     private ControlPrincipal controlPrincipal;
 
     /**
-     * Un conjunto estático para almacenar las coordenadas de las cartas que ya han sido emparejadas exitosamente.
-     * Las coordenadas se guardan como cadenas de texto en formato "x,y".
+     * Un conjunto estático para almacenar las coordenadas de las cartas que ya
+     * han sido emparejadas exitosamente. Las coordenadas se guardan como
+     * cadenas de texto en formato "x,y".
      */
     private static Set<String> cartasEmparejadas;
 
     /**
-     * Conjunto que mantiene un registro de los nombres de usuario de los clientes que han iniciado sesión
-     * y están actualmente conectados al servidor.
+     * Conjunto que mantiene un registro de los nombres de usuario de los
+     * clientes que han iniciado sesión y están actualmente conectados al
+     * servidor.
      */
     private static Set<String> usuariosConectados;
 
     /**
-     * Vector (una lista dinámica y segura para hilos) que contiene todos los hilos de clientes
-     * activos conectados al servidor. Cada cliente está representado por una instancia de {@link ThreadServidor}.
+     * Vector (una lista dinámica y segura para hilos) que contiene todos los
+     * hilos de clientes activos conectados al servidor. Cada cliente está
+     * representado por una instancia de {@link ThreadServidor}.
      */
     private static Vector<ThreadServidor> clientesActivos;
 
     /**
-     * Contador estático que lleva el número de clientes que han completado el proceso de inicio de sesión.
+     * Contador estático que lleva el número de clientes que han completado el
+     * proceso de inicio de sesión.
      */
     private static int cantidadClientesLogeados;
 
@@ -49,20 +55,24 @@ public class ControlServidor {
     private int turnoActivo = 1;
 
     /**
-     * El número total de pares de cartas que existen en el juego. Este valor es configurable.
+     * El número total de pares de cartas que existen en el juego. Este valor es
+     * configurable.
      */
     private int totalPares = 20;
 
     /**
-     * El número de pares de cartas que han sido encontrados y emparejados hasta el momento en el juego actual.
+     * El número de pares de cartas que han sido encontrados y emparejados hasta
+     * el momento en el juego actual.
      */
     private int paresEncontrados = 0;
 
     /**
-     * Constructor de la clase `ControlServidor`. Inicializa las colecciones y el estado inicial del juego.
+     * Constructor de la clase `ControlServidor`. Inicializa las colecciones y
+     * el estado inicial del juego.
      *
-     * @param controlPrincipal La instancia del controlador principal, que representa la ventana principal
-     * de control del servidor y su interfaz de usuario.
+     * @param controlPrincipal La instancia del controlador principal, que
+     * representa la ventana principal de control del servidor y su interfaz de
+     * usuario.
      */
     public ControlServidor(ControlPrincipal controlPrincipal) {
         this.controlPrincipal = controlPrincipal;
@@ -73,9 +83,10 @@ public class ControlServidor {
     }
 
     /**
-     * Inicia el servidor, abriendo sockets en puertos predefinidos y esperando por conexiones de clientes.
-     * Por cada par de conexiones de socket que se aceptan, se crea un nuevo hilo {@link ThreadServidor}
-     * para manejar la comunicación con el cliente y se añade a la lista de clientes activos.
+     * Inicia el servidor, abriendo sockets en puertos predefinidos y esperando
+     * por conexiones de clientes. Por cada par de conexiones de socket que se
+     * aceptan, se crea un nuevo hilo {@link ThreadServidor} para manejar la
+     * comunicación con el cliente y se añade a la lista de clientes activos.
      */
     public void runServer() {
         ServerSocket server1 = null;
@@ -114,9 +125,11 @@ public class ControlServidor {
 
     /**
      * Agrega un nuevo cliente a la lista de clientes conectados y registrados.
-     * Este método es sincronizado para asegurar la seguridad de los hilos al modificar la colección compartida.
+     * Este método es sincronizado para asegurar la seguridad de los hilos al
+     * modificar la colección compartida.
      *
-     * @param threadCliente El hilo {@link ThreadServidor} que representa al cliente a agregar.
+     * @param threadCliente El hilo {@link ThreadServidor} que representa al
+     * cliente a agregar.
      */
     public synchronized void agregarCliente(ThreadServidor threadCliente) {
         clientesActivos.add(threadCliente);
@@ -126,8 +139,9 @@ public class ControlServidor {
     }
 
     /**
-     * Verifica si una carta en las coordenadas dadas ya ha sido emparejada y volteada.
-     * Este método es sincronizado para manejar el acceso concurrente al conjunto de cartas emparejadas.
+     * Verifica si una carta en las coordenadas dadas ya ha sido emparejada y
+     * volteada. Este método es sincronizado para manejar el acceso concurrente
+     * al conjunto de cartas emparejadas.
      *
      * @param x La coordenada X (columna) de la carta.
      * @param y La coordenada Y (fila) de la carta.
@@ -139,11 +153,13 @@ public class ControlServidor {
     }
 
     /**
-     * Remueve un cliente de la lista de clientes activos y desregistra su nombre de usuario.
-     * Si el cliente desconectado tenía el turno activo, el juego avanza automáticamente al siguiente turno.
-     * Este método es sincronizado para asegurar la seguridad de los hilos.
+     * Remueve un cliente de la lista de clientes activos y desregistra su
+     * nombre de usuario. Si el cliente desconectado tenía el turno activo, el
+     * juego avanza automáticamente al siguiente turno. Este método es
+     * sincronizado para asegurar la seguridad de los hilos.
      *
-     * @param threadCliente El hilo {@link ThreadServidor} del cliente a remover.
+     * @param threadCliente El hilo {@link ThreadServidor} del cliente a
+     * remover.
      */
     public synchronized void removerCliente(ThreadServidor threadCliente) {
         clientesActivos.remove(threadCliente);
@@ -160,11 +176,16 @@ public class ControlServidor {
             controlPrincipal.mostrarMensajeConsolaServidor("Cliente con turno activo se desconectó, avanzando turno...");
             avanzarSiguienteTurno();
         }
+
+        if (clientesActivos.size() == 1) {
+            controlPrincipal.mostrarMensajeError("Solo queda un jugador");
+        }
     }
 
     /**
-     * Obtiene el número del turno que está activo actualmente en el juego.
-     * Este método es sincronizado para garantizar que se devuelva el valor más reciente y consistente.
+     * Obtiene el número del turno que está activo actualmente en el juego. Este
+     * método es sincronizado para garantizar que se devuelva el valor más
+     * reciente y consistente.
      *
      * @return El número entero del turno activo.
      */
@@ -173,12 +194,13 @@ public class ControlServidor {
     }
 
     /**
-     * Registra un usuario como conectado al servidor.
-     * Este método es sincronizado para evitar condiciones de carrera al modificar el conjunto de usuarios conectados.
+     * Registra un usuario como conectado al servidor. Este método es
+     * sincronizado para evitar condiciones de carrera al modificar el conjunto
+     * de usuarios conectados.
      *
      * @param usuario El nombre de usuario que se va a registrar.
-     * @return `true` si el usuario se registró exitosamente (es decir, no estaba conectado previamente),
-     * `false` si el usuario ya estaba conectado.
+     * @return `true` si el usuario se registró exitosamente (es decir, no
+     * estaba conectado previamente), `false` si el usuario ya estaba conectado.
      */
     public synchronized boolean registrarUsuarioConectado(String usuario) {
         if (usuariosConectados.contains(usuario)) {
@@ -192,8 +214,9 @@ public class ControlServidor {
     }
 
     /**
-     * Desregistra un usuario de la lista de conectados cuando se desconecta del servidor.
-     * Este método es sincronizado para manejar el acceso concurrente al conjunto de usuarios conectados.
+     * Desregistra un usuario de la lista de conectados cuando se desconecta del
+     * servidor. Este método es sincronizado para manejar el acceso concurrente
+     * al conjunto de usuarios conectados.
      *
      * @param usuario El nombre de usuario que se desconectó.
      */
@@ -207,18 +230,21 @@ public class ControlServidor {
     }
 
     /**
-     * Obtiene una copia (HashSet) de la lista de nombres de usuarios que están actualmente conectados al servidor.
-     * Este método es sincronizado para asegurar la consistencia al acceder a la colección de usuarios conectados.
+     * Obtiene una copia (HashSet) de la lista de nombres de usuarios que están
+     * actualmente conectados al servidor. Este método es sincronizado para
+     * asegurar la consistencia al acceder a la colección de usuarios
+     * conectados.
      *
-     * @return Un {@link Set<String>} que contiene los nombres de usuarios conectados.
+     * @return Un {@link Set<String>} que contiene los nombres de usuarios
+     * conectados.
      */
     public synchronized Set<String> getUsuariosConectados() {
         return new HashSet<>(usuariosConectados);
     }
 
     /**
-     * Muestra en la consola del servidor una lista de todos los usuarios actualmente conectados,
-     * incluyendo el total de usuarios.
+     * Muestra en la consola del servidor una lista de todos los usuarios
+     * actualmente conectados, incluyendo el total de usuarios.
      */
     public void mostrarUsuariosConectados() {
         controlPrincipal.mostrarMensajeConsolaServidor("=== USUARIOS CONECTADOS ===");
@@ -234,9 +260,10 @@ public class ControlServidor {
     }
 
     /**
-     * Avanza el sistema de turnos al siguiente jugador activo en el juego.
-     * Este método es sincronizado para gestionar el cambio de turno de forma segura.
-     * Si encuentra un siguiente jugador, actualiza el `turnoActivo` y notifica a todos los clientes.
+     * Avanza el sistema de turnos al siguiente jugador activo en el juego. Este
+     * método es sincronizado para gestionar el cambio de turno de forma segura.
+     * Si encuentra un siguiente jugador, actualiza el `turnoActivo` y notifica
+     * a todos los clientes.
      */
     public synchronized void avanzarSiguienteTurno() {
         int siguienteTurno = encontrarSiguienteJugadorActivo();
@@ -249,9 +276,9 @@ public class ControlServidor {
 
     /**
      * Avanza al siguiente turno específicamente para el juego de Concentrese.
-     * Después de avanzar el turno, envía un mensaje "pedirCoordenadas" al cliente cuyo turno está activo,
-     * para que este cliente pueda realizar su jugada.
-     * Este método es sincronizado para controlar el flujo de turnos.
+     * Después de avanzar el turno, envía un mensaje "pedirCoordenadas" al
+     * cliente cuyo turno está activo, para que este cliente pueda realizar su
+     * jugada. Este método es sincronizado para controlar el flujo de turnos.
      */
     public synchronized void avanzarSiguienteTurnoConcentrese() {
         // Encontrar el siguiente jugador conectado
@@ -262,29 +289,25 @@ public class ControlServidor {
             controlPrincipal.mostrarMensajeConsolaServidor("Turno de Concentrese pasa a: " + this.turnoActivo);
             notificarCambioTurno();
 
-            // Enviar "pedirCoordenadas" al cliente con el turno activo
             for (ThreadServidor cliente : clientesActivos) {
-                if (cliente.getNumeroTurno() == this.turnoActivo) {
-                    try {
-                        cliente.getServidor().getServidorInformacionSalida1().writeUTF("pedirCoordenadas");
-                        cliente.getServidor().getServidorInformacionSalida1().flush();
 
-                        System.out.println("Se estan pidiendo coordenadas desde el controlServidor, al momento de avanzar siguiente turno");
-                    } catch (Exception e) {
-                        controlPrincipal.mostrarMensajeConsolaServidor("Error al enviar pedirCoordenadas: " + e.getMessage());
-                    }
-                    break; // Una vez que se encuentra el cliente con el turno activo, no es necesario seguir buscando.
+                if (cliente.getNumeroTurno() == turnoActivo) {
+                    actualizarPanelEstadisticas(cliente);
                 }
+                break;
             }
+
         } else {
             controlPrincipal.mostrarMensajeConsolaServidor("No hay más jugadores activos");
         }
     }
 
     /**
-     * Encuentra el número de turno del siguiente jugador activo en la secuencia circular.
+     * Encuentra el número de turno del siguiente jugador activo en la secuencia
+     * circular.
      *
-     * @return El número de turno del siguiente jugador, o -1 si no hay jugadores activos.
+     * @return El número de turno del siguiente jugador, o -1 si no hay
+     * jugadores activos.
      */
     private int encontrarSiguienteJugadorActivo() {
         if (clientesActivos.isEmpty()) {
@@ -315,8 +338,9 @@ public class ControlServidor {
     }
 
     /**
-     * Notifica a todos los clientes conectados sobre el cambio de turno.
-     * Cada cliente recibe una señal para gestionar su estado de turno según la lógica del juego Concentrese.
+     * Notifica a todos los clientes conectados sobre el cambio de turno. Cada
+     * cliente recibe una señal para gestionar su estado de turno según la
+     * lógica del juego Concentrese.
      */
     private void notificarCambioTurno() {
         for (ThreadServidor cliente : clientesActivos) {
@@ -330,8 +354,9 @@ public class ControlServidor {
     }
 
     /**
-     * Muestra en la consola del servidor una lista de todos los clientes conectados,
-     * indicando su información y si tienen el turno activo o están esperando.
+     * Muestra en la consola del servidor una lista de todos los clientes
+     * conectados, indicando su información y si tienen el turno activo o están
+     * esperando.
      */
     public void mostrarClientesConectados() {
         controlPrincipal.mostrarMensajeConsolaServidor("=== CLIENTES CONECTADOS ===");
@@ -361,8 +386,8 @@ public class ControlServidor {
     }
 
     /**
-     * Fuerza el avance del turno al siguiente jugador activo.
-     * Útil para la administración manual del juego por parte del servidor.
+     * Fuerza el avance del turno al siguiente jugador activo. Útil para la
+     * administración manual del juego por parte del servidor.
      */
     public void forzarSiguienteTurno() {
         controlPrincipal.mostrarMensajeConsolaServidor("Forzando avance de turno por administrador...");
@@ -370,10 +395,11 @@ public class ControlServidor {
     }
 
     /**
-     * Establece manualmente un turno específico en el juego.
-     * Este método es sincronizado.
+     * Establece manualmente un turno específico en el juego. Este método es
+     * sincronizado.
      *
-     * @param numeroTurno El número de turno al que se desea cambiar. Debe ser mayor que 0.
+     * @param numeroTurno El número de turno al que se desea cambiar. Debe ser
+     * mayor que 0.
      */
     public synchronized void establecerTurno(int numeroTurno) {
         if (numeroTurno > 0) {
@@ -386,16 +412,17 @@ public class ControlServidor {
     }
 
     /**
-     * Verifica si dos cartas seleccionadas forman una pareja.
-     * Realiza un seguimiento del progreso del juego y registra las cartas emparejadas.
+     * Verifica si dos cartas seleccionadas forman una pareja. Realiza un
+     * seguimiento del progreso del juego y registra las cartas emparejadas.
      *
-     * @param x1     Coordenada X de la primera carta seleccionada.
-     * @param y1     Coordenada Y de la primera carta seleccionada.
+     * @param x1 Coordenada X de la primera carta seleccionada.
+     * @param y1 Coordenada Y de la primera carta seleccionada.
      * @param carta1 El tipo o valor de la primera carta.
-     * @param x2     Coordenada X de la segunda carta seleccionada.
-     * @param y2     Coordenada Y de la segunda carta seleccionada.
+     * @param x2 Coordenada X de la segunda carta seleccionada.
+     * @param y2 Coordenada Y de la segunda carta seleccionada.
      * @param carta2 El tipo o valor de la segunda carta.
-     * @return `true` si las dos cartas forman una pareja y sus coordenadas son diferentes, `false` en caso contrario.
+     * @return `true` si las dos cartas forman una pareja y sus coordenadas son
+     * diferentes, `false` en caso contrario.
      */
     public boolean verificarPareja(int x1, int y1, String carta1, int x2, int y2, String carta2) {
 
@@ -427,12 +454,13 @@ public class ControlServidor {
     }
 
     /**
-     * Método auxiliar para validar si las coordenadas de una carta están dentro del rango válido
-     * del tablero de juego.
+     * Método auxiliar para validar si las coordenadas de una carta están dentro
+     * del rango válido del tablero de juego.
      *
      * @param x La coordenada X (columna) a verificar.
      * @param y La coordenada Y (fila) a verificar.
-     * @return `true` si las coordenadas son válidas y están dentro de los límites del tablero, `false` en caso contrario.
+     * @return `true` si las coordenadas son válidas y están dentro de los
+     * límites del tablero, `false` en caso contrario.
      */
     public boolean coordenadasValidas(int x, int y) {
         // Para un tablero de 8x5 (40 cartas = 20 pares), las coordenadas válidas son de 0 a 7 para X y 0 a 4 para Y.
@@ -440,18 +468,20 @@ public class ControlServidor {
     }
 
     /**
-     * Verifica si el juego de Concentrese ha terminado, lo cual ocurre cuando todas las cartas
-     * han sido emparejadas.
+     * Verifica si el juego de Concentrese ha terminado, lo cual ocurre cuando
+     * todas las cartas han sido emparejadas.
      *
-     * @return `true` si el número de pares encontrados es igual o mayor al total de pares, indicando que el juego ha terminado.
+     * @return `true` si el número de pares encontrados es igual o mayor al
+     * total de pares, indicando que el juego ha terminado.
      */
     public boolean verificarJuegoTerminado() {
         return paresEncontrados >= totalPares;
     }
 
     /**
-     * Termina el juego de Concentrese. Declara el fin del juego, muestra los resultados finales
-     * y notifica a todos los clientes conectados que el juego ha finalizado.
+     * Termina el juego de Concentrese. Declara el fin del juego, muestra los
+     * resultados finales y notifica a todos los clientes conectados que el
+     * juego ha finalizado.
      */
     public void terminarJuego() {
         controlPrincipal.mostrarMensajeConsolaServidor("¡JUEGO TERMINADO! Todas las cartas han sido emparejadas");
@@ -484,9 +514,10 @@ public class ControlServidor {
     }
 
     /**
-     * Reinicia el estado del juego de Concentrese, reseteando el contador de pares encontrados,
-     * el turno activo y vaciando el conjunto de cartas emparejadas.
-     * Notifica a todos los clientes que el juego ha sido reiniciado.
+     * Reinicia el estado del juego de Concentrese, reseteando el contador de
+     * pares encontrados, el turno activo y vaciando el conjunto de cartas
+     * emparejadas. Notifica a todos los clientes que el juego ha sido
+     * reiniciado.
      */
     public void reiniciarJuegoConcentrese() {
         paresEncontrados = 0; // Reinicia el contador de pares.
@@ -510,10 +541,11 @@ public class ControlServidor {
     }
 
     /**
-     * Establece el número total de pares que el juego de Concentrese debe tener.
-     * Este valor se usa para determinar cuándo ha terminado el juego.
+     * Establece el número total de pares que el juego de Concentrese debe
+     * tener. Este valor se usa para determinar cuándo ha terminado el juego.
      *
-     * @param totalPares El número entero de pares de cartas que conformarán el juego.
+     * @param totalPares El número entero de pares de cartas que conformarán el
+     * juego.
      */
     public void configurarTotalPares(int totalPares) {
         if (totalPares > 0) {
@@ -523,7 +555,8 @@ public class ControlServidor {
     }
 
     /**
-     * Obtiene el número de pares de cartas que han sido encontrados hasta el momento en el juego actual.
+     * Obtiene el número de pares de cartas que han sido encontrados hasta el
+     * momento en el juego actual.
      *
      * @return El número entero de pares encontrados.
      */
@@ -541,17 +574,19 @@ public class ControlServidor {
     }
 
     /**
-     * Envía un mensaje de texto a la consola de la interfaz de usuario del servidor.
+     * Envía un mensaje de texto a la consola de la interfaz de usuario del
+     * servidor.
      *
-     * @param mensaje El {@link String} que se desea mostrar en la consola del servidor.
+     * @param mensaje El {@link String} que se desea mostrar en la consola del
+     * servidor.
      */
     public void mostrarMensajeConsolaServidor(String mensaje) {
         controlPrincipal.mostrarMensajeConsolaServidor(mensaje);
     }
 
     /**
-     * Obtiene el {@link Vector} que contiene todos los hilos de clientes activos
-     * actualmente conectados al servidor.
+     * Obtiene el {@link Vector} que contiene todos los hilos de clientes
+     * activos actualmente conectados al servidor.
      *
      * @return Un {@link Vector<ThreadServidor>} de clientes activos.
      */
@@ -560,9 +595,11 @@ public class ControlServidor {
     }
 
     /**
-     * Reemplaza la lista actual de clientes activos con un nuevo {@link Vector}.
+     * Reemplaza la lista actual de clientes activos con un nuevo
+     * {@link Vector}.
      *
-     * @param clientesActivos El nuevo {@link Vector<ThreadServidor>} de clientes activos.
+     * @param clientesActivos El nuevo {@link Vector<ThreadServidor>} de
+     * clientes activos.
      */
     public static void setClientesActivos(Vector<ThreadServidor> clientesActivos) {
         ControlServidor.clientesActivos = clientesActivos;
@@ -570,11 +607,14 @@ public class ControlServidor {
 
     /**
      * Asigna los números de puerto para las conexiones del servidor,
-     * convirtiendo las cadenas de texto a enteros y estableciéndolos en la clase {@link Servidor}.
-     * Se incluye un manejo básico de excepciones para `NumberFormatException`.
+     * convirtiendo las cadenas de texto a enteros y estableciéndolos en la
+     * clase {@link Servidor}. Se incluye un manejo básico de excepciones para
+     * `NumberFormatException`.
      *
-     * @param puerto1 La cadena de texto que representa el primer número de puerto.
-     * @param puerto2 La cadena de texto que representa el segundo número de puerto.
+     * @param puerto1 La cadena de texto que representa el primer número de
+     * puerto.
+     * @param puerto2 La cadena de texto que representa el segundo número de
+     * puerto.
      */
     public void asignarIps(String puerto1, String puerto2) {
         try {
@@ -589,25 +629,27 @@ public class ControlServidor {
     }
 
     /**
-     * Busca la existencia de un usuario y contraseña en el sistema de autenticación,
-     * delegando esta tarea al controlador principal.
+     * Busca la existencia de un usuario y contraseña en el sistema de
+     * autenticación, delegando esta tarea al controlador principal.
      *
-     * @param usuario    El nombre de usuario a buscar.
+     * @param usuario El nombre de usuario a buscar.
      * @param contrasena La contraseña asociada al usuario.
-     * @return `true` si el usuario con la contraseña dada existe y es válido, `false` en caso contrario.
+     * @return `true` si el usuario con la contraseña dada existe y es válido,
+     * `false` en caso contrario.
      */
     public boolean buscarUsuarioYContrasenaExistente(String usuario, String contrasena) {
         return controlPrincipal.buscarUsuarioYContrasenaExistente(usuario, contrasena);
     }
 
     /**
-     * Obtiene el tipo de carta (representado como un String de su valor entero) en una posición específica
-     * de la matriz de cartas del juego.
+     * Obtiene el tipo de carta (representado como un String de su valor entero)
+     * en una posición específica de la matriz de cartas del juego.
      *
      * @param x La coordenada X (columna) de la carta.
      * @param y La coordenada Y (fila) de la carta.
-     * @return El tipo de carta como {@link String}, o una cadena vacía si las coordenadas son inválidas
-     * o si ocurre algún error durante la recuperación.
+     * @return El tipo de carta como {@link String}, o una cadena vacía si las
+     * coordenadas son inválidas o si ocurre algún error durante la
+     * recuperación.
      */
     public String obtenerTipoCartaEnPosicion(int x, int y) {
         try {
@@ -626,30 +668,34 @@ public class ControlServidor {
     }
 
     /**
-     * Verifica si un usuario con el nombre dado ya se encuentra conectado al servidor.
-     * Este método es sincronizado para asegurar la consistencia al acceder a la colección de usuarios conectados.
+     * Verifica si un usuario con el nombre dado ya se encuentra conectado al
+     * servidor. Este método es sincronizado para asegurar la consistencia al
+     * acceder a la colección de usuarios conectados.
      *
      * @param usuario El nombre de usuario a verificar.
-     * @return `true` si el usuario ya está conectado, `false` en caso contrario.
+     * @return `true` si el usuario ya está conectado, `false` en caso
+     * contrario.
      */
     public synchronized boolean usuarioYaConectado(String usuario) {
         return usuariosConectados.contains(usuario);
     }
 
     /**
-     * Obtiene la información del jugador a partir de sus credenciales (nombre de usuario),
-     * delegando la operación al controlador principal.
+     * Obtiene la información del jugador a partir de sus credenciales (nombre
+     * de usuario), delegando la operación al controlador principal.
      *
      * @param usuario El nombre de usuario del jugador.
-     * @return Una cadena de texto con la información del jugador, o null si no se encuentra.
+     * @return Una cadena de texto con la información del jugador, o null si no
+     * se encuentra.
      */
     public String obtenerJugadorPorCredenciales(String usuario) {
         return controlPrincipal.obtenerJugadorPorCredenciales(usuario);
     }
 
     /**
-     * Verifica la cantidad de clientes que han iniciado sesión. Si hay dos o más clientes logeados,
-     * habilita un botón para iniciar el juego en la interfaz de usuario del servidor; de lo contrario, lo deshabilita.
+     * Verifica la cantidad de clientes que han iniciado sesión. Si hay dos o
+     * más clientes logeados, habilita un botón para iniciar el juego en la
+     * interfaz de usuario del servidor; de lo contrario, lo deshabilita.
      */
     public void verificarJugadoresMostrarBotonJugar() {
         if (cantidadClientesLogeados >= 2) {
@@ -660,7 +706,8 @@ public class ControlServidor {
     }
 
     /**
-     * Obtiene el número actual de clientes que han iniciado sesión en el servidor.
+     * Obtiene el número actual de clientes que han iniciado sesión en el
+     * servidor.
      *
      * @return El número entero de clientes logeados.
      */
@@ -678,18 +725,20 @@ public class ControlServidor {
     }
 
     /**
-     * Inicia el juego de Concentrese. Itera sobre los clientes activos, actualiza las estadísticas
-     * del panel para el cliente con el turno activo, y envía el comando "pedirCoordenadas" a todos los clientes,
-     * indicando que el juego ha comenzado y que deben esperar su turno para realizar una jugada.
+     * Inicia el juego de Concentrese. Itera sobre los clientes activos,
+     * actualiza las estadísticas del panel para el cliente con el turno activo,
+     * y envía el comando "pedirCoordenadas" a todos los clientes, indicando que
+     * el juego ha comenzado y que deben esperar su turno para realizar una
+     * jugada.
      */
     public void iniciarJuego() {
         for (ThreadServidor cliente : clientesActivos) {
             try {
-                // Actualiza las estadísticas del panel para el cliente que tiene el turno activo.
+                
                 if (cliente.getNumeroTurno() == turnoActivo) {
                     actualizarPanelEstadisticas(cliente);
                 }
-                // Envía el comando "pedirCoordenadas" a todos los clientes.
+                
                 cliente.getServidor().getServidorInformacionSalida1().writeUTF("pedirCoordenadas");
                 cliente.getServidor().getServidorInformacionSalida1().flush();
 
@@ -724,7 +773,8 @@ public class ControlServidor {
      * Actualiza el panel de estadísticas en la interfaz de usuario del servidor
      * con los datos de un cliente específico.
      *
-     * @param threadServidor El hilo {@link ThreadServidor} del cliente cuyas estadísticas se van a actualizar.
+     * @param threadServidor El hilo {@link ThreadServidor} del cliente cuyas
+     * estadísticas se van a actualizar.
      */
     public void actualizarPanelEstadisticas(ThreadServidor threadServidor) {
         int[] estadisticas = threadServidor.getEstadisticas(); // [0] = intentos, [1] = parejas, [2] = porcentaje de acierto.
@@ -735,10 +785,12 @@ public class ControlServidor {
     }
 
     /**
-     * Determina y retorna una cadena de texto con la información del ganador o ganadores del juego.
-     * El ganador se determina por el porcentaje de acierto más alto. En caso de empate, se listan todos los jugadores empatados.
+     * Determina y retorna una cadena de texto con la información del ganador o
+     * ganadores del juego. El ganador se determina por el porcentaje de acierto
+     * más alto. En caso de empate, se listan todos los jugadores empatados.
      *
-     * @return Una {@link String} que contiene los nombres de los jugadores ganadores y su porcentaje de acierto.
+     * @return Una {@link String} que contiene los nombres de los jugadores
+     * ganadores y su porcentaje de acierto.
      */
     public String enviarGanador() {
         ArrayList<ThreadServidor> ganadores = new ArrayList<>();

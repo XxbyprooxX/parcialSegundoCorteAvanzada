@@ -93,22 +93,6 @@ public class ControlCliente {
     public void mostrarMensajeChatJuego(String msg) {
         controlPrincipal.mostrarMensajeChatJuego(msg);
     }
-
-    public String getCoordenadasCartas() {
-        return controlPrincipal.getCoordenadasCartas();
-    }
-
-    public void setCoordenadasCartas(String coordenadasCartas) {
-        controlPrincipal.setCoordenadasCartas(coordenadasCartas);
-    }
-
-    public int getPasoActivoCoordenadas() {
-        return controlPrincipal.getPasoActivoCoordenadas();
-    }
-
-    public void setPasoActivoCoordenadas(int pasoActivoCoordenadas) {
-        controlPrincipal.setPasoActivoCoordenadas(pasoActivoCoordenadas);
-    }
     
     public void bloquearEntradaTextoChatJuego(){
         controlPrincipal.bloquearEntradaTextoChatJuego();
@@ -117,5 +101,17 @@ public class ControlCliente {
     public void permitirEntradaTextoChatJuego(){
         controlPrincipal.permitirEntradaTextoChatJuego();
     }
+    
+    public void enviarPosicionCartas(int x1, int y1, int x2, int y2) throws IOException{
+        threadCliente.enviarPosicionCartas(x1, y1, x2, y2);
+    }
 
+    public boolean isEsperandoPrimera() {
+        return controlPrincipal.isEsperandoPrimera();
+    }
+
+    public void setEsperandoPrimera(boolean esperandoPrimera) {
+        controlPrincipal.setEsperandoPrimera(esperandoPrimera);
+    }
+    
 }
