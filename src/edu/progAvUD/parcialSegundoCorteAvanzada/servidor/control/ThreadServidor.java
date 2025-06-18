@@ -155,7 +155,6 @@ public class ThreadServidor extends Thread {
             if (salida1 != null) {
                 salida1.writeInt(turnoActivo);
                 salida1.flush();
-                System.out.println("Se envía el turno activo desde el ThreadServidor");
             }
         } catch (IOException ex) {
             controlServidor.mostrarMensajeConsolaServidor("Error al enviar turno activo a " + servidor.getNombreUsuario() + ": " + ex.getMessage());
@@ -187,7 +186,6 @@ public class ThreadServidor extends Thread {
             if (salida1 != null) {
                 salida1.writeUTF("acerto");
                 salida1.flush();
-                System.out.println("Se envió 'acerto' desde ThreadServidor");
             }
 
             // Verificar si el juego ha terminado después del acierto
@@ -227,8 +225,7 @@ public class ThreadServidor extends Thread {
                 salida1.writeUTF("fallo," + razon);
                 salida1.flush();
             }
-
-            System.out.println("Se envió el fallo desde el método manejarFallo de ThreadServidor");
+            
             // Avanzar al siguiente turno
             controlServidor.avanzarSiguienteTurnoConcentrese();
 
@@ -395,17 +392,12 @@ public class ThreadServidor extends Thread {
             this.servidor.setServidorInformacionEntrada1(entrada);
             DataOutputStream salida1 = new DataOutputStream(this.servidor.getServidorCliente1().getOutputStream());
             this.servidor.setServidorInformacionSalida1(salida1);
-            // El segundo socket de salida puede ser para mensajes broadcast o específicos
-            DataOutputStream salida2 = new DataOutputStream(this.servidor.getServidorCliente2().getOutputStream());
-            this.servidor.setServidorInformacionSalida2(salida2);
 
             // Bucle principal para escuchar y procesar mensajes del cliente
             while (true) {
                 String mensaje = entrada.readUTF(); // Lee el mensaje del cliente
                 String[] partes = mensaje.split(","); // Divide el mensaje en partes por coma
                 String comando = partes[0]; // El primer elemento es el comando
-
-                System.out.println("Se está leyendo el mensaje enviado desde cliente " + servidor.getNombreUsuario() + ": " + mensaje);
 
                 switch (comando) {
                     case "eleccionJugador":
@@ -420,7 +412,6 @@ public class ThreadServidor extends Thread {
                             // Lee el segundo mensaje para la segunda carta seleccionada
                             mensaje = entrada.readUTF();
                             partes = mensaje.split(",");
-                            System.out.println("Se leen las segundas coordenadas enviadas por " + servidor.getNombreUsuario() + ": " + mensaje);
 
                             // Segunda carta seleccionada
                             int x2 = Integer.parseInt(partes[1]);
@@ -482,7 +473,6 @@ public class ThreadServidor extends Thread {
                             );
                             salida1.writeUTF("yaConectado"); // Notifica al cliente que ya está conectado
                             salida1.flush();
-                            System.out.println("Se envió 'yaConectado' desde el caso 'login' del ThreadServidor.");
                             break; // Sale del switch
                         }
 
@@ -496,7 +486,6 @@ public class ThreadServidor extends Thread {
                                 this.numeroTurno = asignarTurno(); // Asigna un turno único
                                 salida1.writeUTF("valido"); // Notifica al cliente que el login fue exitoso
                                 salida1.flush();
-                                System.out.println("Se envió 'valido' desde el caso 'login' del ThreadServidor.");
 
                                 controlServidor.mostrarMensajeConsolaServidor(
                                         "Login exitoso para usuario: " + usuario + " (Turno: " + this.numeroTurno + ")"
@@ -508,7 +497,6 @@ public class ThreadServidor extends Thread {
 
                                 salida1.writeInt(numeroTurno); // Envía el número de turno asignado al cliente
                                 salida1.flush();
-                                System.out.println("Se envió el turno asignado al cliente (" + numeroTurno + ") desde el login.");
                                 controlServidor.verificarJugadoresMostrarBotonJugar(); // Permite al servidor decidir si mostrar el botón de jugar
                             } else {
                                 // Esto ocurriría si hay una condición de carrera o un error lógico
@@ -517,7 +505,6 @@ public class ThreadServidor extends Thread {
                                 );
                                 salida1.writeUTF("yaConectado");
                                 salida1.flush();
-                                System.out.println("Se envió 'yaConectado' (error interno) desde el login.");
                             }
                         } else {
                             // Login fallido por credenciales incorrectas
@@ -526,21 +513,18 @@ public class ThreadServidor extends Thread {
                             );
                             salida1.writeUTF("invalido"); // Notifica al cliente que las credenciales son inválidas
                             salida1.flush();
-                            System.out.println("Se envió 'invalido' desde el login.");
                         }
                         break;
 
                     case "pedirDatosJugador":
                         // Envía las estadísticas actuales del jugador al cliente
                         salida1.writeUTF("" + estadisticas[0] + "," + estadisticas[1] + "," + estadisticas[2]);
-                        System.out.println("Se envían los datos del jugador (" + servidor.getNombreUsuario() + ").");
                         break;
 
                     case "pedirGanador":
                         // Solicita al controlador principal la información del ganador y la envía al cliente
                         String infoGanador = controlServidor.enviarGanador();
                         salida1.writeUTF(infoGanador);
-                        System.out.println("Se envía la información del ganador a " + servidor.getNombreUsuario() + ".");
                         break;
 
                     case "siguienteTurno":

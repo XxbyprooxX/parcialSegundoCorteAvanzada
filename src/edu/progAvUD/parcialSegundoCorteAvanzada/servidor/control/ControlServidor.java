@@ -496,7 +496,6 @@ public class ControlServidor {
                 cliente.getServidor().getServidorInformacionSalida1().writeUTF("juegoTerminado");
                 cliente.getServidor().getServidorInformacionSalida1().flush(); // Asegura que el mensaje se envíe inmediatamente.
 
-                System.out.println("Se envia salida en terminar turno como juegoTerminado, desde ControlServidor");
             } catch (IOException e) {
                 controlPrincipal.mostrarMensajeConsolaServidor("Error al notificar fin de juego: " + e.getMessage());
             }
@@ -531,8 +530,6 @@ public class ControlServidor {
             try {
                 cliente.getServidor().getServidorInformacionSalida1().writeUTF("juegoReiniciado");
                 cliente.getServidor().getServidorInformacionSalida1().flush();
-
-                System.out.println("Se envia salida de juegoReiniciado desde el metodo reiniciarJuegoConcentrese, desde ControlServidor");
             } catch (IOException e) {
                 controlPrincipal.mostrarMensajeConsolaServidor("Error al notificar reinicio: " + e.getMessage());
             }
@@ -743,7 +740,6 @@ public class ControlServidor {
                 cliente.getServidor().getServidorInformacionSalida1().writeUTF("pedirCoordenadas");
                 cliente.getServidor().getServidorInformacionSalida1().flush();
 
-                System.out.println("Se piden coordenadas desde el metodo iniciarJuego del controlServidor");
             } catch (IOException e) {
                 controlPrincipal.mostrarMensajeConsolaServidor("Error al notificar inicio de juego: " + e.getMessage());
             }

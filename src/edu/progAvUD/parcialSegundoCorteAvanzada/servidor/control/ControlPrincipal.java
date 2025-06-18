@@ -219,7 +219,6 @@ public class ControlPrincipal {
         }
         
         // Imprime la matriz en la consola (para depuración)
-        System.out.println("Matriz de Cartas Generada:");
         for (int i = 0; i < 5; i++) {
             for (int j = 0; j < 8; j++) {
                 System.out.print(matrizCartas[i][j] + "\t");

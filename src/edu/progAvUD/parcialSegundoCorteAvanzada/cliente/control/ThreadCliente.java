@@ -5,15 +5,15 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 
 /**
- * La clase {@code ThreadCliente} es un hilo que gestiona la comunicación
- * entre el cliente y el servidor dentro del juego. Este hilo escucha
- * constantemente mensajes enviados por el servidor y responde a ellos
- * según la lógica del juego, permitiendo interacciones como turnos, aciertos,
- * fallos, y finalización del juego.
- * 
- * También administra el envío de coordenadas del jugador hacia el servidor
- * y controla la interfaz del usuario en función del estado del turno.
- * 
+ * La clase {@code ThreadCliente} es un hilo que gestiona la comunicación entre
+ * el cliente y el servidor dentro del juego. Este hilo escucha constantemente
+ * mensajes enviados por el servidor y responde a ellos según la lógica del
+ * juego, permitiendo interacciones como turnos, aciertos, fallos, y
+ * finalización del juego.
+ *
+ * También administra el envío de coordenadas del jugador hacia el servidor y
+ * controla la interfaz del usuario en función del estado del turno.
+ *
  * Autor: Andres Felipe
  */
 public class ThreadCliente extends Thread {
@@ -38,7 +38,8 @@ public class ThreadCliente extends Thread {
      *
      * @param entrada Flujo de entrada desde el servidor.
      * @param salida Flujo de salida hacia el servidor.
-     * @param controlCliente Instancia del controlador del cliente que maneja la lógica de IU.
+     * @param controlCliente Instancia del controlador del cliente que maneja la
+     * lógica de IU.
      */
     public ThreadCliente(DataInputStream entrada, DataOutputStream salida, ControlCliente controlCliente) {
         this.entrada = entrada;
@@ -47,15 +48,14 @@ public class ThreadCliente extends Thread {
     }
 
     /**
-     * Método principal del hilo. Ejecuta la lógica de escucha continua
-     * para recibir instrucciones del servidor y responder a ellas.
+     * Método principal del hilo. Ejecuta la lógica de escucha continua para
+     * recibir instrucciones del servidor y responder a ellas.
      */
     @Override
     public void run() {
         try {
             controlCliente.mostrarMensajeChatJuego("Esperando a empezar el juego, espere que el servidor empiece el juego");
             turno = entrada.readInt();
-            System.out.println("Cliente leyendo el turno asignado desde servidor " + turno);
         } catch (IOException ex) {
             controlCliente.mostrarMensajeError("Ocurrió un error al recibir el turno inicial.");
         }
@@ -65,14 +65,11 @@ public class ThreadCliente extends Thread {
                 String opcion = entrada.readUTF();
                 String[] partesOpcion = opcion.split(",");
 
-                System.out.println("Se lee la opción que llega desde el servidor: " + opcion);
-
                 switch (partesOpcion[0]) {
 
                     case "pedirCoordenadas":
                         salida.writeUTF("consultarTurno");
                         turnoActual = entrada.readInt();
-                        System.out.println("Turno actual recibido: " + turnoActual);
                         if (turno == turnoActual) {
                             controlCliente.permitirEntradaTextoChatJuego();
                             controlCliente.mostrarMensajeChatJuego("Es tu turno. Ingresa la primera coordenada:");
@@ -83,7 +80,6 @@ public class ThreadCliente extends Thread {
                     case "acerto":
                         salida.writeUTF("consultarTurno");
                         turnoActual = entrada.readInt();
-                        System.out.println("Turno actual después del acierto: " + turnoActual);
 
                         controlCliente.mostrarMensajeChatJuego("¡Acertaste! Ingresa otras coordenadas.");
                         salida.writeUTF("pedirDatosJugador");
@@ -101,13 +97,11 @@ public class ThreadCliente extends Thread {
                         }
 
                         salida.writeUTF("siguienteTurno");
-                        System.out.println("Se envía señal para pasar al siguiente turno.");
                         break;
 
                     case "fallo":
                         salida.writeUTF("consultarTurno");
                         turnoActual = entrada.readInt();
-                        System.out.println("Turno actual después del fallo: " + turnoActual);
 
                         controlCliente.mostrarMensajeChatJuego("Fallaste porque " + partesOpcion[1]
                                 + ". Se pasa el turno al siguiente jugador.");
@@ -120,15 +114,15 @@ public class ThreadCliente extends Thread {
                                 + " | Aciertos: " + datosBB[1]
                                 + " | Eficiencia: " + datosBB[2] + "%");
 
+                        controlCliente.bloquearEntradaTextoChatJuego();
+
                         salida.writeUTF("siguienteTurno");
-                        System.out.println("Se envía señal para pasar al siguiente turno.");
                         break;
 
                     case "juegoTerminado":
                         salida.writeUTF("pedirGanador");
                         controlCliente.mostrarMensajeChatJuego(entrada.readUTF());
 
-                        System.out.println("El juego ha terminado. Ganador recibido.");
                         break;
 
                     default:
@@ -144,14 +138,15 @@ public class ThreadCliente extends Thread {
     }
 
     /**
-     * Envía al servidor las coordenadas seleccionadas por el jugador.
-     * Solo se ejecuta si es el turno actual del jugador.
+     * Envía al servidor las coordenadas seleccionadas por el jugador. Solo se
+     * ejecuta si es el turno actual del jugador.
      *
      * @param x1 Coordenada X de la primera carta.
      * @param y1 Coordenada Y de la primera carta.
      * @param x2 Coordenada X de la segunda carta.
      * @param y2 Coordenada Y de la segunda carta.
-     * @throws IOException En caso de error en la escritura de datos al servidor.
+     * @throws IOException En caso de error en la escritura de datos al
+     * servidor.
      */
     public synchronized void enviarPosicionCartas(int x1, int y1, int x2, int y2) throws IOException {
         esperarEntradaCoordenada(x1, y1);
@@ -168,6 +163,5 @@ public class ThreadCliente extends Thread {
     private void esperarEntradaCoordenada(int x, int y) throws IOException {
         String mensajeSalida = String.format("eleccionJugador,%d,%d", x, y);
         salida.writeUTF(mensajeSalida);
-        System.out.println("Se envían las coordenadas: " + mensajeSalida);
     }
 }
