@@ -125,6 +125,8 @@ public class ControlGrafico implements ActionListener {
         ventanaPrincipal.panelJuegoChat.jButtonEnviar.setEnabled(false);
         ventanaPrincipal.panelJuegoChat.jSpinnerCoordenadaX.setEnabled(false);
         ventanaPrincipal.panelJuegoChat.jSpinnerCoordenadaY.setEnabled(false);
+        ventanaPrincipal.panelJuegoChat.repaint();
+        ventanaPrincipal.panelJuegoChat.revalidate();
     }
 
     /**
@@ -134,6 +136,8 @@ public class ControlGrafico implements ActionListener {
         ventanaPrincipal.panelJuegoChat.jButtonEnviar.setEnabled(true);
         ventanaPrincipal.panelJuegoChat.jSpinnerCoordenadaX.setEnabled(true);
         ventanaPrincipal.panelJuegoChat.jSpinnerCoordenadaY.setEnabled(true);
+        ventanaPrincipal.panelJuegoChat.repaint();
+        ventanaPrincipal.panelJuegoChat.revalidate();
     }
 
     /**
@@ -161,6 +165,8 @@ public class ControlGrafico implements ActionListener {
             int y2 = y;
             ventanaPrincipal.panelJuegoChat.mostrarMensajeChatJuego(
                     "Segunda coordenada: (" + x2 + "," + y2 + ")");
+            ventanaPrincipal.panelJuegoChat.jSpinnerCoordenadaX.setValue(1);
+            ventanaPrincipal.panelJuegoChat.jSpinnerCoordenadaY.setValue(1);
             try {
                 controlPrincipal.enviarPosicionCartas(coordenadaX1, coordenadaY1, x2, y2);
                 bloquearEntradaTextoChatJuego();

@@ -149,10 +149,6 @@ public class ThreadCliente extends Thread {
      * @throws IOException En caso de error en la escritura de datos al servidor.
      */
     public synchronized void enviarPosicionCartas(int x1, int y1, int x2, int y2) throws IOException {
-        if (turnoActual != turno) {
-            controlCliente.bloquearEntradaTextoChatJuego();
-            return;
-        }
         esperarEntradaCoordenada(x1, y1);
         esperarEntradaCoordenada(x2, y2);
     }
