@@ -69,7 +69,6 @@ public class ConexionBD {
     public static void desconectar() throws SQLException {
         if (connection != null && !connection.isClosed()) {
             connection.close();
-            System.out.println("Conexión a la base de datos cerrada correctamente.");
         }
         connection = null; // Establece la referencia a null para indicar que no hay conexión activa
     }

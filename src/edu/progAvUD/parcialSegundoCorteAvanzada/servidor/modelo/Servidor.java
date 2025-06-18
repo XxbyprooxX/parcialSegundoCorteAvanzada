@@ -55,12 +55,6 @@ public class Servidor {
     private DataOutputStream servidorInformacionSalida1;
 
     /**
-     * El flujo de **salida de datos** hacia el cliente, asociado a `servidorCliente2`.
-     * Utilizado para enviar información a través del segundo socket.
-     */
-    private DataOutputStream servidorInformacionSalida2;
-
-    /**
      * El **nombre de usuario** que identifica al cliente en la aplicación.
      * Este nombre se establece típicamente después de un proceso de autenticación.
      */
@@ -147,24 +141,6 @@ public class Servidor {
      */
     public void setServidorInformacionSalida1(DataOutputStream servidorInformacionSalida1) {
         this.servidorInformacionSalida1 = servidorInformacionSalida1;
-    }
-
-    /**
-     * Obtiene el flujo de salida de datos (`DataOutputStream`) hacia el cliente,
-     * asociado al `servidorCliente2`.
-     * @return El {@link DataOutputStream} para el cliente 2.
-     */
-    public DataOutputStream getServidorInformacionSalida2() {
-        return servidorInformacionSalida2;
-    }
-
-    /**
-     * Establece el flujo de salida de datos (`DataOutputStream`) hacia el cliente,
-     * asociado al `servidorCliente2`.
-     * @param servidorInformacionSalida2 El nuevo {@link DataOutputStream} para el cliente 2.
-     */
-    public void setServidorInformacionSalida2(DataOutputStream servidorInformacionSalida2) {
-        this.servidorInformacionSalida2 = servidorInformacionSalida2;
     }
 
     /**
